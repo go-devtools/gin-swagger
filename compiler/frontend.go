@@ -18,7 +18,7 @@ const ginPackage = "github.com/gin-gonic/gin"
 // 注册静态 Gin 规则，同一个值供 CLI 与项目自定义生成器组合。
 // Provide the same frontend to the CLI and custom generation entry points.
 func Frontend() core.Frontend {
-	return core.Frontend{Name: "gin-v1.12-front-v2", Match: func(f core.Function) bool {
+	return core.Frontend{Name: "gin-v1.12-front-v3", Match: func(f core.Function) bool {
 		return f.Signature.Params().Len() == 1 && isContext(f.Signature.Params().At(0).Type())
 	}, Entry: func(f core.Function) []core.Effect {
 		source := f.Source
@@ -91,11 +91,15 @@ func analyzeCall(c core.CallContext) ([]core.Effect, error) {
 	}
 	switch name {
 	case "ShouldBindJSON", "ShouldBindBodyWithJSON":
-		payload := arg(0)
-		if ptr, ok := payload.Type.(*types.Pointer); ok {
-			payload.Type = ptr.Elem()
-		}
-		return []core.Effect{{Kind: core.RequestBody, MediaType: "application/json", Payload: payload, Source: source}}, nil
+		return bindRequest(c, "json", arg(0)), nil
+	case "ShouldBindQuery":
+		return bindRequest(c, "query", arg(0)), nil
+	case "ShouldBindUri":
+		return bindRequest(c, "uri", arg(0)), nil
+	case "ShouldBindHeader":
+		return bindRequest(c, "header", arg(0)), nil
+	case "ShouldBindWith", "ShouldBindBodyWith":
+		return explicitBinder(c, arg(1), arg(0), name == "ShouldBindBodyWith"), nil
 	case "JSON", "IndentedJSON", "AsciiJSON", "PureJSON":
 		return response("application/json", arg(1)), nil
 	case "AbortWithStatusJSON", "AbortWithStatusPureJSON":

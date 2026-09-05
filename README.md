@@ -10,7 +10,7 @@ This repository is under active implementation. The full acceptance target is re
 
 - Exactly Go 1.27.1 for minimum-version acceptance.
 - Gin v1.12.0 for minimum-version acceptance.
-- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260905175439-4dc4fa0211b7`, resolved from an actual remote commit.
+- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260905185318-8587f99f9504`, resolved from an actual remote commit.
 
 ## Architecture
 
@@ -67,3 +67,5 @@ The frontend derives text, raw data, reader, explicit standard renderer, and imm
 New project code is licensed under [MIT](LICENSE). Third-party assets retain their original licenses and notices.
 
 Project-owned source comments are bilingual (Simplified Chinese and English). Compiler directives and upstream assets retain their original form. In examples and schema fixtures, companion translations are separated from attached Go documentation by a blank line so generated descriptions keep their intended language. Commit messages use English.
+
+See the [request binding guide](docs/requests.md) for explicit JSON, Query, URI, Header, FormPost, Multipart, and centralized custom-decoder rules.

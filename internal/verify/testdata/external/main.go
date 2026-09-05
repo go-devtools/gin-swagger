@@ -36,12 +36,31 @@ func Create(c *gin.Context) {
 // Return plain text to verify independently consumed rendering rules.
 func Text(c *gin.Context) { c.String(200, "ready") }
 
+// 独立消费者的文本字节集合不是 Base64 请求参数。
+// The independent consumer's text byte collection is not a Base64 request parameter.
+type QueryInput struct {
+	// 字节编号。 Byte identifiers.
+	IDs []byte
+}
+
+// 通过真实查询绑定验证独立安装后的 codec 扩展。
+// Verify independently installed codec extensions through real query binding.
+func Search(c *gin.Context) {
+	var input QueryInput
+	if err := c.ShouldBindQuery(&input); err != nil {
+		c.JSON(400, Request{Name: "invalid"})
+		return
+	}
+	c.JSON(200, input)
+}
+
 // 保持 Gin 路由注册方式，按需在启动层挂载文档。
 // Keep ordinary Gin route registration and optionally mount documentation at startup.
 func router(mount bool) (*gin.Engine, *openapi.Document, error) {
 	r := gin.New()
 	r.POST("/users", Create)
 	r.GET("/text", Text)
+	r.GET("/search", Search)
 	if !mount {
 		return r, nil, nil
 	}

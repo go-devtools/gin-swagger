@@ -1,0 +1,40 @@
+# Request binding
+
+The frontend recognizes actual Gin methods and explicit exported binders by full package and go/types identity. It emits shared compiler effects and supplies `BindingCodec`; annotation parsing, enum handling, Schema construction, component identity, and parameter expansion remain in the core. Application DTOs and handlers need no new tags or wrappers.
+
+| Gin call | Derived request contract |
+| --- | --- |
+| `ShouldBindJSON`, `ShouldBindBodyWithJSON` | Standard JSON body projection |
+| `ShouldBindQuery` | Named query parameters using repeated-value form serialization |
+| `ShouldBindUri` | Required parameters matched by their actual URI field names |
+| `ShouldBindHeader` | Named, case-normalized scalar headers |
+| `ShouldBindWith(..., binding.JSON)` | Explicit JSON body |
+| `ShouldBindBodyWith(..., binding.JSON)` | Explicit cached JSON body |
+| `ShouldBindWith(..., binding.Query)` | Query parameters, including supported local aliases of this binder |
+| `ShouldBindWith(..., binding.Header)` | Scalar header parameters |
+| `ShouldBindWith(..., binding.FormPost)` | URL-encoded body fields without query fallback |
+| `ShouldBindWith(..., binding.FormMultipart)` | Multipart text fields and uploaded files |
+
+`BindingCodec{Mode: ...}` is public for custom generation entry points. Valid modes are `query`, `uri`, `header`, `form-post`, and `multipart`. Its field selection follows Gin rather than encoding/json: existing simple form/uri/header names are read when present; no tag is required. Exported anonymous struct children are traversed, and an anonymously embedded time.Time does not invent a bindable Time parameter. Conflicting field names are diagnosed instead of applying JSON promotion precedence.
+
+Text input pointers express absence through an optional parameter/property, not a JSON null value. Slices and fixed arrays are collections; byte slices remain byte lists rather than Base64. Named enums and field constraints from ordinary comments survive projection. A time.Time text field uses RFC3339 date-time, and time.Duration uses Go duration text. The same DTO can independently retain JSON response behavior: for example, a query byte list can produce a Base64 JSON response field.
+
+Multipart FileHeader values describe raw uploaded content with contentMediaType and no JSON string/Base64 constraint. A list of file headers becomes an array of files, not an array of Go metadata objects. Tests send real multipart bodies and separately verify actual response bytes and generated input representation.
+
+## Declarations and binding errors
+
+Declared required/minLength/enum constraints define the client contract; they do not prove that Gin or business code enforces those declarations. Tests distinguish real binder rejection from independent contract validation. The example invalid numeric, array-length, header, URI, form, and malformed JSON requests keep their actual 400 response branches after mounting documentation.
+
+The compiler does not yet infer body-level required from all binder error and continuation paths. Field-level required remains separate. Automatic ShouldBind/Bind selection, binding.Form's method/media-dependent query/body behavior, MustBind's implicit commits, and raw form/file getter effects still require their remaining conditional-effect implementation. They must not be treated as JSON defaults or claimed as complete support.
+
+## Centralized custom decoding
+
+Custom UnmarshalParam methods produce a diagnostic until an explicit TypeMapper describes their input representation. Register that mapper through `core.Options.Mappers` alongside `gincompiler.Frontend()`. TypeMapper rules run before BindingCodec's type rules. The integration test `TestCustomBindingMapper` uses real source and an actual custom decoder to prove this extension works without changing its DTO or handler.
+
+Default repeated header or URI collections cannot be mislabeled as comma-separated OpenAPI parameters. Nested named struct fields with JSON-text versus flattened fallback behavior, recursive embedded structures, dynamic map/interface inputs, and unmodeled tag options likewise retain diagnostics. Existing binding/validate tags are not repurposed as documentation metadata. XML/YAML/TOML/ProtoBuf and other distinct codecs require their own actual wire rules.
+
+## Verification
+
+The dedicated integration package compares equivalent engines before and after mounting and validates actual responses through an independent Schema engine. Parameter schemas validate decoded values; their real text serialization is exercised through HTTP requests. Multipart byte representation is checked separately from JSON instance validation. Compiler input files are checked for byte equality before and after generation.
+
+The independent-consumer fixture now includes query binding, repeated byte values, malformed numeric input, first generation, and a stripped application build. Fixed remote validation must explicitly set `GIN_SWAGGER_TEST_VERSION` or install a fixed remote CLI. Development workspace/replacement checks are recorded separately from fixed-version and cold-cache evidence in [verification.md](verification.md).
