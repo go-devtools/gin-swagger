@@ -4,7 +4,7 @@ go 1.27.1
 
 require (
 	github.com/gin-gonic/gin v1.12.0
-	github.com/openapi-golang/openapi v0.0.0-20260905220837-53be915a92d6
+	github.com/openapi-golang/openapi v0.0.0-20260905221805-0a1bf9fc1369
 )
 
 require (
