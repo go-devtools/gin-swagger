@@ -10,7 +10,7 @@
 
 - 最低版本验收使用精确 Go 1.27.1。
 - 最低版本验收使用 Gin v1.12.0。
-- 最终模块必须通过真实远端固定版本依赖 `github.com/openapi-golang/openapi`。
+- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260905135839-1c9eeff38e45`，由 Go 工具从真实远端提交解析。
 
 ## 架构
 
@@ -27,6 +27,35 @@ Go 源码与真实编解码提供结构，普通注释提供业务语义。文�
 
 Fiber 和 Echo 仅为未来扩展方向，本仓库未交付或宣称支持这些适配器。
 
+## Swagger UI 示例与分组
+
+[基础示例](examples/basic) 包含以下真实路由。资源写入仅用于演示，不持久化数据。
+
+| 方法 | 路由 | 行为 |
+| --- | --- | --- |
+| GET | `/examples/items/:id` | 读取资源；`missing` 演示 404。 |
+| POST | `/examples/items` | 创建样本并返回 201。 |
+| PUT | `/examples/items/:id` | 完整替换样本字段。 |
+| PATCH | `/examples/items/:id` | 更新非 null 字段；`false` 是明确更新。 |
+| DELETE | `/examples/items/:id` | 返回 204，不携带响应体。 |
+| GET | `/examples/legacy/items/:id` | 已弃用接口，说明中给出替代路径。 |
+
+`Config.Groups` 配置右上角 **Select a definition** 的整体文档分类。每项包含稳定的 `ID`、展示 `Name`，以及可选的 `Include(method, path)`；path 使用原始 Gin 路由语法。分类范围始终与全局 `Config.Include` 求交集，`Config.DefaultGroup` 指定默认分类。挂载前先构建全部文档，请求只读取 `/docs/groups/<ID>.json` 缓存；`/docs/openapi.json` 保留完整的已配置总览。
+
+标签用于当前文档内部的接口分组。普通 `@openapi tags=[...]` 注释设置操作标签，`OpenAPI.Tags` 设置分组描述和顺序；`UI.Filter`、`UI.DocExpansion`、`UI.TagsSorter`、`UI.OperationsSorter` 控制筛选、展开与排序。示例关闭标签筛选框，提供“All endpoints、Users and resources、Types and enums、Authentication、Legacy · Deprecated”五个分类。
+
+鉴权分类只提供 Bearer 授权接口。**Authorize** 中填写公开演示值 `demo-token`，无需添加 `Bearer` 前缀；该 token 只保护新示例路由，原 `/users` 接口不变。枚举示例提供 `admin/0`、`editor/1`、`viewer/2` 三组完整请求，Schema 中列出所有允许值。
+
+示例项目的 OpenAPI 注释、接口说明、文档分组和字段说明使用英文；枚举显示如 `"admin" - Administrator`、`"editor" - Editor`、`0 - Pending`。
+
+枚举说明直接读取类型常量的普通注释。生成的 `x-enum-descriptions` 与标准 `enum` 数组一一对应，共享 UI 显示为“值 - 含义”；没有注释时只显示原值。
+
+刷新和深链接只恢复已注册的分类，其他 URL 查询配置保持禁用。默认禁止提交 API 请求；需要时通过 `UI.SubmitMethods` 显式启用指定的小写方法。
+
 ## 许可证
 
 项目新增代码采用 [MIT](LICENSE)。第三方资源保留原许可证与声明。
+
+## 当前模块验证
+
+使用下载到模块缓存的固定核心版本，关闭 workspace 且不设置本地 replace 后，`GOWORK=off make dev`、`go test -race ./...`、`go vet ./...` 和 `go mod verify` 均通过。这证明当前实现可使用真实远端依赖；最终冷缓存、CI 和完整能力验收仍见[验证记录](docs/verification.md)。
