@@ -10,7 +10,7 @@
 
 - 最低版本验收使用精确 Go 1.27.1。
 - 最低版本验收使用 Gin v1.12.0。
-- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260905164423-8498b003aec9`，由 Go 工具从真实远端提交解析。
+- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260905175439-4dc4fa0211b7`，由 Go 工具从真实远端提交解析。
 
 ## 架构
 
@@ -53,6 +53,10 @@ Fiber 和 Echo 仅为未来扩展方向，本仓库未交付或宣称支持这�
 刷新和深链接只恢复已注册的分类，其他 URL 查询配置保持禁用。默认禁止提交 API 请求；需要时通过 `UI.SubmitMethods` 显式启用指定的小写方法。
 
 新 checkout 先运行 `GOWORK=off go mod download`，再运行 `GOWORK=off make dev`，避免首次依赖下载占用生成器默认一分钟预算。直接调用 CLI 时可通过 `--timeout=5m` 设置更长预算。
+
+## 响应渲染
+
+前端从真实 Gin 调用推导文本、原始字节、读取器、明确标准 Renderer 及立即提交状态。已支持范围与未完成边界见[响应及验收指南](docs/responses.md)。
 
 ## 许可证
 

@@ -7,7 +7,7 @@
 - 两个目标目录各自是 Git 根和独立 module；父目录未初始化 Git。
 - SSH 成功认证为 Rainer-Yu；两个 private 远端创建后均通过 ls-remote，并已非强制推送首次提交。
 - 核心首批提交：c28ea4b52b58b60732b80b65968ad6c7d6d9035e；适配器首批提交：86bcb463014574551129cf19ce5e1d6d0f57250f。
-- 当前本地还有未提交实现增量，因此上述 SHA 不代表最终交付版本。
+- 本节记录首次实现阶段，当时还有未提交增量；上述 SHA 不代表后续版本或最终交付。
 
 ## 已执行的产品检查
 
@@ -58,7 +58,7 @@
 
 `TestNoFrameworkDependencies`、`TestRuntimeDependencyBoundary`、`TestExternalFrontend` 真实通过：外部临时 module 仅调用公开 SDK、执行编译/构建/契约/非 HTTP 资源消费。开发模式的临时 replace 明确记录，不作为远端固定版本证据；最终可通过 OPENAPI_TEST_CORE_VERSION 指定真实版本且禁止 replace。
 
-## 尚未执行完毕
+## 早期阶段的待验收项
 
 完整 race/vet/fuzz/benchmark、自动化浏览器跨环境回归、完整 3.2 语义矩阵、远端外部 SDK 模块、GitHub CI 和最终冷缓存远端固定版本验收尚未完成。未执行或受阻项目不记为通过。
 
@@ -138,3 +138,19 @@ Adapter make dev, go test -race ./..., go vet ./..., and go mod verify all exite
 A new external consumer directory used this exact remote core version without replace. Its three public SDK tests, including eight concurrent read-only standalone exports, passed with go test -race -count=1 -v. The core CLI was installed from this fixed remote version; its version command reported the expected version and Go 1.27.1. It exported a request schema from the external consumer's real Go source. A separate contracttest validation accepted a valid request and rejected a name below the declared minimum length. No core internal package was imported.
 
 These tests use the existing task cache. They establish the stated SDK, CLI, and adapter dependency behavior, not a new cold-cache run or full-goal completion. Earlier cold-cache records remain tied to their recorded commits. All reachable commit messages in both repositories were rechecked as English; project-owned source comments retain both languages.
+
+## Response rendering and dedicated acceptance packages
+
+Core commit `4dc4fa0211b745142b78efa35e5a31faf443d62b` was pushed as a normal fast-forward English commit. Go resolved `v0.0.0-20260905175439-4dc4fa0211b7`, now pinned in go.mod and go.sum without replace. All checks below use Go 1.27.1, Gin v1.12.0, and GOWORK=off.
+
+The Gin frontend now derives text, raw bytes, readers, eight standard explicit renderer types, immediate abort commits, and response headers through public core effects. Twenty actual status/header/body samples pass against equivalent Gin engines with and without documentation mounting. JSON and text are checked by the independent contract engine; binary bytes and their contentMediaType representation are checked separately. Two additional 204/304 reader cases first exposed incorrectly declared Content-Length and extra headers; both now pass after matching Gin's skipped Renderer.Render behavior. A preserved-status reader call remains a diagnostic pending its conditional header model.
+
+Negative cases reject unknown renderers, unrecognized Writer methods, and repeated complete body writes. A real httptest HTTP server demonstrated that a 103 followed by nominal 201 can arrive as final status 200 with Gin's writer; until that sequence has a complete model, generation explicitly diagnoses it instead of claiming an incorrect final 103. All fixtures remain unchanged by compilation.
+
+Dedicated internal/verify tests pass for runtime dependency isolation and an independent consumer. The consumer starts without generated files, uses the real CLI to generate/check/regenerate deterministically, preserves its business source, runs actual HTTP contract tests, builds with `-trimpath -ldflags='-s -w'`, exports the runtime-linked document, and passes both core and CLI specification checks. This development invocation replaces only the adapter; it consumes the pinned remote core. The child consumer test does not enable race itself; the outer module's race result is recorded separately.
+
+Final adapter make dev, go test -race ./..., go vet ./..., and go mod verify exit zero. Example generation and freshness checking agree on 11 templates and fingerprint `52dd00dac73cf08b0db48b35d1e3c87b53f41610cd3b9db7cb3e7a5404b07374`. A rebuilt example exports native OpenAPI 3.2.0 with 152 English explanation strings and only BearerAuth; all 13 original business and routing function bodies match their AST baseline. The preview process was not restarted.
+
+A new independent consumer uses the exact remote core version above without replace. Four public SDK tests pass with race: public frontend, neutral resources, standalone schema, and explicit wire responses with header provenance and immutable shared input. The core CLI is installed from that fixed remote version and reports it with Go 1.27.1. Its schema command generates an actual request schema from consumer source; independent instance validation accepts the valid request and rejects a short name, also with race enabled.
+
+The bilingual audit covers 1545 natural-language Go comment lines with no missing counterparts or unreviewed translations, plus 56 UI and Makefile comment lines. Original compiler directives and third-party assets retain their syntax and notices. Historical message rewriting is already complete; this stage uses ordinary fast-forward English commits. The earlier statements about missing integration/verify packages are historical and are superseded by this section. The remaining complete framework/schema matrices, CI, and final cold-cache acceptance are still outstanding. These checks reuse the task cache and do not constitute full-goal completion.

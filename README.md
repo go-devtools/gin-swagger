@@ -10,7 +10,7 @@ This repository is under active implementation. The full acceptance target is re
 
 - Exactly Go 1.27.1 for minimum-version acceptance.
 - Gin v1.12.0 for minimum-version acceptance.
-- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260905164423-8498b003aec9`, resolved from an actual remote commit.
+- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260905175439-4dc4fa0211b7`, resolved from an actual remote commit.
 
 ## Architecture
 
@@ -57,6 +57,10 @@ The UI preserves a selected registered definition across refreshes and deep link
 `GOWORK=off make dev`, `go test -race ./...`, `go vet ./...`, and `go mod verify` pass with the pinned core downloaded into the module cache and no local `replace`. This verifies the current implementation against a real remote version; final cold-cache, CI, and full capability acceptance remain tracked in [verification](docs/verification.md).
 
 For a new checkout, run `GOWORK=off go mod download` before `GOWORK=off make dev`. This keeps initial dependency downloads outside the generator's default one-minute budget. Direct CLI calls may select a longer budget with `--timeout=5m`.
+
+## Response rendering
+
+The frontend derives text, raw data, reader, explicit standard renderer, and immediate-status behavior from actual Gin calls. See the [response and verification guide](docs/responses.md) for supported cases and remaining boundaries.
 
 ## License
 
