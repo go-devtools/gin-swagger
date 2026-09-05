@@ -25,7 +25,7 @@ Multipart FileHeader values describe raw uploaded content with contentMediaType 
 
 Declared required/minLength/enum constraints define the client contract; they do not prove that Gin or business code enforces those declarations. Tests distinguish real binder rejection from independent contract validation. The example invalid numeric, array-length, header, URI, form, and malformed JSON requests keep their actual 400 response branches after mounting documentation.
 
-The compiler does not yet infer body-level required from all binder error and continuation paths. Field-level required remains separate. Automatic ShouldBind/Bind selection, binding.Form's method/media-dependent query/body behavior, MustBind's implicit commits, and raw form/file getter effects still require their remaining conditional-effect implementation. They must not be treated as JSON defaults or claimed as complete support.
+The compiler does not yet infer body-level required from all binder error and continuation paths. Field-level required remains separate. Automatic ShouldBind/Bind selection, binding.Form's method/media-dependent query/body behavior and raw form/file getter effects still require their remaining conditional-effect implementation. They must not be treated as JSON defaults or claimed as complete support.
 
 ## Centralized custom decoding
 
@@ -38,3 +38,13 @@ Default repeated header or URI collections cannot be mislabeled as comma-separat
 The dedicated integration package compares equivalent engines before and after mounting and validates actual responses through an independent Schema engine. Parameter schemas validate decoded values; their real text serialization is exercised through HTTP requests. Multipart byte representation is checked separately from JSON instance validation. Compiler input files are checked for byte equality before and after generation.
 
 The independent-consumer fixture now includes query binding, repeated byte values, malformed numeric input, first generation, and a stripped application build. Fixed remote validation must explicitly set `GIN_SWAGGER_TEST_VERSION` or install a fixed remote CLI. Development workspace/replacement checks are recorded separately from fixed-version and cold-cache evidence in [verification.md](verification.md).
+
+## Mandatory binding and committed errors
+
+`BindJSON`, `BindQuery`, `BindHeader`, `BindUri`, and supported `MustBindWith` binders now use the core's public CallOutcomes API. Successful and failed calls return distinct nil/non-nil alternatives. The adapter emits Gin-specific commits; the core owns subsequent Go control flow. The corresponding explicit `ShouldBind` methods also expose correlated error results without implicit response commits.
+
+For the fixed Gin v1.12.0 standard JSON profile, ordinary mandatory-binding errors commit 400 and a propagated http.MaxBytesError commits 413. Body binders can encounter a request-body limit; custom text decoders can also return that error type. BindUri itself always commits 400 on failure. These are possible failure paths, not a requirement for the adapter to install a body limit or change existing middleware.
+
+Abort does not return from the current handler. Ignoring the binding error and writing JSON afterward keeps the committed error status. Trying to write 422 on the error branch cannot override 400 or 413. Returning immediately leaves the failure response bodyless. Integration tests issue real valid, malformed, and explicitly size-limited requests and compare status, headers, and body before and after mounting. They independently validate emitted JSON bodies and assert the absence of invented status branches.
+
+The implementation does not generalize the default codec's MaxBytesError behavior to unverified sonic/go-json build profiles. Automatic Bind/ShouldBind method/media selection remains a separate conditional-fact requirement; it is not treated as implicit JSON support.

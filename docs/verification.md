@@ -170,3 +170,17 @@ The basic example generates 11 templates with fingerprint `a4f46199a03430112ca57
 A new external core consumer uses the exact remote version above without replacement. Five public SDK tests, including the new non-framework parameter codec, pass under race. The CLI is installed from this fixed version and successfully exports an actual request Schema; independent valid/invalid instance checks pass under race as well. No framework or core internal import is needed for the new SDK boundary.
 
 Automatic method/media binding conditions, implicit Bind commits, mixed raw/decoded parameter semantics, complete tag options, all schema/type/provenance matrices, CI, and final cold-cache acceptance remain outstanding. This stage uses existing task caches and is not full-goal completion.
+
+## Correlated mandatory-binding outcomes
+
+The adapter pins the real remote core `v0.0.0-20260905193137-a978fefd3c30` and uses frontend `gin-v1.12-front-v4`. Exact Go 1.27.1 and Gin v1.12.0 remain fixed. The core exposes neutral CallOutcomes; Gin-specific binder identities, 400/413 error commits, and codecs remain in this adapter.
+
+The new integration matrix initially failed on all seven mandatory-binder handlers. Its 18 actual HTTP cases now pass: valid and malformed requests for BindJSON, BindQuery, BindHeader, BindUri, and an aliased explicit JSON MustBindWith; body binders additionally receive a real MaxBytesReader limit. Assertions compare status, headers, and body before and after mounting, independently validate JSON bodies, and reject invented statuses. Tests distinguish immediate error return, ignored errors followed by JSON, and attempts to overwrite a committed error status with 422. A separate external consumer fixture verifies generated mandatory-binding contracts, including 413.
+
+After publishing and pinning the core, GOWORK=off make dev, full go test -race ./..., go vet ./..., go mod verify, generated-bundle freshness checking, and example rebuilding all pass. The first development-workspace dev attempt failed in internal/verify because that package intentionally disabled workspace and still resolved the previous fixed core without the new API; pinning the synchronized core resolved that failure. No local core replace was added. The verification harness's ordinary child go test does not automatically inherit its parent's race flag.
+
+A new independent core consumer resolves the exact remote version above with no replace. Seven public SDK tests, including call outcomes and control-flow cases, pass with race enabled inside the consumer. A CLI installed from that version reports the expected module and Go version, exports a real request schema, and passes independent valid/invalid instance tests with race.
+
+The basic example has 11 templates and freshness fingerprint `a1900a4451a682ae18c59a744851063a8a4e92243d1ffee9c4e5ed64777354f3`. Its original 13 business and routing function bodies remain AST-identical. A fresh runtime export is OpenAPI 3.2.0, retains English descriptions, and contains only BearerAuth. Source comment auditing finds no missing bilingual counterpart across 1769 natural-language Go comment lines. Existing UI assets were not changed.
+
+This is stage acceptance using existing task caches. Automatic Bind/ShouldBind method/media conditions, the complete helper and schema matrices, CI, and final independent cold-cache acceptance remain part of the active full goal.

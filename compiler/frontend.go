@@ -18,13 +18,13 @@ const ginPackage = "github.com/gin-gonic/gin"
 // 注册静态 Gin 规则，同一个值供 CLI 与项目自定义生成器组合。
 // Provide the same frontend to the CLI and custom generation entry points.
 func Frontend() core.Frontend {
-	return core.Frontend{Name: "gin-v1.12-front-v3", Match: func(f core.Function) bool {
+	return core.Frontend{Name: "gin-v1.12-front-v4", Match: func(f core.Function) bool {
 		return f.Signature.Params().Len() == 1 && isContext(f.Signature.Params().At(0).Type())
 	}, Entry: func(f core.Function) []core.Effect {
 		source := f.Source
 		source.Kind, source.Rule = "derived", "gin.default.status"
 		return []core.Effect{{Kind: core.ResponseStatus, Status: "200", Source: source}}
-	}, Call: analyzeCall, CarriesEffects: carriesResponseEffects}
+	}, Call: analyzeCall, CallOutcomes: bindingOutcomes, CarriesEffects: carriesResponseEffects}
 }
 
 // 使用完整类型身份识别 Gin Context，不访问框架私有状态。
@@ -132,8 +132,6 @@ func analyzeCall(c core.CallContext) ([]core.Effect, error) {
 		return []core.Effect{{Kind: core.ParameterRead, Name: literal(arg(0)), In: location, Payload: core.Value{Type: typ}, Source: source}}, nil
 	case "ShouldBind", "Bind":
 		return unresolved(c, "自动绑定器依赖实际请求方法和媒体类型，需要条件事实"), nil
-	case "BindJSON", "BindQuery", "BindUri", "BindHeader", "MustBindWith":
-		return unresolved(c, "强制绑定器隐含错误写入，需要路径相关的提交规则"), nil
 	case "AbortWithStatus", "AbortWithError":
 		if interimStatus(integer(arg(0))) {
 			return unresolved(c, "临时状态的最终提交需要明确序列规则"), nil
