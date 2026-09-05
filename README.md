@@ -75,3 +75,5 @@ The request-binding guide also covers mandatory Bind calls, correlated error res
 Build target settings, dependency source, overlays, and declared custom mapping configuration participate in generation freshness. Compile calls with TypeMapper functions must provide named JSON inputs through Options.Configuration; configuration values are represented by digests in the Bundle.
 
 Gin `Build` and `Mount` verify the executable build conditions against the generated Bundle. Known mismatches fail before mounting documentation routes; missing build metadata is retained as warnings in `Document.Report()`. This does not replace source freshness checks in CI.
+
+Raw PostForm, array/dictionary getters, FormFile, and SaveUploadedFile now preserve their body/query locations, encodings, and business error branches. See the [request guide](docs/requests.md) for tested behavior and remaining boundaries.

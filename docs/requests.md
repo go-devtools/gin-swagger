@@ -25,7 +25,7 @@ Multipart FileHeader values describe raw uploaded content with contentMediaType 
 
 Declared required/minLength/enum constraints define the client contract; they do not prove that Gin or business code enforces those declarations. Tests distinguish real binder rejection from independent contract validation. The example invalid numeric, array-length, header, URI, form, and malformed JSON requests keep their actual 400 response branches after mounting documentation.
 
-The compiler does not yet infer body-level required from all binder error and continuation paths. Field-level required remains separate. Raw form/file getter effects and the complete decoder/tag matrix still require additional implementation. Automatic selection and binding.Form now use the finite conditions described below.
+The compiler does not yet infer body-level required from all binder error and continuation paths. Field-level required remains separate. Raw form/file getters are covered below; the complete decoder/tag matrix still requires additional implementation. Automatic selection and binding.Form now use the finite conditions described below.
 
 ## Centralized custom decoding
 
@@ -88,3 +88,15 @@ The real-request matrix covers 17 successful cases across GET, POST, PUT, PATCH,
 When passing Mappers to core.Options, also pass stable, named JSON settings in Configuration. These settings identify captured configuration that cannot be reconstructed from callback addresses. The integration example declares `{"version":1,"minLength":2}` for its custom-parameter rule; no DTO or handler changes are needed. The core includes the settings in freshness checks and serializes only their digest, not their original values. Update the declaration when mapping or external codec configuration changes.
 
 The core's build-input profile records the actual Go target, CGO/experiment/architecture selectors, selected module and local workspace inputs, overlay snapshots, embedded and inactive source, and build-parameter digests. GoFlag values are not exposed in the generated Bundle. The generator uses read-only module mode and rejects executable packages drivers or tool wrappers; provide source overlays through the public LoadOptions.Overlay API.
+
+## Raw getters and file saving
+
+PostForm, DefaultPostForm, GetPostForm, PostFormArray/GetPostFormArray, and PostFormMap/GetPostFormMap now emit body-field effects. URL-encoded bodies are read for POST/PUT/PATCH; multipart text fields are read for all methods. These getters read PostForm rather than the combined Form map, so query parameters do not become fallback body values. Supported media can be derived directly for these explicit getters; no additional media setting is required.
+
+Repeated values use array schemas and form/explode encoding. Bracket dictionaries use deepObject for URL-encoded/multipart body fields and QueryMap/GetQueryMap parameters; only string-valued dictionaries are modeled, without claiming arbitrary nested-object syntax. QueryArray/GetQueryArray retain repeated-value serialization. Explicit wire schemas prevent JSON null or Base64 conventions from leaking into text inputs. A constant DefaultQuery/DefaultPostForm fallback becomes a documentation default without changing the handler or making the field mandatory.
+
+FormFile describes generic raw upload content rather than FileHeader metadata or Base64 JSON. It returns the first matching file; nil/non-nil file and error results remain correlated with business branches. It does not implicitly commit 400 or 413. SaveUploadedFile is modeled as filesystem work returning success/error, with HTTP responses derived only from subsequent business code. GetString reads application context without inventing a request parameter. Known nil file pointers and dynamic getter field names remain diagnostics, scoped to selected routes.
+
+Ten real form cases cover five HTTP methods and two media types, including empty strings, defaults, repeated values, and query isolation. Further tests cover repeated/missing query values, both dictionary encodings, binary uploads and missing files, and saving bytes before and after documentation mounting. Saving failures use an occupied regular-file parent, since Gin intentionally creates missing parent directories. Tests verify that compilation and mounting do not write uploaded files. Independent validators check decoded inputs and actual responses; wire behavior is checked through real HTTP requests.
+
+Core composition preserves multiple fields and whole-body constraints, while field required stays separate from body required. Full inference of empty-body rejection from arbitrary error paths, arbitrary MultipartForm map access, all file I/O helpers, all decoder/tag variants, and complete browser Try it out coverage remain work in progress. Read the [OpenAPI 3.2 encoding rules](https://spec.openapis.org/oas/v3.2.0.html#encoding-object) when adding custom serialization.

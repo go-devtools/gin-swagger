@@ -18,13 +18,13 @@ const ginPackage = "github.com/gin-gonic/gin"
 // 注册静态 Gin 规则，同一个值供 CLI 与项目自定义生成器组合。
 // Provide the same frontend to the CLI and custom generation entry points.
 func Frontend() core.Frontend {
-	return core.Frontend{Name: "gin-v1.12-front-v5", Match: func(f core.Function) bool {
+	return core.Frontend{Name: "gin-v1.12-front-v6", Match: func(f core.Function) bool {
 		return f.Signature.Params().Len() == 1 && isContext(f.Signature.Params().At(0).Type())
 	}, Entry: func(f core.Function) []core.Effect {
 		source := f.Source
 		source.Kind, source.Rule = "derived", "gin.default.status"
 		return []core.Effect{{Kind: core.ResponseStatus, Status: "200", Source: source}}
-	}, Call: analyzeCall, CallOutcomes: bindingOutcomes, CarriesEffects: carriesResponseEffects}
+	}, Call: analyzeCall, CallOutcomes: requestOutcomes, CarriesEffects: carriesResponseEffects}
 }
 
 // 使用完整类型身份识别 Gin Context，不访问框架私有状态。
@@ -111,25 +111,6 @@ func analyzeCall(c core.CallContext) ([]core.Effect, error) {
 		return []core.Effect{{Kind: core.ResponseStatus, Status: integer(arg(0)), Source: source}}, nil
 	case "Abort":
 		return []core.Effect{{Kind: core.Abort, Source: source}}, nil
-	case "Param", "Query", "GetQuery", "DefaultQuery", "QueryArray", "GetHeader", "Cookie", "PostForm", "DefaultPostForm", "GetPostForm", "PostFormArray":
-		location := "query"
-		if name == "Param" {
-			location = "path"
-		}
-		if name == "GetHeader" {
-			location = "header"
-		}
-		if name == "Cookie" {
-			location = "cookie"
-		}
-		if name == "PostForm" || name == "DefaultPostForm" || name == "GetPostForm" || name == "PostFormArray" {
-			return unresolved(c, "表单字段需要 requestBody 表单投影"), nil
-		}
-		typ := types.Type(types.Typ[types.String])
-		if name == "QueryArray" {
-			typ = types.NewSlice(typ)
-		}
-		return []core.Effect{{Kind: core.ParameterRead, Name: literal(arg(0)), In: location, Payload: core.Value{Type: typ}, Source: source}}, nil
 	case "ShouldBind", "Bind":
 		return unresolved(c, "自动绑定器依赖实际请求方法和媒体类型，需要条件事实"), nil
 	case "AbortWithStatus", "AbortWithError":
