@@ -322,7 +322,7 @@ func TestCustomBindingMapper(t *testing.T) {
 		schema.MinLength = spec.Set(uint64(2))
 		return schema, true, nil
 	}
-	result, err := core.Compile(context.Background(), core.Options{Load: core.LoadOptions{Dir: "testdata/requests"}, Frontends: []core.Frontend{front.Frontend()}, Mappers: []core.TypeMapper{mapper}})
+	result, err := core.Compile(context.Background(), core.Options{Load: core.LoadOptions{Dir: "testdata/requests"}, Frontends: []core.Frontend{front.Frontend()}, Mappers: []core.TypeMapper{mapper}, Configuration: map[string]json.RawMessage{"custom-parameter": json.RawMessage(`{"version":1,"minLength":2}`)}})
 	if err != nil {
 		t.Fatal(err)
 	}

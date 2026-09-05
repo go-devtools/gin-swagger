@@ -1,25 +1,27 @@
 # 当前状态
 
-总体目标尚未完成验收。两个独立 Git 仓库及 Go module 均使用 main 主分支，远端保持 private。GitHub 描述和 README.md 使用英文，配套 README.zh-cn.md；自有代码采用 MIT，上游资源保留原许可证与通知。
+完整 Goal 仍未完成最终验收。两个独立 Git 仓库及 Go module 均使用 main，远端保持 private。GitHub 描述和 README.md 为英文，README.zh-cn.md 提供中文版本；自有代码采用 MIT。Go 固定 1.27.1，Gin 固定 v1.12.0，核心依赖为真实远端 `v0.0.0-20260905213234-136c21287694`，没有本地 replace。
 
-自有代码注释已同时提供简体中文和英文，包括 UI 扩展、构建脚本、静态契约生成文件及临时引导文件。最新 AST 清单核对两仓库的 1889 行自然语言 Go 注释，没有缺少对应翻译；56 行 UI 和 Makefile 注释也保持双语。实际导出的 152 处示例 OpenAPI 说明仍为英文，13 个业务及路由函数体与原始 AST 一致。历史中文提交说明已按用户明确要求改为对应英文，改写前验证了完整 Git bundle 备份，逐条保留代码树、作者和时间，并使用精确远端版本保护推送。
+## 已实现与验证
 
-零 tag 源码生成 Bundle、Gin 启动层挂载、五种 HTTP 方法、Deprecated、Bearer 授权、枚举说明、完整字段示例及五份文档分类已有实现和实际测试。共享离线 Swagger UI 使用业务类型名称展示 Schema，内部引用身份仍可区分；标签筛选框按要求关闭。
+从零 tag 业务源码生成 Bundle，在启动层通过 Build/Mount 读取真实 Gin 路由并链接共享核心。运行时不导入编译器，不读取业务源码，不将文档采集逻辑插入业务请求。适配器只使用核心公开 SDK，Gin 规则保留在本仓库。
 
-核心依赖固定为真实远端版本 v0.0.0-20260905203249-f0f660a9475e，Gin 固定 v1.12.0。核心包括独立 Schema 资源作用域导出、显式依赖嵌入、方言与预算，以及响应头提交快照和明确的网络表示 Schema。新的外部 module 对该远端核心版本运行九项公开 SDK race 测试和实际远端安装 CLI 的导出及实例校验，均通过且无 replace。
+示例具有 GET/POST/PUT/PATCH/DELETE、Deprecated、Bearer 授权、带含义的枚举、字段类型及五份整体分类。共享离线 Swagger UI 使用业务名称显示模型，保留内部引用身份；标签筛选关闭。示例 OpenAPI 展示为英文，自有代码注释为中英双语。最近核验的 13 个业务与路由函数体保持原始 AST，导出包含 152 处英文说明，且仅有 BearerAuth。
 
-Gin 的文本、原始字节、读取器、标准显式 Renderer、状态提交与响应头规则已通过 20 组真实响应检查；204/304 Reader 的附加头另有两组回归。未知 Renderer、连续完整 body 写入、直接 Writer 调用、尚未建模的临时响应和保留状态的 Reader 序列明确诊断。Gin 专有规则只在适配器中，通用控制流仍通过公开核心 SDK。
+显式 JSON/Query/URI/Header/FormPost/Multipart、已支持的 ShouldBindWith/MustBindWith、强制绑定错误提交，以及自动 ShouldBind/Bind 与显式 Form 已有真实请求测试。有限方法/媒体条件、query/body 优先顺序与诊断隔离通过公开核心支持；DefaultRequestMediaTypes 和 RequestMediaTypes 只集中解析文档条件，不改变实际请求处理。17 组成功自动绑定请求、八组错误路径和独立消费者的六组请求分别验证。
 
-专用 internal/integration 和 internal/verify 包现已实现并运行。独立消费者验证首次生成、重复生成确定性、新鲜度检查、真实请求契约、裁剪符号构建与运行时文档导出。开发测试临时 replace 仅指向当前适配器；核心始终使用真实远端固定版本。设置 GIN_SWAGGER_TEST_VERSION 可切换为远端适配器版本并禁止替换。当前构建的 CLI 与远端安装的 CLI 分别记录，不能混称。
+文本、原始字节、读取器、明确标准 Renderer、状态提交和响应头已有真实响应矩阵。未知 renderer、未建模的临时响应/文件行为、歧义和不能准确表达的输入关系应明确失败，不靠猜测填补契约。支持范围见[请求](requests.md)和[响应](responses.md)指南。
 
-关闭 workspace 的 make dev、完整 race、vet、模块校验与示例生成新鲜度检查均通过。本阶段使用已有任务缓存。此前独立空缓存验证的版本及首次下载超时记录保留在 verification.md，不能当作当前版本的冷缓存验收。冷环境应先运行 go mod download，避免首次下载占用生成器默认一分钟预算。
+核心最新构建输入清单记录真实加载目标、模块/工作区源码、overlay、构建条件和配置摘要。集中 TypeMapper 编译调用现在显式声明 Configuration。固定新远端核心后，关闭 workspace 的 dev、全量 race、vet、模块校验、生成新鲜度和示例构建均通过。独立核心消费者的 23 项公开 SDK race 测试及实际安装 CLI 的 Schema 导出验证通过。
 
-这不代表完整交付。全部 binder/render 与运行时身份矩阵、自定义方言与完整 Schema 组合矩阵、注释及编解码边界、专用验收包的完整矩阵、GitHub CI、完整文档和最终版本冷缓存复验仍需完成。未来 Fiber/Echo 仅作为经过测试的公开扩展方向，不新增产品仓库。
+内部 integration/verify 包验证实际源码生成、首次无 apidoc、重复生成、真实 HTTP 与独立契约、符号裁剪构建和运行时导出。开发消费者临时替换当前适配器时，核心仍固定真实远端；实际安装远端 CLI 的证据独立记录，不能混称。当前阶段复用已有任务缓存。
 
-显式请求绑定已扩展到 Query、URI、Header、JSON、FormPost、Multipart 以及可传播别名的 ShouldBindWith。普通文本字段与 multipart 的类型规则由公开 BindingCodec 提供；核心复用注释、枚举、组件及参数展开。真实正例、错误分支、嵌入字段与集中自定义 UnmarshalParam mapper 已通过；同一 DTO 的文本输入与 JSON 输出分别验证。新增独立消费者包括查询字节数组及错误输入，关闭 workspace 的 dev/race/vet/模块校验通过。完整表单读取和编解码矩阵仍未完成，不能将本阶段称为全部请求绑定支持。
+## 语言与历史
 
-强制 BindJSON、BindQuery、BindHeader、BindUri 和已支持的 MustBindWith 现已通过公开 CallOutcomes 关联返回值与隐含提交。18 组真实请求涵盖成功、无效输入及请求体上限；立即返回、忽略错误和试图覆盖状态的行为与挂载前一致。独立消费者新增强制绑定契约用例。核心已固定到真实远端 a978fefd3c30，关闭 workspace 的 dev 已通过；完整目标仍未完成。
+自有代码和生成器注释同时使用简体中文与英文；最新审计覆盖 1987 行自然语言 Go 注释，无缺少对应翻译。第三方资源、许可证与编译指令保留原文。已授权的历史提交说明翻译保留代码树、作者、提交者和时间；之后使用普通快进英文提交。
 
-有限请求条件阶段已贯通自动 ShouldBind/Bind 和显式 Form，前端版本为 gin-v1.12-front-v5。配置通过 DefaultRequestMediaTypes 和按原始 METHOD /Gin/path 的 RequestMediaTypes 集中声明，仅用于选择文档契约。17 组成功请求和八组错误路径验证真实 Gin 的方法/媒体选择、重复值优先顺序及 400/413/422。条件诊断不污染其他媒体，跨位置 required 无法准确表达时明确失败。
+## 未完成范围
 
-本阶段固定核心 f0f660a9475e，在关闭 workspace 后通过 dev、全量 race、vet、模块校验和生成新鲜度检查；新建核心消费者的九项公开 SDK race 测试及固定远端 CLI Schema 导出与实例校验通过。Gin 独立消费者新增六组自动绑定真实请求，开发验收已通过；本次适配器发布后的实际远端 CLI 验证单独留存。13 个原有业务和路由函数体仍与原始 AST 一致，最新导出的 152 处说明均为英文。完整 Goal 和最终冷缓存验收保持未完成。
+完整 tag/codec/Schema、helper/闭包/receiver、身份与来源矩阵；raw form/file、完整流式与文件响应；运行时构建条件不匹配诊断与全部构建组合；原生 OpenAPI 3.2 完整正反例；UI 外部资源及完整浏览器黑盒链路；GitHub CI、路由基准、完整文档和最终单仓库源码的双模块冷缓存验收。
+
+未来 Fiber/Echo 仅为公开扩展方向，不新增这些产品仓库。各阶段精确版本、失败原因及验证结果见[验证记录](verification.md)。

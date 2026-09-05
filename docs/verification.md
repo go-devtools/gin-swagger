@@ -198,3 +198,15 @@ A newly created independent core consumer uses the exact remote version without 
 The regenerated basic example contains 11 templates with fingerprint `90a4225eb6abf165ecaba26868018f67c5b4988599e44a885187f15996fb21cd`. Its 13 original business and routing function bodies remain AST-identical. The fresh runtime export is OpenAPI 3.2.0 with 152 English descriptions and enum labels, and only BearerAuth. Auditing both repositories finds no missing bilingual counterpart across 1889 natural-language Go comment lines, all top-level declarations are documented, and 56 existing UI/Makefile comment lines retain both languages. The historical commit-message mappings were checked again: trees, authors, committers, and timestamps remain unchanged.
 
 This is stage evidence using existing task caches. Raw form/file getters, complete tag/codec/helper matrices, build fingerprints, complete OpenAPI 3.2 and UI acceptance, CI, benchmarks, and final source-only independent cold-cache acceptance remain part of the active full goal.
+
+## Effective build inputs and configuration freshness
+
+The adapter pins the actual remote core `v0.0.0-20260905213234-136c21287694`. The core fingerprints actual target/build selectors, module and workspace inputs, package-qualified source identities, overlays, inactive and embedded sources, declared configuration, and projected contracts. It rejects executable packages drivers and writable module modes; raw build/configuration values are replaced by digests in Bundle profiles.
+
+The centralized custom-parameter mapper fixture now supplies Configuration through the public SDK. After pinning the synchronized core, Go 1.27.1 with GOWORK=off passed make dev, full go test -race ./..., go vet ./..., go mod verify, bundle freshness checking, and rebuilding the basic example. The development workspace was used only before pinning the core. No local core replace was added.
+
+A separate actual fixed-remote core consumer runs 23 top-level public SDK tests with race enabled inside the consumer. Its installed fixed-version CLI reports the expected module version and Go 1.27.1, exports a request schema, and passes an independent valid/invalid instance test. Actual fixed-remote adapter CLI consumption is recorded separately after publishing this adapter commit.
+
+The basic example has 11 templates and fingerprint `5f0a5e2085edad22ce2b805ef516f6bc68181b68160d372794630cb884616761`. Its 13 original business/routing function bodies remain AST-identical. The rebuilt runtime export is OpenAPI 3.2.0, contains 152 English descriptions and enum labels, and exposes only BearerAuth. The latest bilingual source audit covers 1987 natural-language Go comment lines without missing counterparts; all top-level declarations have comments.
+
+This stage uses existing task caches. It does not complete runtime build-profile mismatch enforcement, arbitrary C toolchain/header graphs, full schema/helper/codec and identity matrices, complete OpenAPI 3.2/UI acceptance, CI, benchmarks, or final source-only independent cold-cache acceptance.

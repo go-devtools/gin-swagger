@@ -10,7 +10,7 @@
 
 - 最低版本验收使用精确 Go 1.27.1。
 - 最低版本验收使用 Gin v1.12.0。
-- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260905203249-f0f660a9475e`，由 Go 工具从真实远端提交解析。
+- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260905213234-136c21287694`，由 Go 工具从真实远端提交解析。
 
 ## 架构
 
@@ -71,3 +71,5 @@ Fiber 和 Echo 仅为未来扩展方向，本仓库未交付或宣称支持这�
 显式 JSON、Query、URI、Header、FormPost、Multipart 与集中自定义解码规则见[请求绑定指南](docs/requests.md)。
 
 请求绑定指南同时说明强制 Bind 调用、关联错误返回值、已提交的 400/413 响应，以及自动 Bind/ShouldBind 和显式 Form 的有限方法与媒体条件。通过 Config 集中声明默认或单路由请求媒体范围，解析文档条件而不改变请求处理。
+
+构建目标、依赖源码、overlay 和声明的集中映射配置均参与生成新鲜度。包含 TypeMapper 的编译调用需要通过 Options.Configuration 提供具名 JSON 输入；Bundle 仅保留配置摘要。
