@@ -97,3 +97,15 @@ CLI 清单测试验证资源路径相对于清单目录、普通文件读取预�
 - 核心本身的 go mod verify 与 go vet ./... 也退出 0。
 
 这些验证使用本任务现有模块缓存，没有把它们称为冷缓存验收。未重启预览服务或重新验证 UI 外部资源映射；最终两个仅含各自源码的冷环境与 GitHub CI 仍待完成。
+
+## Bilingual comments and English history
+
+Project-owned source comments now include Simplified Chinese and English. Directives and upstream assets retain their original form. Companion translations in examples are separated from attached English Go documentation by a blank line. Generated comments come from the updated generator.
+
+The AST inventory covered 1322 natural-language Go comment lines across both repositories with no missing counterparts; 28 UI and Makefile comments also received translations. Token comparison covered 80 Go files and found changes only in three generator comment strings. Attached documentation remained unchanged in eight example or fixture files. The 13 business and routing function bodies still match the original baseline.
+
+The user explicitly authorized translating historical commit messages into English. Complete Git bundles were created and verified before rewriting. All three core commits retained their trees, authors, committers, and timestamps, with verified parent mappings. The core push used an exact remote SHA in force-with-lease. Earlier SHA/version entries in this log are historical evidence from before the rewrite; go.mod defines the current dependency.
+
+Go resolved the new remote core commit `6d6aa524250376a58fcf64b65440fbdb98d60fe0` to `v0.0.0-20260905143106-6d6aa5242503`, now pinned without replace. With GOWORK=off, the external module's TestPublicFrontend and TestTransportNeutralResources passed against this exact remote version.
+
+Adapter GOWORK=off make dev, go mod verify, go test -race ./..., and go vet ./... all exited zero. Generation produced 11 templates with fingerprint `090883ddffbc8d5a4eac7217b7c6aed305b2eb01325d3ac099474e2af37ceec6`. The rebuilt example exported native OpenAPI 3.2.0; all 152 title, summary, description, and enum-description strings remained English. The existing browser preview process was not restarted. These checks used the existing task cache and do not establish final cold-cache or CI acceptance.

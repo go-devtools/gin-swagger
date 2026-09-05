@@ -15,6 +15,7 @@ import (
 )
 
 // 使用真实零 tag handler 比较挂载前后行为，再以独立 Schema 引擎检查网络字节。
+// Compare real handler responses before and after mounting, then validate their wire bytes independently.
 func TestRequestContracts(t *testing.T) {
 	if reflect.TypeFor[CreateUserRequest]().Field(0).Tag != "" {
 		t.Fatal("示例意外依赖 DTO tag")
@@ -73,6 +74,7 @@ func TestRequestContracts(t *testing.T) {
 }
 
 // 用真实 HTTP 输出验证完整类型示例及字符串、数字枚举的反例。
+// Validate the complete type sample and reject invalid string and numeric enum values.
 func TestAllFieldTypesContract(t *testing.T) {
 	engine, doc, err := Router()
 	if err != nil {

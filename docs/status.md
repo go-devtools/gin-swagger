@@ -10,10 +10,12 @@
 
 已增加五种 HTTP 方法、Deprecated、Authorize、命名枚举请求及五份可切换文档。13 组方法请求、五分类范围、全局范围求交、缓存和原接口不变性均有实际测试。顶部选择器、分类刷新、三组枚举切换、弃用删除线和 390 / 1280 像素布局已在浏览器核对。按用户后续要求，授权示例仅保留 Bearer，标签筛选框关闭。独立 Schema 导出的根级精度、已有 $defs 和业务示例数据保留已补齐回归。
 
-早期联调使用专用 workspace。当前已改为依赖真实远端核心固定版本 `v0.0.0-20260905135839-1c9eeff38e45`，关闭 workspace 后的 dev、完整 race、vet 与模块校验均已通过；最终冷缓存单仓库环境和 CI 验收仍待完成。
+早期联调使用专用 workspace。当前已改为依赖真实远端核心固定版本 `v0.0.0-20260905143106-6d6aa5242503`，关闭 workspace 后的 dev、完整 race、vet 与模块校验均已通过；最终冷缓存单仓库环境和 CI 验收仍待完成。
 
 用户随后直接编辑了目标，明确提交信息使用英文、代码注释同时保留中英文。本轮新增与修改的契约验证代码已按更新后的要求执行；既有源码的全量统一仍待完成。此前自动审批拒绝属于旧授权状态，未据此重写历史或绕过权限。
 
 按用户本轮明确要求，示例项目的 OpenAPI 注释及展示文案已改为英文。随后用户更新目标，要求代码注释双语和英文提交；示例的英文展示与现有源码的统一处理仍将逐项核对。示例 dev 已通过，浏览器已核对英文分组、接口和枚举说明；144 处规范说明文字没有中文残留，13 个业务及路由函数体与翻译前一致。
 
-两个产品仓库均使用 main 作为本地和远端默认分支。当前核心 SHA 为 `1c9eeff38e45a3085d74dcaa66bea9b6e630a07a`；适配器的依赖来自该远端提交，不再使用相邻核心工作区。源码注释全量双语统一、Standalone 资源完整语义及总体目标中的其余能力仍未完成，阶段同步不代表正式发布。
+两个产品仓库均使用 main 作为本地和远端默认分支。当前核心 SHA 为 `6d6aa524250376a58fcf64b65440fbdb98d60fe0`；适配器的依赖来自该远端提交，不再使用相邻核心工作区。源码注释全量双语统一、Standalone 资源完整语义及总体目标中的其余能力仍未完成，阶段同步不代表正式发布。
+
+Current language status: project-owned source comments are now bilingual. Generated example descriptions remain English. The history-message rewrite was explicitly requested and is being verified independently of source changes. Remaining full-goal capabilities, cold-cache acceptance, and CI are still incomplete.

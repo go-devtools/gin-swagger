@@ -1,4 +1,5 @@
 // 组合公开 Gin 前端与核心编译器，不复制注释或 Schema 算法。
+// Compose the public Gin frontend and core compiler without copying shared algorithms.
 package main
 
 import (
@@ -21,6 +22,7 @@ import (
 )
 
 // 响应中断并将失败转换为可自动化处理的退出码。
+// Handle interruption and expose automation-friendly exit codes.
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
@@ -28,6 +30,7 @@ func main() {
 }
 
 // 分派生成、检查、来源解释与版本命令。
+// Dispatch generation, validation, provenance, and version commands.
 func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 	fail := func(err error) int {
 		_ = json.NewEncoder(stderr).Encode(map[string]any{"code": "gin-swagger.cli.failed", "severity": "error", "message": err.Error()})
@@ -102,6 +105,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 		target = filepath.Join(absolute, target)
 	}
 	// 首次仅引导本工具拥有的生成文件；任何失败都恢复缺失状态。
+	// Bootstrap only owned generated output and restore absence on failure.
 	cleanup := func() {}
 	if args[0] == "generate" {
 		cleanup, err = bootstrap(target, *packageName)
@@ -152,6 +156,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 }
 
 // 为缺失的生成包创建可恢复的类型检查引导文件，不运行或注册空契约。
+// Create a temporary type-checking package without executing or registering an empty contract.
 func bootstrap(dir, packageName string) (func(), error) {
 	path := filepath.Join(dir, "zz_openapi.gen.go")
 	if _, err := os.Stat(path); err == nil {

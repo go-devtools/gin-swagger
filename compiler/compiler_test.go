@@ -12,6 +12,7 @@ import (
 )
 
 // 验证 Gin 规则经公开 SDK 编译真实零 tag handler。
+// Compile actual tag-free Gin handlers through the public SDK.
 func TestGinFrontendFromSource(t *testing.T) {
 	dir := t.TempDir()
 	module, err := os.ReadFile("../go.mod")

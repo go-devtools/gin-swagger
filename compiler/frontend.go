@@ -1,4 +1,5 @@
 // 通过核心公开 SDK 提供 Gin 生成前端；普通业务程序不导入本包。
+// Expose Gin generation rules through the public compiler SDK.
 package compiler
 
 import (
@@ -10,9 +11,11 @@ import (
 )
 
 // 明确限定 Gin 的真实包身份，禁止仅按方法短名匹配。
+// Match the complete Gin package identity rather than short method names.
 const ginPackage = "github.com/gin-gonic/gin"
 
 // 注册静态 Gin 规则，同一个值供 CLI 与项目自定义生成器组合。
+// Provide the same frontend to the CLI and custom generation entry points.
 func Frontend() core.Frontend {
 	return core.Frontend{Name: "gin-v1.12-front-v1", Match: func(f core.Function) bool {
 		return f.Signature.Params().Len() == 1 && isContext(f.Signature.Params().At(0).Type())
@@ -20,6 +23,7 @@ func Frontend() core.Frontend {
 }
 
 // 使用完整类型身份识别 Gin Context，不访问框架私有状态。
+// Recognize Gin Context by full type identity without accessing private state.
 func isContext(t types.Type) bool {
 	if t == nil {
 		return false
@@ -33,6 +37,7 @@ func isContext(t types.Type) bool {
 }
 
 // 提取无损的可求值整数状态码。
+// Extract an exact constant integer status code.
 func integer(v core.Value) string {
 	if v.Constant != nil && v.Constant.Kind() == constant.Int {
 		return v.Constant.ExactString()
@@ -41,6 +46,7 @@ func integer(v core.Value) string {
 }
 
 // 提取代码中真实的字符串常量。
+// Extract an actual constant string.
 func literal(v core.Value) string {
 	if v.Constant != nil && v.Constant.Kind() == constant.String {
 		return constant.StringVal(v.Constant)
@@ -49,11 +55,13 @@ func literal(v core.Value) string {
 }
 
 // 输出明确的 Gin 能力边界，不能用 default 或空 Schema 隐藏未知。
+// Report unsupported Gin semantics instead of hiding unknowns behind default or empty Schemas.
 func unresolved(c core.CallContext, message string) []core.Effect {
 	return []core.Effect{{Kind: core.Unresolved, Source: c.Source, Message: "gin-swagger.analysis: " + message, Fix: "通过项目生成入口注册集中规则"}}
 }
 
 // 将真实 Gin 调用转换成框架中立效果；控制流由核心调度。
+// Translate Gin calls into neutral effects while the core manages control flow.
 func analyzeCall(c core.CallContext) ([]core.Effect, error) {
 	if c.Object == nil || c.Object.Pkg() == nil || c.Object.Pkg().Path() != ginPackage {
 		return nil, nil

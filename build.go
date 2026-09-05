@@ -1,4 +1,5 @@
 // 在保持既有 Gin handler 与路由注册不变的前提下构建和挂载文档。
+// Build and mount documentation while preserving existing Gin handlers and routes.
 package ginswagger
 
 import (
@@ -13,6 +14,7 @@ import (
 )
 
 // 将核心文档设置与 Gin 挂载和作用域设置分开。
+// Separate core document settings from Gin scope and mounting options.
 type Config struct {
 	OpenAPI     openapi.Config
 	Path        string
@@ -21,11 +23,13 @@ type Config struct {
 	Bindings    map[string]openapi.OperationKey
 	Include     func(method, path string) bool
 	// 可选的整份文档分类，范围始终与全局 Include 求交集。
+	// Optionally group complete documents, always intersecting their scope with global Include.
 	Groups       []DocumentGroup
 	DefaultGroup string
 }
 
 // 描述右上角文档选择器的一个分类，不改变 Gin 的业务路由注册。
+// Describe one top-right document choice without changing Gin business route registration.
 type DocumentGroup struct {
 	ID      string
 	Name    string
@@ -33,6 +37,7 @@ type DocumentGroup struct {
 }
 
 // 对真实已注册路由快照并匹配公开模板证据；不注册任何路由。
+// Match a snapshot of registered routes against public template evidence without registering routes.
 func Build(r *gin.Engine, bundle openapi.Bundle, cfg Config) (*openapi.Document, error) {
 	if r == nil {
 		return nil, fmt.Errorf("gin-swagger.engine.nil: 缺少 Engine")
@@ -75,6 +80,7 @@ func Build(r *gin.Engine, bundle openapi.Bundle, cfg Config) (*openapi.Document,
 }
 
 // 检查用于单次文档挂载的前缀，不修改业务路由前缀。
+// Validate the documentation prefix without changing business route prefixes.
 func mountPath(value string) (string, error) {
 	if value == "" {
 		value = "/docs"

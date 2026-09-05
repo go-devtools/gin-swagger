@@ -1,4 +1,5 @@
 // 将 Gin 原始路径转换为框架中立 OpenAPI 路径。
+// Convert raw Gin paths into neutral OpenAPI paths.
 package routes
 
 import (
@@ -7,6 +8,7 @@ import (
 )
 
 // 保留 catch-all 不可无损表达的跨斜杠语义。
+// Record the lossy cross-slash semantics of catch-all parameters.
 type Path struct {
 	Path       string
 	Parameters []string
@@ -14,6 +16,7 @@ type Path struct {
 }
 
 // 按 Gin 一点十二路径词法扫描，转义冒号仍是静态字符。
+// Parse Gin 1.12 path syntax while preserving escaped literal colons.
 func Parse(raw string) (Path, error) {
 	out := Path{}
 	if len(raw) == 0 || raw[0] != '/' || len(raw) > 16384 {

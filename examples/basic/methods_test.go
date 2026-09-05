@@ -13,6 +13,7 @@ import (
 )
 
 // 五种方法的真实网络字节与生成契约一致，局部更新明确保留 false 和 null 的差别。
+// Validate actual wire bytes for all five methods and preserve the distinction between false and null in partial updates.
 func TestHTTPMethodExamples(t *testing.T) {
 	engine, doc, err := Router()
 	if err != nil {
@@ -100,6 +101,7 @@ func TestHTTPMethodExamples(t *testing.T) {
 }
 
 // 顶部分类加载独立规范，分类内部仅展示有接口的标签。
+// Load independent specifications from the top selector and show only tags containing operations.
 func TestExampleDocumentDefinitions(t *testing.T) {
 	engine, _, err := Router()
 	if err != nil {

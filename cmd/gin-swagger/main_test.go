@@ -9,6 +9,7 @@ import (
 )
 
 // 验证首次不存在生成目录时可以引导，失败不会留下空 Bundle。
+// Test bootstrap failure cleanup when the generated directory is initially absent.
 func TestBootstrapFailureRestoresOutput(t *testing.T) {
 	root := t.TempDir()
 	module, err := os.ReadFile("../../go.mod")
@@ -37,7 +38,9 @@ func TestBootstrapFailureRestoresOutput(t *testing.T) {
 		t.Fatal(err)
 	}
 	// 临时消费模块无需复制运行时源码，使用真实固定远端模块仍属于后续独立验收。
+	// Keep this fixture separate from the later fixed-remote independent-module acceptance test.
 	// 此处只验证失败恢复：故意缺少同模块根运行时包，首次加载必须失败并移除引导文件。
+	// Omit the runtime package deliberately to verify failed bootstrap cleanup.
 	var out, errs bytes.Buffer
 	code := run(context.Background(), []string{"generate", "--dir", app, "--output", "./internal/apidoc"}, &out, &errs)
 	if code == 0 {

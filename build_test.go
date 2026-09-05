@@ -13,9 +13,11 @@ import (
 )
 
 // 保留原始业务 handler；文档挂载不参与业务响应。
+// Preserve the original handler; documentation mounting does not participate in its response.
 func userHandler(c *gin.Context) { c.JSON(200, struct{ Name string }{Name: "alice"}) }
 
 // 构造具备真实运行时符号证据的中立 Bundle。
+// Build a neutral Bundle with actual runtime symbol evidence.
 func runtimeBundle(t *testing.T) openapi.Bundle {
 	t.Helper()
 	symbol := runtime.FuncForPC(reflect.ValueOf(userHandler).Pointer()).Name()
@@ -27,6 +29,7 @@ func runtimeBundle(t *testing.T) openapi.Bundle {
 }
 
 // 验证 Build 不修改路由，Mount 后业务状态头与 body 不变。
+// Verify Build has no routing side effects and Mount preserves business responses.
 func TestBuildMountAndNonInvasive(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
@@ -63,6 +66,7 @@ func TestBuildMountAndNonInvasive(t *testing.T) {
 }
 
 // 预检查在目标 Engine 发生任何文档注册前发现冲突。
+// Detect predictable conflicts before mutating the target Engine.
 func TestMountConflictLeavesRoutesUnchanged(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
@@ -80,6 +84,7 @@ func TestMountConflictLeavesRoutesUnchanged(t *testing.T) {
 }
 
 // 不使用函数代码地址猜测不同捕获状态的闭包身份。
+// Do not infer captured closure state from function code addresses.
 func TestAmbiguousClosureRequiresCentralBinding(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.New()

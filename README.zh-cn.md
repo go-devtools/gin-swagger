@@ -10,7 +10,7 @@
 
 - 最低版本验收使用精确 Go 1.27.1。
 - 最低版本验收使用 Gin v1.12.0。
-- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260905135839-1c9eeff38e45`，由 Go 工具从真实远端提交解析。
+- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260905143106-6d6aa5242503`，由 Go 工具从真实远端提交解析。
 
 ## 架构
 
@@ -59,3 +59,5 @@ Fiber 和 Echo 仅为未来扩展方向，本仓库未交付或宣称支持这�
 ## 当前模块验证
 
 使用下载到模块缓存的固定核心版本，关闭 workspace 且不设置本地 replace 后，`GOWORK=off make dev`、`go test -race ./...`、`go vet ./...` 和 `go mod verify` 均通过。这证明当前实现可使用真实远端依赖；最终冷缓存、CI 和完整能力验收仍见[验证记录](docs/verification.md)。
+
+自有源码注释同时提供简体中文和英文。编译指令及上游资源保留原文；示例与 Schema 测试数据中的伴随翻译通过空行与 Go 声明注释分开，使生成说明保持原有语言。提交信息使用英文。
