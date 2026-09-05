@@ -1,21 +1,11 @@
 # 当前状态
 
-总体目标尚未完成验收。两个独立仓库和 module 已建立，远端均为 private，SSH 首次提交已真实推送。GitHub 描述与 README.md 使用英文，配套 README.zh-cn.md；本项目自有代码采用 MIT，上游 Swagger UI 保留 Apache 2.0 与第三方通知。
+总体目标尚未完成验收。两个独立 Git 仓库及 Go module 均使用 main 主分支，远端保持 private。GitHub 描述和 README.md 使用英文，配套 README.zh-cn.md；自有代码采用 MIT，上游资源保留原许可证与通知。
 
-双仓库纵向链路已运行：零 tag 源码经 Gin CLI 首次引导生成 Bundle，业务路由在启动层挂载真实 Swagger UI。浏览器已核对模型列表、请求和响应展示、默认无提交按钮、同源离线资源加载。模型显示使用业务 title，内部组件身份仍可区分。字段 Examples 改为直接显示值，复制图标有独立占位。
+自有代码注释已同时提供简体中文和英文，包括 UI 扩展、构建脚本、静态契约生成文件及临时引导文件。示例声明中的英文文档与中文伴随注释通过空行分隔；实际导出的 152 处 OpenAPI 说明仍为英文。业务及路由函数体保持不变。历史中文提交说明已按用户明确要求改为对应英文，改写前验证了完整 Git bundle 备份，逐条保留代码树、作者和时间，并使用精确远端版本保护推送。
 
-完整字段示例包含基本数值、布尔、别名、指针、集合、空集合和 null、字节、RawMessage、时间、嵌入、泛型、字符串及数字枚举。示例的真实 HTTP 响应由独立 JSON Schema 引擎验证，并检查文档挂载前后原接口状态、头和 body 一致。
+零 tag 源码生成 Bundle、Gin 启动层挂载、五种 HTTP 方法、Deprecated、Bearer 授权、枚举说明、完整字段示例及五份文档分类已有实现和实际测试。共享离线 Swagger UI 使用业务类型名称展示 Schema，内部引用身份仍可区分；标签筛选框按要求关闭。
 
-核心还已提供中立前端 SDK、返回值前端测试、Schema 导出、版本化 Bundle、轻量离线检查，以及可选 contracttest 的 JSON、NDJSON 与 SSE 校验。状态提交与 switch break 有真实源码回归测试。公开 SDK 已通过真正外部临时 module 的消费测试；完整 OAS 3.2 fixture 已通过类型化往返、自有检查和固定官方 schema-base 的独立校验，并验证 14 个反例。全面 Gin binder/render 支持、引用资源语义、完整标准矩阵、CI、远端最终固定版本和冷缓存独立验收仍在推进。
+核心依赖固定为真实远端版本 v0.0.0-20260905143106-6d6aa5242503，Gin 固定为 v1.12.0。GOWORK=off 的 dev、完整 race、vet 和模块校验均已通过。两套新目录及空模块/构建缓存中的独立消费、CLI 构建、远端固定版本安装、核心外部 SDK 和现有 Gin 集成测试也已通过；测试提交及首轮下载超时记录见 verification.md。冷环境应先运行 go mod download，避免首次下载占用生成器默认一分钟预算。
 
-已增加五种 HTTP 方法、Deprecated、Authorize、命名枚举请求及五份可切换文档。13 组方法请求、五分类范围、全局范围求交、缓存和原接口不变性均有实际测试。顶部选择器、分类刷新、三组枚举切换、弃用删除线和 390 / 1280 像素布局已在浏览器核对。按用户后续要求，授权示例仅保留 Bearer，标签筛选框关闭。独立 Schema 导出的根级精度、已有 $defs 和业务示例数据保留已补齐回归。
-
-早期联调使用专用 workspace。当前已改为依赖真实远端核心固定版本 `v0.0.0-20260905143106-6d6aa5242503`，关闭 workspace 后的 dev、完整 race、vet 与模块校验均已通过；最终冷缓存单仓库环境和 CI 验收仍待完成。
-
-用户随后直接编辑了目标，明确提交信息使用英文、代码注释同时保留中英文。本轮新增与修改的契约验证代码已按更新后的要求执行；既有源码的全量统一仍待完成。此前自动审批拒绝属于旧授权状态，未据此重写历史或绕过权限。
-
-按用户本轮明确要求，示例项目的 OpenAPI 注释及展示文案已改为英文。随后用户更新目标，要求代码注释双语和英文提交；示例的英文展示与现有源码的统一处理仍将逐项核对。示例 dev 已通过，浏览器已核对英文分组、接口和枚举说明；144 处规范说明文字没有中文残留，13 个业务及路由函数体与翻译前一致。
-
-两个产品仓库均使用 main 作为本地和远端默认分支。当前核心 SHA 为 `6d6aa524250376a58fcf64b65440fbdb98d60fe0`；适配器的依赖来自该远端提交，不再使用相邻核心工作区。源码注释全量双语统一、Standalone 资源完整语义及总体目标中的其余能力仍未完成，阶段同步不代表正式发布。
-
-Current language status: project-owned source comments are now bilingual. Generated example descriptions remain English. The history-message rewrite was explicitly requested and is being verified independently of source changes. Remaining full-goal capabilities, cold-cache acceptance, and CI are still incomplete.
+这不代表完整交付。Gin 的全部 binder/render 与运行时身份矩阵、Standalone 资源完整语义、Schema 注释及编解码边界、专用集成与独立验收包、GitHub CI、完整文档和最终版本复验仍需完成。未来 Fiber/Echo 仅作为经过测试的公开扩展方向，不新增产品仓库。

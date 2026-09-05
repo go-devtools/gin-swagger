@@ -56,6 +56,8 @@ The UI preserves a selected registered definition across refreshes and deep link
 
 `GOWORK=off make dev`, `go test -race ./...`, `go vet ./...`, and `go mod verify` pass with the pinned core downloaded into the module cache and no local `replace`. This verifies the current implementation against a real remote version; final cold-cache, CI, and full capability acceptance remain tracked in [verification](docs/verification.md).
 
+For a new checkout, run `GOWORK=off go mod download` before `GOWORK=off make dev`. This keeps initial dependency downloads outside the generator's default one-minute budget. Direct CLI calls may select a longer budget with `--timeout=5m`.
+
 ## License
 
 New project code is licensed under [MIT](LICENSE). Third-party assets retain their original licenses and notices.

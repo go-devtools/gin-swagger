@@ -109,3 +109,22 @@ The user explicitly authorized translating historical commit messages into Engli
 Go resolved the new remote core commit `6d6aa524250376a58fcf64b65440fbdb98d60fe0` to `v0.0.0-20260905143106-6d6aa5242503`, now pinned without replace. With GOWORK=off, the external module's TestPublicFrontend and TestTransportNeutralResources passed against this exact remote version.
 
 Adapter GOWORK=off make dev, go mod verify, go test -race ./..., and go vet ./... all exited zero. Generation produced 11 templates with fingerprint `090883ddffbc8d5a4eac7217b7c6aed305b2eb01325d3ac099474e2af37ceec6`. The rebuilt example exported native OpenAPI 3.2.0; all 152 title, summary, description, and enum-description strings remained English. The existing browser preview process was not restarted. These checks used the existing task cache and do not establish final cold-cache or CI acceptance.
+
+## Independent cold-cache module consumption
+
+Two new directories each contained one remote checkout, its own initially empty GOMODCACHE, and its own initially empty GOCACHE. The exact preinstalled Go 1.27.1 toolchain was reused; dependency and build caches were not. Every command used GOWORK=off. Neither module declared replace. Full remote checkouts confirmed all main-branch commit messages were English.
+
+| Module | Tested commit | Remote version |
+| --- | --- | --- |
+| openapi | 6d6aa524250376a58fcf64b65440fbdb98d60fe0 | v0.0.0-20260905143106-6d6aa5242503 |
+| gin-swagger | a6c966b359c196697dd728a3ec79467c50822826 | v0.0.0-20260905143924-a6c966b359c1 |
+
+Both make dev, go mod verify, go test -race ./..., go vet ./..., CLI builds, and fixed-remote-version go install commands exited zero. The installed version commands reported the expected module versions, Go 1.27.1, Bundle 1, and OpenAPI 3.2.0. Core's external SDK consumer used the exact remote core version without replacement; framework and runtime dependency boundary tests passed. Core's complete standard fixture returned an empty diagnostic set.
+
+The Gin checkout downloaded its fixed core version into its own module cache and used Gin v1.12.0. Generation and freshness checks agreed on fingerprint 090883ddffbc8d5a4eac7217b7c6aed305b2eb01325d3ac099474e2af37ceec6. Existing real HTTP contract tests passed, and the exported example specification passed the remotely installed core checker with no diagnostics. Both checkouts remained clean after generation and tests.
+
+The first Gin attempt failed because dependency downloads consumed the generator's default one-minute timeout. Its failure record was preserved. A second attempt started with fresh empty caches, explicitly ran go mod download (66.516 seconds), then completed make dev (21.136 seconds). This validates a documented cold setup sequence; it does not claim that unprepared dependency downloads always fit the default generation budget. Direct generator calls can set --timeout.
+
+After these versioned checks, the temporary first-generation bootstrap received two additional bilingual comment lines; local GOWORK=off make dev passed again with the same generated fingerprint. This is a separate comment-only follow-up, not a retroactive change to the tested commits above.
+
+This is module-consumption evidence for the stated revisions, not full-goal completion. The dedicated Gin internal/integration and internal/verify acceptance packages, the remaining framework/schema matrices, GitHub CI, and final validation of the completed product remain outstanding.

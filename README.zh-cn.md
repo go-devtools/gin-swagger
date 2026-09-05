@@ -52,6 +52,8 @@ Fiber 和 Echo 仅为未来扩展方向，本仓库未交付或宣称支持这�
 
 刷新和深链接只恢复已注册的分类，其他 URL 查询配置保持禁用。默认禁止提交 API 请求；需要时通过 `UI.SubmitMethods` 显式启用指定的小写方法。
 
+新 checkout 先运行 `GOWORK=off go mod download`，再运行 `GOWORK=off make dev`，避免首次依赖下载占用生成器默认一分钟预算。直接调用 CLI 时可通过 `--timeout=5m` 设置更长预算。
+
 ## 许可证
 
 项目新增代码采用 [MIT](LICENSE)。第三方资源保留原许可证与声明。
