@@ -128,3 +128,13 @@ The first Gin attempt failed because dependency downloads consumed the generator
 After these versioned checks, the temporary first-generation bootstrap received two additional bilingual comment lines; local GOWORK=off make dev passed again with the same generated fingerprint. This is a separate comment-only follow-up, not a retroactive change to the tested commits above.
 
 This is module-consumption evidence for the stated revisions, not full-goal completion. The dedicated Gin internal/integration and internal/verify acceptance packages, the remaining framework/schema matrices, GitHub CI, and final validation of the completed product remain outstanding.
+
+## Standalone export dependency update
+
+Core commit `8498b003aec96f2e383343d8fe3438042fab2e6f` was pushed as a normal fast-forward English commit. Go downloaded it over SSH and resolved `v0.0.0-20260905164423-8498b003aec9`, now pinned in go.mod and go.sum. Go 1.27.1, Gin v1.12.0, and GOWORK=off were used throughout; module metadata has no Replace field and points to the downloaded cache directory.
+
+Adapter make dev, go test -race ./..., go vet ./..., and go mod verify all exited zero. The generate and check commands agree on 11 templates and fingerprint `40c8ab2c4930159fd58dad17c647e32d13de1a96c431a0ea2666514feeaccc3b`. The rebuilt example exported OpenAPI 3.2.0 with 152 English title, summary, description, and enum-description strings. BearerAuth is the only security scheme. The 13 business and routing function bodies still match the original AST baseline. The preview server was not restarted.
+
+A new external consumer directory used this exact remote core version without replace. Its three public SDK tests, including eight concurrent read-only standalone exports, passed with go test -race -count=1 -v. The core CLI was installed from this fixed remote version; its version command reported the expected version and Go 1.27.1. It exported a request schema from the external consumer's real Go source. A separate contracttest validation accepted a valid request and rejected a name below the declared minimum length. No core internal package was imported.
+
+These tests use the existing task cache. They establish the stated SDK, CLI, and adapter dependency behavior, not a new cold-cache run or full-goal completion. Earlier cold-cache records remain tied to their recorded commits. All reachable commit messages in both repositories were rechecked as English; project-owned source comments retain both languages.
