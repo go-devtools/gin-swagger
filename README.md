@@ -73,3 +73,5 @@ See the [request binding guide](docs/requests.md) for explicit JSON, Query, URI,
 The request-binding guide also covers mandatory Bind calls, correlated error results, committed 400/413 responses, and finite method/media selection for automatic Bind/ShouldBind and explicit Form. Declare default or per-route request media centrally through Config; the settings resolve documentation scope without changing request handling.
 
 Build target settings, dependency source, overlays, and declared custom mapping configuration participate in generation freshness. Compile calls with TypeMapper functions must provide named JSON inputs through Options.Configuration; configuration values are represented by digests in the Bundle.
+
+Gin `Build` and `Mount` verify the executable build conditions against the generated Bundle. Known mismatches fail before mounting documentation routes; missing build metadata is retained as warnings in `Document.Report()`. This does not replace source freshness checks in CI.

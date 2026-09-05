@@ -73,3 +73,5 @@ Fiber 和 Echo 仅为未来扩展方向，本仓库未交付或宣称支持这�
 请求绑定指南同时说明强制 Bind 调用、关联错误返回值、已提交的 400/413 响应，以及自动 Bind/ShouldBind 和显式 Form 的有限方法与媒体条件。通过 Config 集中声明默认或单路由请求媒体范围，解析文档条件而不改变请求处理。
 
 构建目标、依赖源码、overlay 和声明的集中映射配置均参与生成新鲜度。包含 TypeMapper 的编译调用需要通过 Options.Configuration 提供具名 JSON 输入；Bundle 仅保留配置摘要。
+
+Gin 的 `Build` 和 `Mount` 会校验当前程序与生成 Bundle 的构建条件。已知不匹配时在挂载文档路由前失败，缺少元数据时在 `Document.Report()` 保留警告。这不能替代 CI 的源码新鲜度检查。

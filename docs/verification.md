@@ -210,3 +210,11 @@ A separate actual fixed-remote core consumer runs 23 top-level public SDK tests 
 The basic example has 11 templates and fingerprint `5f0a5e2085edad22ce2b805ef516f6bc68181b68160d372794630cb884616761`. Its 13 original business/routing function bodies remain AST-identical. The rebuilt runtime export is OpenAPI 3.2.0, contains 152 English descriptions and enum labels, and exposes only BearerAuth. The latest bilingual source audit covers 1987 natural-language Go comment lines without missing counterparts; all top-level declarations have comments.
 
 This stage uses existing task caches. It does not complete runtime build-profile mismatch enforcement, arbitrary C toolchain/header graphs, full schema/helper/codec and identity matrices, complete OpenAPI 3.2/UI acceptance, CI, benchmarks, or final source-only independent cold-cache acceptance.
+
+## Runtime build condition verification
+
+Pinned core: `v0.0.0-20260905220837-53be915a92d6`. Gin Build/Mount enables the public core runtime check. The route-preservation regression first demonstrated that the old implementation accepted a Bundle for another platform; it now fails before documentation mounting. The independent module harness builds a real trimpath/stripped executable with `-tags=openapi_runtime_mismatch`, verifies `openapi.build.mismatch`, and confirms no output document was written.
+
+GOWORK=off `make dev`, full `go test -race ./...`, `go vet ./...`, `go mod verify`, generator freshness, and the rebuilt example passed. The basic Bundle contains 11 templates with fingerprint `3e31e8461d24158c867a3c84ccecd9303478613511a51d4f757b356bbc2d4b10`. The existing 13 business/routing function bodies are unchanged. Runtime export remains OpenAPI 3.2 with 152 English descriptions/enum meanings and BearerAuth only. The bilingual Go audit covers 2023 natural-language comment lines without missing translations.
+
+The core's actual fixed-remote external consumer passed 25 top-level SDK tests with race enabled in the consumer process, including executable metadata checks. Installing that exact core CLI, checking its reported version, exporting a Schema from independent source, and positive/negative instance validation also passed. Existing task caches were used; these are stage results, not final cold-cache acceptance.

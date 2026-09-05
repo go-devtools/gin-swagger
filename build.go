@@ -84,6 +84,9 @@ func Build(r *gin.Engine, bundle openapi.Bundle, cfg Config) (*openapi.Document,
 		}
 		selected = append(selected, neutral)
 	}
+	// Gin 文档绑定当前 Engine，始终验证可读取的程序构建条件。
+	// Gin documents bind the current Engine, so always verify observable executable build conditions.
+	cfg.OpenAPI.VerifyRuntimeBuild = true
 	return openapi.Build(bundle, selected, cfg.OpenAPI)
 }
 

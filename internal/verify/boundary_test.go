@@ -149,4 +149,21 @@ func TestExternalModule(t *testing.T) {
 		t.Fatal(report)
 	}
 	execute(t, dir, cli, "check", "--spec", specPath)
+	// 用不同 tags 构建真实应用，旧 Bundle 必须在写出文档前被拒绝。
+	// Build the real application with different tags and reject its stale Bundle before writing a document.
+	mismatched := filepath.Join(t.TempDir(), "consumer-mismatched")
+	execute(t, dir, "go", "build", "-tags=openapi_runtime_mismatch", "-trimpath", "-ldflags=-s -w", "-o", mismatched, ".")
+	rejectedPath := filepath.Join(dir, "rejected.json")
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	command := exec.CommandContext(ctx, mismatched, rejectedPath)
+	command.Dir = dir
+	output, runError := command.CombinedOutput()
+	if runError == nil || !strings.Contains(string(output), "openapi.build.mismatch") {
+		t.Fatalf("runtime build mismatch was not rejected: %v\n%s", runError, output)
+	}
+	if _, err := os.Stat(rejectedPath); !os.IsNotExist(err) {
+		t.Fatal("rejected build wrote an output document")
+	}
+
 }
