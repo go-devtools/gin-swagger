@@ -27,7 +27,7 @@ func (c BindingCodec) Name() string { return "gin-v1.12-binding-" + c.Mode + "-v
 // Validate the explicit mode and select the tag actually read by Gin.
 func (c BindingCodec) fieldTag() (string, error) {
 	switch c.Mode {
-	case "query", "form-post", "multipart":
+	case "query", "form", "form-post", "multipart":
 		return "form", nil
 	case "uri":
 		return "uri", nil

@@ -20,6 +20,8 @@ func bindingOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	var effects []core.Effect
 	mandatory := false
 	switch name {
+	case "ShouldBind", "Bind":
+		return automaticBinding(c, name == "Bind", false)
 	case "ShouldBindJSON", "ShouldBindBodyWithJSON", "BindJSON":
 		effects = bindRequest(c, "json", c.Arguments[0])
 		mandatory = name == "BindJSON"
@@ -36,11 +38,21 @@ func bindingOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 		if len(c.Arguments) < 2 {
 			return nil, nil
 		}
+		if name != "ShouldBindBodyWith" && isFormBinder(c.Arguments[1]) {
+			return automaticBinding(c, name == "MustBindWith", true)
+		}
 		effects = explicitBinder(c, c.Arguments[1], c.Arguments[0], name == "ShouldBindBodyWith")
 		mandatory = name == "MustBindWith"
 	default:
 		return nil, nil
 	}
+	return bindingResults(c, effects, mandatory)
+}
+
+// 将已经选择的绑定事实关联到成功与错误提交。
+// Correlate selected binding facts with success and committed-error results.
+func bindingResults(c core.CallContext, effects []core.Effect, mandatory bool) ([]core.CallOutcome, error) {
+	name := c.Object.Name()
 	// 未解决的绑定器保留原诊断，不制造成功或失败的确定事实。
 	// Preserve unresolved binder diagnostics without inventing known success or failure facts.
 	for _, effect := range effects {

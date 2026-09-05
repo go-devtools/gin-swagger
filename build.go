@@ -16,12 +16,16 @@ import (
 // 将核心文档设置与 Gin 挂载和作用域设置分开。
 // Separate core document settings from Gin scope and mounting options.
 type Config struct {
-	OpenAPI     openapi.Config
-	Path        string
-	UI          swaggerui.Config
-	Middlewares []gin.HandlerFunc
-	Bindings    map[string]openapi.OperationKey
-	Include     func(method, path string) bool
+	// 默认请求媒体范围及按原始 METHOD /Gin/path 覆盖的声明，仅用于文档链接。
+	// Declare default request media and overrides keyed by original METHOD /Gin/path for documentation linking only.
+	DefaultRequestMediaTypes []string
+	RequestMediaTypes        map[string][]string
+	OpenAPI                  openapi.Config
+	Path                     string
+	UI                       swaggerui.Config
+	Middlewares              []gin.HandlerFunc
+	Bindings                 map[string]openapi.OperationKey
+	Include                  func(method, path string) bool
 	// 可选的整份文档分类，范围始终与全局 Include 求交集。
 	// Optionally group complete documents, always intersecting their scope with global Include.
 	Groups       []DocumentGroup
@@ -71,6 +75,10 @@ func Build(r *gin.Engine, bundle openapi.Bundle, cfg Config) (*openapi.Document,
 			key = matches[0]
 		}
 		neutral := openapi.Route{Method: route.Method, Path: normalized.Path, OperationKey: key, Source: openapi.Source{Kind: "derived", Rule: "gin.Engine.Routes", Symbol: route.Handler}}
+		neutral.RequestMediaTypes = append([]string(nil), cfg.DefaultRequestMediaTypes...)
+		if media, ok := cfg.RequestMediaTypes[routeName]; ok {
+			neutral.RequestMediaTypes = append([]string(nil), media...)
+		}
 		if normalized.CatchAll {
 			neutral.Extensions = spec.Extensions{"x-gin-catch-all": []byte(`true`), "x-gin-catch-all-note": []byte(`"The Gin catch-all may span slashes; OpenAPI path parameters and generated clients may not preserve this behavior."`)}
 		}

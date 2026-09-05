@@ -24,6 +24,31 @@ func bindRequest(c core.CallContext, mode string, payload core.Value) []core.Eff
 	source.Kind, source.Rule = "derived", "gin."+c.Object.Name()
 	effect := core.Effect{Kind: core.RequestBody, Payload: payload, Source: source}
 	switch mode {
+	case "form-query", "form-urlencoded", "form-multipart":
+		effect.Kind = core.ParameterObject
+		effect.In = "query"
+		effect.MediaType = "application/x-www-form-urlencoded"
+		effect.Codec = BindingCodec{Mode: "form"}
+		effect.Style = "form"
+		effect.Explode = spec.Set(true)
+		effect.Source.Rule += "." + mode
+		if mode == "form-query" {
+			return []core.Effect{effect}
+		}
+		effect.AlternativeLocations = true
+		body := effect
+		body.Kind = core.RequestBody
+		body.In = ""
+		body.Style = ""
+		body.Explode = spec.Optional[bool]{}
+		if mode == "form-multipart" {
+			body.MediaType = "multipart/form-data"
+			body.Source.Rule += ".query-before-body"
+		} else {
+			body.Source.Rule += ".body-before-query"
+		}
+		return []core.Effect{effect, body}
+
 	case "json":
 		effect.MediaType = "application/json"
 	case "query", "uri", "header":

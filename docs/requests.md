@@ -25,7 +25,7 @@ Multipart FileHeader values describe raw uploaded content with contentMediaType 
 
 Declared required/minLength/enum constraints define the client contract; they do not prove that Gin or business code enforces those declarations. Tests distinguish real binder rejection from independent contract validation. The example invalid numeric, array-length, header, URI, form, and malformed JSON requests keep their actual 400 response branches after mounting documentation.
 
-The compiler does not yet infer body-level required from all binder error and continuation paths. Field-level required remains separate. Automatic ShouldBind/Bind selection, binding.Form's method/media-dependent query/body behavior and raw form/file getter effects still require their remaining conditional-effect implementation. They must not be treated as JSON defaults or claimed as complete support.
+The compiler does not yet infer body-level required from all binder error and continuation paths. Field-level required remains separate. Raw form/file getter effects and the complete decoder/tag matrix still require additional implementation. Automatic selection and binding.Form now use the finite conditions described below.
 
 ## Centralized custom decoding
 
@@ -47,4 +47,38 @@ For the fixed Gin v1.12.0 standard JSON profile, ordinary mandatory-binding erro
 
 Abort does not return from the current handler. Ignoring the binding error and writing JSON afterward keeps the committed error status. Trying to write 422 on the error branch cannot override 400 or 413. Returning immediately leaves the failure response bodyless. Integration tests issue real valid, malformed, and explicitly size-limited requests and compare status, headers, and body before and after mounting. They independently validate emitted JSON bodies and assert the absence of invented status branches.
 
-The implementation does not generalize the default codec's MaxBytesError behavior to unverified sonic/go-json build profiles. Automatic Bind/ShouldBind method/media selection remains a separate conditional-fact requirement; it is not treated as implicit JSON support.
+The implementation does not generalize the default codec's MaxBytesError behavior to unverified sonic/go-json build profiles. Automatic Bind/ShouldBind selection now uses explicit finite conditions rather than implicit JSON assumptions.
+
+## Automatic selection and explicit Form
+
+ShouldBind, Bind, and explicitly identified binding.Form now preserve finite method/media conditions in the generated Bundle. Source analysis projects every applicable case and its success/error continuation. Runtime linking uses Engine.Routes() for methods and centralized documentation settings for the intended media scope; no handler, DTO tag, or route registration needs modification.
+
+```go
+// 为自动绑定声明默认媒体范围，并为上传路由集中覆盖。
+// Declare default automatic-binding media and centrally override the upload route.
+cfg := ginswagger.Config{
+    OpenAPI: openapi.Config{Title: "Service", Version: "1"},
+    DefaultRequestMediaTypes: []string{"application/json"},
+    RequestMediaTypes: map[string][]string{
+        "POST /uploads": {"multipart/form-data"},
+    },
+}
+```
+
+RequestMediaTypes keys use the original Gin method and path, before path normalization. A present route entry overrides the default, including an empty entry that leaves that route unresolved. Use a single empty string to declare absence of Content-Type. Values are exact base selector strings without charset/boundary parameters or wildcards. These settings resolve documentation conditions; they do not install request filters or alter explicit binder behavior.
+
+| Actual selection | Input sources |
+| --- | --- |
+| Automatic GET with non-multipart media | Form query fields; even a JSON/XML body is not selected as that codec |
+| Automatic non-GET with application/json | JSON request body |
+| Automatic non-GET with multipart/form-data | Multipart body fields and supported uploads, without query fallback |
+| Form with POST/PUT/PATCH and URL-encoded media | Body fields followed by query fallback; repeated values preserve body-first order |
+| Form with other methods and URL-encoded media | Query fields |
+| Form with multipart media, including GET | Query fields followed by multipart text values; this is distinct from FormMultipart |
+| Form with other/absent media | Query fields |
+
+Automatic non-GET XML/YAML/TOML/ProtoBuf/MsgPack/BSON selections retain codec diagnostics until their actual wire rules are supplied. Those diagnostics do not block a selected JSON case or GET's Form behavior. Unknown media scope fails during Build/Mount instead of defaulting to JSON. Multiple media such as JSON and Multipart are supported when their parameter and presence contracts can be merged accurately.
+
+For mixed Form sources, generated query parameters and body properties describe the same logical fields. Source rules record body-before-query or query-before-body precedence. A field-required declaration across these alternative locations is diagnosed because OpenAPI cannot simply require that field in both places. A centralized contract rule must resolve that ambiguity; the generator does not discard the declaration.
+
+The real-request matrix covers 17 successful cases across GET, POST, PUT, PATCH, DELETE, and QUERY, including repeated-value precedence and explicit Form. Eight additional cases cover business 422, mandatory 400/413, and a GET body limit that must not invent an unread-body 413. Independent validators check response bodies, numeric request representation, non-null form arrays, and repeated query serialization. Default and per-route configuration, unresolved media, unsupported selected codecs, compatible multi-media output, and cross-location presence ambiguity have boundary tests.
