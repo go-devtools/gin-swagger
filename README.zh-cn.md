@@ -10,7 +10,7 @@
 
 - 开发和验证使用 Go 1.27.1。
 - 最低版本验收使用 Gin v1.12.0。
-- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260906112229-094f7f6d9faf`，由 Go 工具从真实远端提交解析。
+- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260906141009-cb0cfbb4dfdc`，由 Go 工具从真实远端提交解析。
 
 ## 架构
 

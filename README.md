@@ -10,7 +10,7 @@ This pre-1.0 SDK evolves between pinned versions. Use the public APIs and check 
 
 - Go 1.27.1 for development and verification.
 - Gin v1.12.0 or the version pinned in go.mod.
-- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260906112229-094f7f6d9faf`, resolved from an actual remote commit.
+- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260906141009-cb0cfbb4dfdc`, resolved from an actual remote commit.
 
 ## Architecture
 
