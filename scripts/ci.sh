@@ -37,6 +37,35 @@ fuzz_target() {
   go test "$ci_package" -run '^$' -fuzz "^$ci_name$" -fuzztime="${CI_FUZZ_TIME:-30s}" | tee "$ci_artifacts/$ci_name.txt"
 }
 
+# Run the large source/HTTP matrix in bounded processes without omitting any discovered test or fuzz seed.
+race_tests() {
+  local ci_package ci_name ci_names ci_list ci_index=0 ci_shard
+  local ci_packages=() ci_groups=('' '' '')
+  ci_list="$(go list ./...)"
+  while IFS= read -r ci_package; do
+    [[ "$ci_package" == "$ci_module/internal/integration" ]] || ci_packages+=("$ci_package")
+  done <<< "$ci_list"
+  [[ "${#ci_packages[@]}" -gt 0 ]] || { echo 'ci.test.missing: no race packages discovered'; exit 2; }
+  go test -race -count=1 -json "${ci_packages[@]}" | tee "$ci_artifacts/race.json"
+  ci_names="$(go test ./internal/integration -list '.')"
+  : > "$ci_artifacts/race-integration-selection.txt"
+  while IFS= read -r ci_name; do
+    case "$ci_name" in
+      Test*|Example*|Fuzz*)
+        ci_shard=$((ci_index % 3))
+        ci_groups[$ci_shard]="${ci_groups[$ci_shard]:+${ci_groups[$ci_shard]}|}$ci_name"
+        printf '%s %s\n' "$ci_shard" "$ci_name" >> "$ci_artifacts/race-integration-selection.txt"
+        ci_index=$((ci_index + 1))
+        ;;
+    esac
+  done <<< "$ci_names"
+  [[ "$ci_index" -gt 0 ]] || { echo 'ci.test.missing: no integration tests discovered'; exit 2; }
+  for ci_shard in 0 1 2; do
+    [[ -n "${ci_groups[$ci_shard]}" ]] || continue
+    go test -race -count=1 -json -run "^(${ci_groups[$ci_shard]})$" ./internal/integration | tee -a "$ci_artifacts/race.json"
+  done
+}
+
 case "${1:-test}" in
   test)
     go env -json GOVERSION GOOS GOARCH CGO_ENABLED GOFLAGS GOWORK GOTOOLCHAIN | tee "$ci_artifacts/environment.json"
@@ -55,7 +84,7 @@ case "${1:-test}" in
       go run ./cmd/gin-swagger check --dir ./examples/basic --output ./internal/apidoc
     fi
     go test -count=1 -json ./... | tee "$ci_artifacts/tests.json"
-    go test -race -count=1 -json ./... | tee "$ci_artifacts/race.json"
+    race_tests
     go vet ./... 2>&1 | tee "$ci_artifacts/vet.txt"
     go build ./...
     if [[ "$ci_module" == github.com/openapi-golang/openapi ]]; then
