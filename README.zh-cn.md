@@ -77,3 +77,5 @@ Fiber 和 Echo 仅为未来扩展方向，本仓库未交付或宣称支持这�
 Gin 的 `Build` 和 `Mount` 会校验当前程序与生成 Bundle 的构建条件。已知不匹配时在挂载文档路由前失败，缺少元数据时在 `Document.Report()` 保留警告。这不能替代 CI 的源码新鲜度检查。
 
 原始 PostForm、数组/字典读取、FormFile 和 SaveUploadedFile 已保留正文与查询位置、编码和业务错误分支。已验证行为及剩余边界见[请求指南](docs/requests.md)。
+
+HEAD 和重定向响应语义已通过真实 HTTP 服务验证，详见[响应指南](docs/responses.md)。

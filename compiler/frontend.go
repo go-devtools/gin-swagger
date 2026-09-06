@@ -18,7 +18,7 @@ const ginPackage = "github.com/gin-gonic/gin"
 // 注册静态 Gin 规则，同一个值供 CLI 与项目自定义生成器组合。
 // Provide the same frontend to the CLI and custom generation entry points.
 func Frontend() core.Frontend {
-	return core.Frontend{Name: "gin-v1.12-front-v6", Match: func(f core.Function) bool {
+	return core.Frontend{Name: "gin-v1.12-front-v7", Match: func(f core.Function) bool {
 		return f.Signature.Params().Len() == 1 && isContext(f.Signature.Params().At(0).Type())
 	}, Entry: func(f core.Function) []core.Effect {
 		source := f.Source
@@ -128,7 +128,7 @@ func analyzeCall(c core.CallContext) ([]core.Effect, error) {
 		return readerResponse(c, integer(arg(0)), literal(arg(2)), arg(1), arg(3), arg(4)), nil
 	case "Render":
 		return explicitRenderer(c, integer(arg(0)), arg(1)), nil
-	case "Redirect", "File", "FileAttachment", "FileFromFS", "SSEvent", "Stream":
+	case "File", "FileAttachment", "FileFromFS", "SSEvent", "Stream":
 		return unresolved(c, fmt.Sprintf("%s 需要媒体类型或流式输出投影", name)), nil
 	case "Next":
 		return unresolved(c, "路由快照仅暴露末位 handler，中间件链需要集中声明"), nil

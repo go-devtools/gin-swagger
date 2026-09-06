@@ -71,7 +71,7 @@ func TestExternalModule(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "go.mod"), module, 0600); err != nil {
 		t.Fatal(err)
 	}
-	for _, name := range []string{"go.sum", "main.go", "main_test.go", "mandatory.go", "mandatory_test.go", "automatic.go", "automatic_test.go", "raw.go", "raw_test.go"} {
+	for _, name := range []string{"go.sum", "main.go", "main_test.go", "mandatory.go", "mandatory_test.go", "automatic.go", "automatic_test.go", "raw.go", "raw_test.go", "http.go", "http_test.go"} {
 		source := filepath.Join(root, name)
 		if name != "go.sum" {
 			source = filepath.Join("testdata", "external", name)

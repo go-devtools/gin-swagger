@@ -109,10 +109,14 @@ func rawReadOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	}, nil
 }
 
-// 先分派原始读取，再复用绑定器的有限返回值规则。
-// Dispatch raw reads first, then reuse finite binder-result rules.
+// 先分派依赖响应状态的重定向，再处理原始读取与绑定器的有限备选。
+// Dispatch state-dependent redirects before raw reads and finite binder outcomes.
 func requestOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
-	results, err := rawReadOutcomes(c)
+	results, err := redirectOutcomes(c)
+	if err != nil || len(results) > 0 {
+		return results, err
+	}
+	results, err = rawReadOutcomes(c)
 	if err != nil || len(results) > 0 {
 		return results, err
 	}

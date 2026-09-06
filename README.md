@@ -77,3 +77,5 @@ Build target settings, dependency source, overlays, and declared custom mapping 
 Gin `Build` and `Mount` verify the executable build conditions against the generated Bundle. Known mismatches fail before mounting documentation routes; missing build metadata is retained as warnings in `Document.Report()`. This does not replace source freshness checks in CI.
 
 Raw PostForm, array/dictionary getters, FormFile, and SaveUploadedFile now preserve their body/query locations, encodings, and business error branches. See the [request guide](docs/requests.md) for tested behavior and remaining boundaries.
+
+HEAD and redirect response semantics are validated against real HTTP servers; see the [response guide](docs/responses.md).
