@@ -38,7 +38,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 		return 1
 	}
 	if len(args) == 0 || args[0] == "help" || args[0] == "--help" {
-		fmt.Fprintln(stdout, "gin-swagger generate --dir . --output ./internal/apidoc\ngin-swagger check --dir . --output ./internal/apidoc\ngin-swagger check --spec openapi.json\ngin-swagger explain --dir . --symbol module/pkg.Handler\ngin-swagger version")
+		fmt.Fprintln(stdout, "gin-swagger generate --dir . --output ./internal/apidoc\ngin-swagger check --dir . --output ./internal/apidoc\ngin-swagger check --spec openapi.json\ngin-swagger explain --dir . --symbol module/pkg.Handler\ngin-swagger explain --dir . --symbol module/pkg.DTO.Field\ngin-swagger explain --dir . --symbol module/pkg.Handler --response 201\ngin-swagger version")
 		return 0
 	}
 	if args[0] == "version" {
@@ -69,6 +69,8 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 	packageName := flags.String("package", "apidoc", "Generated file package name")
 	specFile := flags.String("spec", "", "Independent specification validation file")
 	symbol := flags.String("symbol", "", "Fully qualified symbol to explain")
+	response := flags.String("response", "", "Exact response status for the selected handler (explain only)")
+	maxExplainBytes := flags.Int("max-explain-bytes", 0, "Evidence byte limit for explain; zero selects sixteen MiB")
 	tags := flags.String("tags", "", "Actual build tags")
 	maxDepth := flags.Int("max-depth", 12, "Maximum cross-function depth")
 	maxPaths := flags.Int("max-paths", 128, "Maximum path count")
@@ -82,6 +84,15 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 	}
 	if flags.NArg() != 0 {
 		return fail(fmt.Errorf("%s does not accept positional arguments", args[0]))
+	}
+	if *response != "" && args[0] != "explain" {
+		return fail(fmt.Errorf("--response is only supported by explain"))
+	}
+	if args[0] == "explain" && strings.TrimSpace(*symbol) == "" {
+		return fail(fmt.Errorf("explain requires --symbol with a fully qualified Go symbol"))
+	}
+	if *maxExplainBytes < 0 {
+		return fail(fmt.Errorf("--max-explain-bytes must not be negative"))
 	}
 	if *specFile != "" {
 		if args[0] != "check" {
@@ -126,7 +137,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 			cleanup()
 		}
 	}()
-	options := core.Options{Load: core.LoadOptions{Dir: absolute, Patterns: []string{"./..."}}, Frontends: []core.Frontend{front.Frontend()}, MaxDepth: *maxDepth, MaxPaths: *maxPaths, MaxCalls: *maxCalls}
+	options := core.Options{Load: core.LoadOptions{Dir: absolute, Patterns: []string{"./..."}}, Frontends: []core.Frontend{front.Frontend()}, MaxDepth: *maxDepth, MaxPaths: *maxPaths, MaxCalls: *maxCalls, Explain: args[0] == "explain", MaxExplainBytes: *maxExplainBytes}
 	if *tags != "" {
 		options.Load.BuildFlags = []string{"-tags=" + *tags}
 	}
@@ -141,15 +152,22 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 	case "check":
 		err = result.Check(write)
 	case "explain":
-		found := false
-		for _, template := range result.Bundle.Index() {
-			if template.Symbol == *symbol {
-				found = true
-				_ = json.NewEncoder(stdout).Encode(template)
-			}
+		var explanation core.Explanation
+		explanation, err = result.Explain(core.ExplainQuery{Symbol: *symbol, Response: *response})
+		if err != nil {
+			break
 		}
-		if !found {
-			return fail(fmt.Errorf("no matching symbol %s", *symbol))
+		if explanation.Operation != nil {
+			// Preserve the existing top-level template contract for handler consumers.
+			// 为 handler 输出的既有使用方保留顶层模板契约。
+			template := *explanation.Operation
+			explanation.Operation = nil
+			err = json.NewEncoder(stdout).Encode(struct {
+				openapi.Template
+				Explanation core.Explanation `json:"explanation"`
+			}{Template: template, Explanation: explanation})
+		} else {
+			err = json.NewEncoder(stdout).Encode(explanation)
 		}
 	}
 	if err != nil {

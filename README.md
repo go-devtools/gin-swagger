@@ -93,3 +93,5 @@ Function comments can declare request and response types through the shared core
 See the [performance guide](docs/performance.md) for reproducible 100/1000-route generation, startup Build, document-read, and allocation benchmarks.
 
 See the [independent CI guide](docs/ci.md) for pinned tools, private module access, offline browser checks, actual platform jobs, and fixed remote-version consumption.
+
+The [explanation commands](docs/ai-integration.md#explain-a-field-or-response) report field and response origins, actual projection rules, and declarations without claiming business enforcement.

@@ -93,3 +93,5 @@ Stream 回调与面向 Gin 响应 Writer 的 JSON Encoder 通过公开核心回�
 参见[性能指南](docs/performance.md)，运行可复现的 100／1000 路由生成、启动 Build、文档读取与内存分配基准。
 
 参见[独立 CI 指南](docs/ci.md)，了解固定工具链、私有模块访问、离线浏览器检查、真实平台任务和固定远端版本消费验证。
+
+[来源解释命令](docs/ai-integration.md#explain-a-field-or-response) 可查询字段和响应来源、实际投影规则及声明，并明确区分契约与业务实施证据。
