@@ -25,7 +25,6 @@ import (
 	"github.com/openapi-golang/openapi/spec"
 )
 
-// 从真实回调源码生成 Bundle，逐字节确认业务源码未修改。
 // Generate a Bundle from real callback source and verify that business source remains byte-identical.
 func streamCallbackBundle(t *testing.T) openapi.Bundle {
 	t.Helper()
@@ -45,7 +44,6 @@ func streamCallbackBundle(t *testing.T) openapi.Bundle {
 	return result.Bundle
 }
 
-// 用真实 HTTP 逐项校验 SSE 与 NDJSON，并比较挂载前后的状态、头和正文。
 // Validate SSE and NDJSON over real HTTP and compare status, headers, and body before and after mounting.
 func TestStreamCallbacksWire(t *testing.T) {
 	bundle := streamCallbackBundle(t)
@@ -140,7 +138,6 @@ func TestStreamCallbacksWire(t *testing.T) {
 	}
 }
 
-// 不确定回调、错误逐行编码或晚写媒体头必须阻断选中路由。
 // Unresolved callbacks, invalid line framing, and late media headers must block selected routes.
 func TestStreamCallbacksDiagnostics(t *testing.T) {
 	bundle := streamCallbackBundle(t)
@@ -153,7 +150,6 @@ func TestStreamCallbacksDiagnostics(t *testing.T) {
 	}
 }
 
-// 状态稳定的长连接生成原生契约，真实客户端关闭后 handler 及时结束。
 // A stable long-lived stream generates a native contract and its handler terminates promptly after the real client closes.
 func TestStreamCallbackCancellation(t *testing.T) {
 	bundle := streamCallbackBundle(t)

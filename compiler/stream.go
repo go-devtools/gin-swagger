@@ -9,7 +9,6 @@ import (
 	core "github.com/openapi-golang/openapi/compiler"
 )
 
-// 从 Context 的实际公开字段类型构造 Writer 实参，不引入核心私有状态。
 // Construct the writer argument from Context's actual public field type without core-private state.
 func contextWriter(context core.Value) (core.Value, bool) {
 	if value, ok := context.Fields["Writer"]; ok {
@@ -35,7 +34,6 @@ func contextWriter(context core.Value) (core.Value, bool) {
 	return core.Value{}, false
 }
 
-// Gin Stream 先检查断连，再调用 step、Flush，最后按布尔结果重复。
 // Gin Stream checks disconnection, invokes step, flushes, and then repeats according to the boolean result.
 func streamCallback(c core.CallContext) (*core.CallbackPlan, error) {
 	if c.Object == nil || c.Object.Pkg() == nil || c.Object.Pkg().Path() != ginPackage || c.Object.Name() != "Stream" || !isContext(c.Receiver.Type) {
@@ -43,7 +41,7 @@ func streamCallback(c core.CallContext) (*core.CallbackPlan, error) {
 	}
 	writer, ok := contextWriter(c.Receiver)
 	if !ok || len(c.Arguments) != 1 {
-		return nil, fmt.Errorf("gin-swagger.analysis: Stream Writer 或回调未解决")
+		return nil, fmt.Errorf("gin-swagger.analysis: Stream Writer or callback is unresolved")
 	}
 	source := c.Source
 	source.Kind, source.Rule = "derived", "gin.Stream.flush"
@@ -52,7 +50,6 @@ func streamCallback(c core.CallContext) (*core.CallbackPlan, error) {
 	return &core.CallbackPlan{Function: c.Arguments[0], Arguments: []core.Value{writer}, After: []core.Effect{{Kind: core.ResponseCommit, Status: "-1", Source: source}}, Results: []core.Value{falseValue}, Repeat: &core.CallbackRepeat{ContinueValue: true}, MayInterrupt: true, InterruptResults: []core.Value{trueValue}}, nil
 }
 
-// 使用完整类型身份识别 Gin Writer，普通文件或日志 Writer 不作为响应。
 // Recognize Gin writers by full type identity without treating ordinary file or log writers as responses.
 func isGinWriter(t types.Type) bool {
 	if t == nil {
@@ -66,7 +63,6 @@ func isGinWriter(t types.Type) bool {
 	return ok && named.Obj().Pkg() != nil && named.Obj().Pkg().Path() == ginPackage && named.Obj().Name() == "ResponseWriter"
 }
 
-// 将标准 JSON 编码器的 Writer 身份随返回值传播，并保留 Encode 的错误分支。
 // Propagate a standard JSON encoder's writer identity through its result and preserve Encode error branches.
 func streamWriterOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	if c.Object == nil || c.Object.Pkg() == nil || c.Object.Pkg().Path() != "encoding/json" {
@@ -90,7 +86,7 @@ func streamWriterOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	}
 	writer, known := c.Receiver.Fields["openapi.gin.writer"]
 	if !known {
-		return nil, fmt.Errorf("gin-swagger.analysis: JSON Encoder 的输出 Writer 身份未解决")
+		return nil, fmt.Errorf("gin-swagger.analysis: JSON Encoder output Writer identity is unresolved")
 	}
 	var returned []core.Value
 	for i := 0; i < signature.Results().Len(); i++ {
@@ -99,10 +95,10 @@ func streamWriterOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	handled := []core.Effect{{Kind: core.Handled, Source: c.Source}}
 	if !isGinWriter(writer.Type) {
 		if writer.Type == nil || writer.Unknown {
-			return nil, fmt.Errorf("gin-swagger.analysis: JSON Encoder 的 Writer 类型未解决")
+			return nil, fmt.Errorf("gin-swagger.analysis: JSON Encoder Writer type is unresolved")
 		}
 		if _, dynamic := writer.Type.Underlying().(*types.Interface); dynamic {
-			return nil, fmt.Errorf("gin-swagger.analysis: JSON Encoder 的接口 Writer 可能指向响应，需要集中规则")
+			return nil, fmt.Errorf("gin-swagger.analysis: JSON Encoder interface Writer may target the response; register a centralized rule")
 		}
 		return []core.CallOutcome{{Results: returned, Effects: handled}}, nil
 	}
@@ -111,12 +107,12 @@ func streamWriterOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 		return []core.CallOutcome{{Effects: handled}}, nil
 	case "SetIndent":
 		if len(c.Arguments) != 2 || c.Arguments[0].Constant == nil || c.Arguments[1].Constant == nil || literal(c.Arguments[0]) != "" || literal(c.Arguments[1]) != "" {
-			return nil, fmt.Errorf("gin-swagger.analysis: NDJSON 不接受可能跨行的 JSON 缩进")
+			return nil, fmt.Errorf("gin-swagger.analysis: NDJSON does not accept JSON indentation that may introduce line breaks")
 		}
 		return []core.CallOutcome{{Effects: handled}}, nil
 	case "Encode":
 		if len(c.Arguments) != 1 || len(returned) != 1 {
-			return nil, fmt.Errorf("gin-swagger.analysis: JSON Encode 签名未解决")
+			return nil, fmt.Errorf("gin-swagger.analysis: JSON Encode signature is unresolved")
 		}
 		headers := c.Response.Headers
 		if c.Response.Committed {
@@ -125,7 +121,7 @@ func streamWriterOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 		header, exists := headers["Content-Type"]
 		media, _, err := mime.ParseMediaType(header.Value)
 		if !exists || !header.Known || err != nil || (media != "application/x-ndjson" && media != "application/ndjson") {
-			return nil, fmt.Errorf("gin-swagger.analysis: 逐项 JSON 输出需要明确的 NDJSON 媒体类型")
+			return nil, fmt.Errorf("gin-swagger.analysis: item-wise JSON output requires an explicit NDJSON media type")
 		}
 		source := c.Source
 		source.Kind, source.Rule = "derived", "gin.writer.json.Encode"
@@ -135,5 +131,5 @@ func streamWriterOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 		failure.NonNil = true
 		return []core.CallOutcome{{Results: []core.Value{success}, Effects: []core.Effect{effect}}, {Results: []core.Value{failure}, Effects: []core.Effect{effect}}}, nil
 	}
-	return nil, fmt.Errorf("gin-swagger.analysis: JSON Encoder 的响应调用未识别")
+	return nil, fmt.Errorf("gin-swagger.analysis: JSON Encoder response call was not recognized")
 }

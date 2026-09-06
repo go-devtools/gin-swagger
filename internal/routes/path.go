@@ -1,4 +1,3 @@
-// 将 Gin 原始路径转换为框架中立 OpenAPI 路径。
 // Convert raw Gin paths into neutral OpenAPI paths.
 package routes
 
@@ -7,7 +6,6 @@ import (
 	"strings"
 )
 
-// 保留 catch-all 不可无损表达的跨斜杠语义。
 // Record the lossy cross-slash semantics of catch-all parameters.
 type Path struct {
 	Path       string
@@ -15,12 +13,11 @@ type Path struct {
 	CatchAll   bool
 }
 
-// 按 Gin 一点十二路径词法扫描，转义冒号仍是静态字符。
 // Parse Gin 1.12 path syntax while preserving escaped literal colons.
 func Parse(raw string) (Path, error) {
 	out := Path{}
 	if len(raw) == 0 || raw[0] != '/' || len(raw) > 16384 {
-		return out, fmt.Errorf("gin-swagger.path.invalid: 路径为空、非绝对或超过预算")
+		return out, fmt.Errorf("gin-swagger.path.invalid: path is empty, not absolute, or exceeds the budget")
 	}
 	var b strings.Builder
 	names := map[string]bool{}
@@ -28,7 +25,7 @@ func Parse(raw string) (Path, error) {
 		c := raw[i]
 		if c == '\\' {
 			if i+1 >= len(raw) || raw[i+1] != ':' {
-				return out, fmt.Errorf("gin-swagger.path.escape: 仅允许转义冒号")
+				return out, fmt.Errorf("gin-swagger.path.escape: only colons may be escaped")
 			}
 			b.WriteByte(':')
 			i += 2
@@ -39,19 +36,19 @@ func Parse(raw string) (Path, error) {
 			i++
 			for i < len(raw) && raw[i] != '/' {
 				if raw[i] == ':' || raw[i] == '*' || raw[i] == '{' || raw[i] == '}' {
-					return out, fmt.Errorf("gin-swagger.path.parameter: 同一段存在多个通配符或非法名称")
+					return out, fmt.Errorf("gin-swagger.path.parameter: segment contains multiple wildcards or an invalid name")
 				}
 				i++
 			}
 			name := raw[start+1 : i]
 			if name == "" || names[name] {
-				return out, fmt.Errorf("gin-swagger.path.parameter: 参数为空或重复")
+				return out, fmt.Errorf("gin-swagger.path.parameter: parameter is empty or duplicated")
 			}
 			names[name] = true
 			out.Parameters = append(out.Parameters, name)
 			if c == '*' {
 				if start == 0 || raw[start-1] != '/' || i != len(raw) {
-					return out, fmt.Errorf("gin-swagger.path.catchall: catch-all 必须单独位于最后一段")
+					return out, fmt.Errorf("gin-swagger.path.catchall: catch-all must occupy the final segment alone")
 				}
 				out.CatchAll = true
 			}
@@ -61,7 +58,7 @@ func Parse(raw string) (Path, error) {
 			continue
 		}
 		if c == '{' || c == '}' || c == '?' || c == '#' || c < 32 {
-			return out, fmt.Errorf("gin-swagger.path.static: 静态字符无法直接表示为 OpenAPI 路径")
+			return out, fmt.Errorf("gin-swagger.path.static: static character cannot be represented directly in an OpenAPI path")
 		}
 		b.WriteByte(c)
 		i++

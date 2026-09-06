@@ -1,0 +1,26 @@
+# gin-swagger
+
+> Generate native OpenAPI 3.2 contracts from existing Gin source and mount shared offline Swagger UI at startup.
+
+The module is github.com/openapi-golang/gin-swagger and the root package is ginswagger. Use Go 1.27.1 and Gin v1.12.0 with the core version pinned in go.mod. Generate source contracts, then link the actual Engine.Routes snapshot. Preserve DTOs, handlers, and existing route registration. Runtime packages do not import the compiler or access core internal packages.
+
+## Integration
+
+- [AI integration guide](docs/ai-integration.md): Actual commands, JSON diagnostics, source freshness, and integration boundaries.
+- [README](README.md): Mounting, document groups, Bearer authentication, and UI configuration.
+- [Basic application](examples/basic/main.go): Tag-free source, generated Bundle import, and startup mounting.
+- [Runtime API](build.go): Config, scope selection, request media, and explicit operation bindings.
+- [Mounting](mount.go): Cached documents, route preflight, and document-group endpoints.
+
+## Supported behavior
+
+- [Request guide](docs/requests.md): Automatic and explicit binding, raw fields, files, and limits.
+- [Response guide](docs/responses.md): Actual rendering, HEAD, redirects, SSE, Stream, and NDJSON.
+- [HTTP method examples](examples/basic/methods.go): GET, POST, PUT, PATCH, DELETE, and deprecation.
+- [Type examples](examples/basic/types.go): Wire types and enums with source descriptions.
+- [Frontend](compiler/frontend.go): Gin semantics expressed through the public core SDK.
+
+## Optional
+
+- [External consumer](internal/verify/testdata/external/main_test.go): Generation and runtime use from an independent module.
+- [Chinese README](README.zh-cn.md): Corresponding Chinese documentation.

@@ -10,7 +10,6 @@ import (
 	"github.com/openapi-golang/openapi"
 )
 
-// 构建条件不匹配必须在挂载任何文档路由前失败。
 // Reject mismatched build conditions before mounting any documentation routes.
 func TestRuntimeProfileMismatchLeavesRoutesUnchanged(t *testing.T) {
 	gin.SetMode(gin.TestMode)

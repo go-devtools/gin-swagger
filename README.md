@@ -1,16 +1,16 @@
 # gin-swagger
 
-[简体中文](README.zh-cn.md)
+[Simplified Chinese](README.zh-cn.md)
 
 Non-invasive Gin source contract generation and runtime integration for native OpenAPI 3.2.
 
-This repository is under active implementation. The full acceptance target is recorded in [GOAL.md](GOAL.md); current evidence and remaining work are tracked in [status](docs/status.md) and [verification](docs/verification.md). It is not yet a completed or released product.
+This pre-1.0 SDK evolves between pinned versions. Use the public APIs and check the documented capability boundaries before depending on advanced behavior.
 
 ## Requirements
 
-- Exactly Go 1.27.1 for minimum-version acceptance.
-- Gin v1.12.0 for minimum-version acceptance.
-- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260906025859-a178878ec844`, resolved from an actual remote commit.
+- Go 1.27.1 for development and verification.
+- Gin v1.12.0 or the version pinned in go.mod.
+- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260906035319-560c9adbb5be`, resolved from an actual remote commit.
 
 ## Architecture
 
@@ -52,9 +52,9 @@ Enum descriptions come from ordinary comments on the typed constants. Generated 
 
 The UI preserves a selected registered definition across refreshes and deep links. Other query-string overrides remain disabled. Submitting API requests is disabled by default; enable specific lower-case methods explicitly with `UI.SubmitMethods` when appropriate.
 
-## Verified module snapshot
+## Development checks
 
-`GOWORK=off make dev`, `go test -race ./...`, `go vet ./...`, and `go mod verify` pass with the pinned core downloaded into the module cache and no local `replace`. This verifies the current implementation against a real remote version; final cold-cache, CI, and full capability acceptance remain tracked in [verification](docs/verification.md).
+Use `GOWORK=off make dev`, `GOWORK=off go test -race ./...`, `GOWORK=off go vet ./...`, and `GOWORK=off go mod verify` with the pinned core and no local replace. The independent consumer test supports a fixed remote version through `GIN_SWAGGER_TEST_VERSION`.
 
 For a new checkout, run `GOWORK=off go mod download` before `GOWORK=off make dev`. This keeps initial dependency downloads outside the generator's default one-minute budget. Direct CLI calls may select a longer budget with `--timeout=5m`.
 
@@ -66,7 +66,7 @@ The frontend derives text, raw data, reader, explicit standard renderer, and imm
 
 New project code is licensed under [MIT](LICENSE). Third-party assets retain their original licenses and notices.
 
-Project-owned source comments are bilingual (Simplified Chinese and English). Compiler directives and upstream assets retain their original form. In examples and schema fixtures, companion translations are separated from attached Go documentation by a blank line so generated descriptions keep their intended language. Commit messages use English.
+Project-owned code comments, diagnostics, CLI help, and example text use English. Multilingual encoding tests retain their input values through escaped literals. Upstream assets retain their original form. Commit messages use English; [README.zh-cn.md](README.zh-cn.md) provides corresponding Chinese documentation.
 
 See the [request binding guide](docs/requests.md) for explicit JSON, Query, URI, Header, FormPost, Multipart, and centralized custom-decoder rules.
 
@@ -83,3 +83,7 @@ HEAD and redirect response semantics are validated against real HTTP servers; se
 Gin SSEvent and standard sse.Event renderers produce native event itemSchema, preserving actual text/JSON payloads and transmitted metadata. See the [response guide](docs/responses.md) for the real HTTP matrix and remaining streaming callback boundaries.
 
 Stream callbacks and JSON Encoder writes to the Gin response writer are supported through the public core callback SDK, including explicit NDJSON framing and stable long-lived SSE. See the [response guide](docs/responses.md) for tested behavior and remaining boundaries.
+
+## AI-assisted integration
+
+Start with [llms.txt](llms.txt) for a compact documentation index and the [AI integration guide](docs/ai-integration.md) for actual commands, structured diagnostics, and public API boundaries. Generated JSON and provenance provide evidence for integration decisions.

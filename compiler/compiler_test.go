@@ -11,7 +11,6 @@ import (
 	core "github.com/openapi-golang/openapi/compiler"
 )
 
-// 验证 Gin 规则经公开 SDK 编译真实零 tag handler。
 // Compile actual tag-free Gin handlers through the public SDK.
 func TestGinFrontendFromSource(t *testing.T) {
 	dir := t.TempDir()
@@ -32,20 +31,20 @@ func TestGinFrontendFromSource(t *testing.T) {
 	}
 	source := `package sample
 import "github.com/gin-gonic/gin"
-// 创建信息。
+// Describe creation input.
 type Request struct {
- // 用户名。
+ // User name.
  // @openapi required minLength=3
  Name string
 }
-// 响应信息。
+// Describe response data.
 type User struct { ID int64; Name string }
-// 错误信息。
+// Error information.
 type APIError struct { Message string }
-// 创建用户
+// Create a user
 func Create(c *gin.Context) {
  var req Request
- if err:=c.ShouldBindJSON(&req);err!=nil { c.JSON(400,APIError{Message:"无效请求"});return }
+ if err:=c.ShouldBindJSON(&req);err!=nil { c.JSON(400,APIError{Message:"Invalid request"});return }
  c.JSON(201,User{ID:1,Name:req.Name})
 }
 `
@@ -58,15 +57,15 @@ func Create(c *gin.Context) {
 	}
 	index := result.Bundle.Index()
 	if len(index) != 1 {
-		t.Fatalf("候选识别错误：%+v", index)
+		t.Fatalf("candidate recognition failed: %+v", index)
 	}
-	doc, err := openapi.Build(result.Bundle, []openapi.Route{{Method: "POST", Path: "/users", OperationKey: index[0].Key}}, openapi.Config{Title: "用户服务", Version: "1"})
+	doc, err := openapi.Build(result.Bundle, []openapi.Route{{Method: "POST", Path: "/users", OperationKey: index[0].Key}}, openapi.Config{Title: "User service", Version: "1"})
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, want := range []string{`"400"`, `"201"`, `"Name"`, `"minLength": 3`, "创建用户"} {
+	for _, want := range []string{`"400"`, `"201"`, `"Name"`, `"minLength": 3`, "Create a user"} {
 		if !strings.Contains(string(doc.JSON()), want) {
-			t.Fatalf("缺少 %s：%s", want, doc.JSON())
+			t.Fatalf("missing %s: %s", want, doc.JSON())
 		}
 	}
 }

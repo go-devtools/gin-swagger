@@ -14,7 +14,6 @@ import (
 	"github.com/openapi-golang/openapi/spec"
 )
 
-// 根据实际方法和已有响应头，表达标准重定向的正文与待提交状态。
 // Model standard redirect bodies and pending status using the actual method and existing response headers.
 func redirectOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	if c.Object == nil || c.Object.Pkg() == nil || c.Object.Pkg().Path() != ginPackage || c.Object.Name() != "Redirect" {
@@ -25,12 +24,12 @@ func redirectOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 		return nil, nil
 	}
 	if len(c.Arguments) < 2 {
-		return []core.CallOutcome{{Effects: unresolved(c, "重定向参数未解决")}}, nil
+		return []core.CallOutcome{{Effects: unresolved(c, "redirect arguments are unresolved")}}, nil
 	}
 	status := integer(c.Arguments[0])
 	code, err := strconv.Atoi(status)
 	if err != nil || (code != 201 && (code < 300 || code > 308)) {
-		return []core.CallOutcome{{Effects: unresolved(c, "重定向状态必须是 Gin 接受的明确 201 或 300～308")}}, nil
+		return []core.CallOutcome{{Effects: unresolved(c, "redirect status must be an explicit 201 or 300 through 308 accepted by Gin")}}, nil
 	}
 	source := c.Source
 	source.Kind, source.Rule = "derived", "gin.Redirect"
@@ -54,7 +53,6 @@ func redirectOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	}, nil
 }
 
-// 只归一化不依赖请求路径的目标；相对目标保留已知的字符串网络类型。
 // Normalize only targets independent of the request path; relative targets retain their known string wire type.
 func redirectLocation(target string) (string, bool) {
 	parsed, err := url.Parse(target)

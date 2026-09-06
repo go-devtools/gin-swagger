@@ -21,7 +21,6 @@ import (
 	"github.com/openapi-golang/openapi/contracttest"
 )
 
-// 编译真实自动绑定源码，并验证编译过程没有改写业务文件。
 // Compile actual automatic-binding source and verify compilation leaves business files unchanged.
 func automaticBundle(t *testing.T) openapi.Bundle {
 	t.Helper()
@@ -40,7 +39,6 @@ func automaticBundle(t *testing.T) openapi.Bundle {
 	return result.Bundle
 }
 
-// 设置文档媒体范围，不修改实际请求或 Gin 路由。
 // Configure documentation media scope without modifying actual requests or Gin routes.
 func automaticConfig(t *testing.T, method string, media []string) ginswagger.Config {
 	t.Helper()
@@ -48,7 +46,6 @@ func automaticConfig(t *testing.T, method string, media []string) ginswagger.Con
 	return cfg
 }
 
-// 独立构造请求体，使实际 Gin 选择和生成的条件契约可以互相校验。
 // Construct bodies independently so real Gin selection and generated conditional contracts can cross-check each other.
 func automaticBody(t *testing.T, media string) (string, string) {
 	t.Helper()
@@ -73,7 +70,6 @@ func automaticBody(t *testing.T, media string) (string, string) {
 	return "ignored body", media
 }
 
-// 验证自动和显式 Form 绑定的真实来源、优先顺序及挂载前后等价性。
 // Verify actual sources, precedence, and mount equivalence for automatic and explicit Form binding.
 func TestAutomaticBinderConditions(t *testing.T) {
 	bundle := automaticBundle(t)
@@ -191,7 +187,6 @@ func TestAutomaticBinderConditions(t *testing.T) {
 	}
 }
 
-// 未确定媒体、未知 codec 与跨位置必填歧义必须在所选路由上明确失败。
 // Unresolved media, unknown codecs, and ambiguous cross-location requirements must fail on selected routes.
 func TestAutomaticBinderBoundaries(t *testing.T) {
 	bundle := automaticBundle(t)

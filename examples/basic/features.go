@@ -14,24 +14,17 @@ import (
 	"github.com/openapi-golang/openapi/swaggerui"
 )
 
-// 演示字符串与数字枚举在同一请求和响应中的表示。
-
 // Demonstrates string and numeric enums in the same request and response.
 type EnumSelection struct {
-	// 角色：admin 管理员、editor 编辑者、viewer 查看者。
 
 	// User role: admin for administrators, editor for editors, and viewer for viewers.
 	// @openapi required nonnull examples=["admin","editor","viewer"]
 	Role Role
-	// 状态：0 待处理、1 执行中、2 已完成；省略时采用 0。
 
 	// Task state: 0 for pending, 1 for running, and 2 for completed; defaults to 0 when omitted.
 	// @openapi default=0 examples=[0,1,2]
 	State TaskState
 }
-
-// 选择角色与状态
-// 请求和响应均包含字符串、数字枚举。可在 Examples 下拉框切换三组完整请求；无效枚举返回 400。
 
 // Select a role and task state
 //
@@ -40,36 +33,29 @@ type EnumSelection struct {
 func SelectEnums(c *gin.Context) {
 	var req EnumSelection
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(400, APIError{Code: "INVALID_JSON", Message: "请求体格式错误"})
+		c.JSON(400, APIError{Code: "INVALID_JSON", Message: "Invalid request body format"})
 		return
 	}
 	validRole := req.Role == RoleAdmin || req.Role == RoleEditor || req.Role == RoleViewer
 	validState := req.State == StatePending || req.State == StateRunning || req.State == StateDone
 	if !validRole || !validState {
-		c.JSON(400, APIError{Code: "INVALID_ENUM", Message: "角色或状态不在允许的枚举值中"})
+		c.JSON(400, APIError{Code: "INVALID_ENUM", Message: "Role or state is outside the allowed enum values"})
 		return
 	}
 	c.JSON(200, req)
 }
 
-// 通过鉴权后可读取的演示结果。
-
 // A sample result available after authentication.
 type AuthorizedExample struct {
-	// 当前演示用户。
 
 	// Current demo user.
 	// @openapi examples=["demo-user"]
 	User string
-	// 本次鉴权是否通过。
 
 	// Whether authentication succeeded.
 	// @openapi examples=[true]
 	Authorized bool
 }
-
-// 读取受保护内容
-// 点击 Authorize 填入对应的演示凭据。未提供或错误的凭据返回 401，通过后返回 200。
 
 // Read protected content
 //
@@ -79,18 +65,14 @@ func GetAuthorizedExample(c *gin.Context) {
 	c.JSON(200, AuthorizedExample{User: "demo-user", Authorized: true})
 }
 
-// 只保护新增的 Bearer 演示分组，不改变用户接口的既有行为。
-
 // Protects the Bearer demo group while preserving the existing user endpoint behavior.
 func requireDemoBearer(c *gin.Context) {
 	if c.GetHeader("Authorization") != "Bearer demo-token" {
-		c.AbortWithStatusJSON(401, APIError{Code: "UNAUTHORIZED", Message: "请提供演示 Bearer token"})
+		c.AbortWithStatusJSON(401, APIError{Code: "UNAUTHORIZED", Message: "Provide the demonstration Bearer token"})
 		return
 	}
 	c.Next()
 }
-
-// 在启动层集中设置文档标签及鉴权说明，Swagger 标签与 Gin 路径分组各自独立。
 
 // Configures documentation tags and authentication at startup; Swagger tags are independent of Gin route groups.
 func documentationConfig() ginswagger.Config {
@@ -123,8 +105,6 @@ func documentationConfig() ginswagger.Config {
 	}
 }
 
-// 通过公开类型化入口补充中间件契约和命名示例，并复用源码生成的错误模型。
-
 // Uses the public typed API to add middleware contracts and named examples, reusing the generated error model.
 func configureExamples(doc *spec.OpenAPI) error {
 	doc.Components.SecuritySchemes = map[string]spec.RefOr[spec.SecurityScheme]{
@@ -134,7 +114,6 @@ func configureExamples(doc *spec.OpenAPI) error {
 		op := item.Get
 		op.Security = spec.Set([]spec.SecurityRequirement{{"BearerAuth": []string{}}})
 		op.Summary = "Read Bearer-protected content"
-		// 从已生成的业务模板复用 APIError 契约，分类文档不依赖其他分类的路由存在。
 
 		// Reuses the generated APIError contract so each document group can be built independently.
 		var unauthorized spec.Response
@@ -144,23 +123,21 @@ func configureExamples(doc *spec.OpenAPI) error {
 			}
 		}
 		if len(unauthorized.Content) == 0 {
-			return fmt.Errorf("示例缺少源码生成的错误响应")
+			return fmt.Errorf("example is missing the source-derived error response")
 		}
 		unauthorized.Description = "Missing or invalid demo credentials."
 		op.Responses["401"] = spec.Inline(unauthorized)
 	}
-	// 标签仅展示当前分类实际使用的接口组。
 
 	// Shows only tags used by operations in the selected document group.
 	used := map[string]bool{}
 	for _, path := range doc.Paths {
 		for _, op := range []*spec.Operation{path.Get, path.Post, path.Put, path.Delete, path.Patch, path.Head, path.Options, path.Trace, path.Query} {
 			if op != nil {
-				// 使用标准英文状态说明填充生成的响应占位内容。
 
 				// Uses standard English status descriptions for generated response placeholders.
 				for status, response := range op.Responses {
-					if response.Value != nil && response.Value.Description == "响应 "+status {
+					if response.Value != nil && response.Value.Description == "Response "+status {
 						code, _ := strconv.Atoi(status)
 						response.Value.Description = http.StatusText(code)
 					}

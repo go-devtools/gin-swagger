@@ -24,7 +24,7 @@ Status 204 and 304 samples have no response content or reader-generated length/e
 
 `internal/verify` checks the runtime dependency graph and exercises an independent consumer module through first generation, deterministic regeneration, freshness checking, real HTTP contract tests, a `-trimpath -ldflags='-s -w'` application build, and runtime document export. Set `GIN_SWAGGER_TEST_VERSION` to a synchronized remote version to reject adapter replacements; without it, development uses a temporary replacement of this adapter checkout. The core dependency always remains fixed to the version in go.mod, without a local replacement. This mode choice is reported by the test and must not be confused with cold-cache acceptance.
 
-Run the module's `make dev` after downloading dependencies. The dedicated checks are also available through `go test ./internal/integration` and `go test ./internal/verify`. Actual stage results and remaining full-goal work are recorded in [verification.md](verification.md).
+Run the module's `make dev` after downloading dependencies. The dedicated checks are also available through `go test ./internal/integration` and `go test ./internal/verify`. Each integration case compares actual HTTP behavior with the generated contract.
 
 ## Redirects and HEAD on the real HTTP wire
 
@@ -34,7 +34,7 @@ Known destinations independent of the request path retain their exact normalized
 
 The real-server matrix covers 72 combinations: six methods and twelve redirect cases, including 201, 301/302/303/304/307/308, prior committed 409, custom/deleted/late media headers, and absolute/relative/dynamic destinations. Mount is compared against an equivalent unmounted engine for status, headers, and body bytes. Separate tests verify continued POST output, mixed GET diagnostics, and GET/HEAD reuse of one handler. HEAD is tested through an actual HTTP server; ResponseRecorder alone does not establish wire-body suppression. Native response summary/description metadata and local shared responses are handled by the core.
 
-See the [Go Redirect contract](https://pkg.go.dev/net/http#Redirect) and the fixed dependency source for framework-specific behavior. This increment leaves file/range/stream outputs, interim sequences, arbitrary custom renderers, full request mutation tracking, and the complete browser matrix in the active Goal.
+See the [Go Redirect contract](https://pkg.go.dev/net/http#Redirect) and the fixed dependency source for framework-specific behavior. File/range responses, arbitrary interim sequences, custom renderers, and full request mutation tracking remain diagnostic boundaries. Supported SSE and Stream callbacks are described below.
 
 ## Server-sent events
 

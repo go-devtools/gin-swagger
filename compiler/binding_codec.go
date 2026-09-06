@@ -11,19 +11,15 @@ import (
 	"github.com/openapi-golang/openapi/spec"
 )
 
-// 明确选择 Gin 文本绑定字段规则，可供项目生成入口复用。
 // Select explicit Gin text-binding field rules for reuse by project generation entry points.
 type BindingCodec struct {
-	// 模式为 query、uri、header、form-post 或 multipart。
 	// Mode is query, uri, header, form-post, or multipart.
 	Mode string
 }
 
-// 编解码身份包含模式，避免与 JSON 或其他位置的组件共用缓存。
 // Include the mode in codec identity to isolate JSON and other location projections.
 func (c BindingCodec) Name() string { return "gin-v1.12-binding-" + c.Mode + "-v1" }
 
-// 校验明确模式并选择 Gin 实际读取的 tag 名称。
 // Validate the explicit mode and select the tag actually read by Gin.
 func (c BindingCodec) fieldTag() (string, error) {
 	switch c.Mode {
@@ -34,10 +30,9 @@ func (c BindingCodec) fieldTag() (string, error) {
 	case "header":
 		return "header", nil
 	}
-	return "", fmt.Errorf("gin.codec.mode: 未知绑定模式 %q", c.Mode)
+	return "", fmt.Errorf("gin.codec.mode: unknown binding mode %q", c.Mode)
 }
 
-// 按 Gin 的递归字段遍历读取现有名称，不套用 JSON 字段优先级。
 // Follow Gin's recursive field traversal and existing names without imposing JSON field precedence.
 func (c BindingCodec) Fields(root *types.Struct) ([]core.WireField, error) {
 	tag, err := c.fieldTag()
@@ -50,7 +45,7 @@ func (c BindingCodec) Fields(root *types.Struct) ([]core.WireField, error) {
 	var visit func(*types.Struct, int) error
 	visit = func(value *types.Struct, depth int) error {
 		if depth > 32 || visiting[value] {
-			return fmt.Errorf("gin.codec.fields: 嵌入字段递归超过可分析范围")
+			return fmt.Errorf("gin.codec.fields: embedded field recursion exceeds the analysis scope")
 		}
 		visiting[value] = true
 		defer delete(visiting, value)
@@ -64,11 +59,11 @@ func (c BindingCodec) Fields(root *types.Struct) ([]core.WireField, error) {
 				continue
 			}
 			if tags.Get("binding") != "" || tags.Get("validate") != "" {
-				return fmt.Errorf("gin.codec.validation: %s 的既有校验来源需要集中声明", field.Name())
+				return fmt.Errorf("gin.codec.validation: %s existing validation source requires a centralized declaration", field.Name())
 			}
 			name, options, _ := strings.Cut(tags.Get(tag), ",")
 			if options != "" || tags.Get("parser") != "" || tags.Get("collection_format") != "" || tags.Get("time_format") != "" || tags.Get("time_utc") != "" || tags.Get("time_location") != "" {
-				return fmt.Errorf("gin.codec.options: %s 的自定义文本绑定选项需要集中规则", field.Name())
+				return fmt.Errorf("gin.codec.options: %s custom text binding options require a centralized rule", field.Name())
 			}
 			if name == "" {
 				name = field.Name()
@@ -90,20 +85,20 @@ func (c BindingCodec) Fields(root *types.Struct) ([]core.WireField, error) {
 					continue
 				}
 				if identity != "time.Time" && identity != "mime/multipart.FileHeader" {
-					return fmt.Errorf("gin.codec.nested: %s 的 JSON 字段与平铺回退需要条件投影", field.Name())
+					return fmt.Errorf("gin.codec.nested: %s JSON field and flat fallback require conditional projection", field.Name())
 				}
 			}
 			if c.Mode == "header" || c.Mode == "uri" {
 				switch typ.Underlying().(type) {
 				case *types.Array, *types.Slice:
-					return fmt.Errorf("gin.codec.serialization: %s 的重复值不能冒充逗号分隔参数", field.Name())
+					return fmt.Errorf("gin.codec.serialization: %s repeated values cannot be represented as a comma-separated parameter", field.Name())
 				}
 			}
 			if c.Mode == "header" {
 				name = textproto.CanonicalMIMEHeaderKey(name)
 			}
 			if names[name] {
-				return fmt.Errorf("gin.codec.collision: 多个字段消费同一网络名称 %s", name)
+				return fmt.Errorf("gin.codec.collision: multiple fields consume the same wire name %s", name)
 			}
 			names[name] = true
 			fields = append(fields, core.WireField{Name: name, Field: field})
@@ -116,14 +111,13 @@ func (c BindingCodec) Fields(root *types.Struct) ([]core.WireField, error) {
 	return fields, nil
 }
 
-// 文本和 multipart 输入由实际 Gin 绑定规则决定，不继承 JSON 的 null 或 Base64 表示。
 // Actual Gin text and multipart binding determines input types instead of JSON null or Base64 representations.
 func (c BindingCodec) ProjectType(request core.ProjectionRequest, project func(types.Type) (*spec.Schema, error)) (*spec.Schema, bool, error) {
 	if _, err := c.fieldTag(); err != nil {
 		return nil, true, err
 	}
 	if request.Direction != core.Input {
-		return nil, true, fmt.Errorf("gin.codec.direction: 此绑定器仅用于输入")
+		return nil, true, fmt.Errorf("gin.codec.direction: this binder only supports input")
 	}
 	typ := types.Unalias(request.Type)
 	switch value := typ.(type) {
@@ -143,13 +137,13 @@ func (c BindingCodec) ProjectType(request core.ProjectionRequest, project func(t
 			return schema, true, nil
 		case "mime/multipart.FileHeader":
 			if c.Mode != "multipart" {
-				return nil, true, fmt.Errorf("gin.codec.file: 文件字段需要 multipart 绑定器")
+				return nil, true, fmt.Errorf("gin.codec.file: file field requires a multipart binder")
 			}
 			return &spec.Schema{SchemaObject: &spec.SchemaObject{ContentMediaType: "application/octet-stream"}}, true, nil
 		}
 		if method, _, _ := types.LookupFieldOrMethod(types.NewPointer(value), true, nil, "UnmarshalParam"); method != nil {
 			if signature, ok := method.Type().(*types.Signature); ok && signature.Params().Len() == 1 && signature.Results().Len() == 1 && types.Identical(signature.Params().At(0).Type(), types.Typ[types.String]) && types.Identical(signature.Results().At(0).Type(), types.Universe.Lookup("error").Type()) {
-				return nil, true, fmt.Errorf("gin.codec.custom: %s 的 UnmarshalParam 需要集中 TypeMapper", identity)
+				return nil, true, fmt.Errorf("gin.codec.custom: %s UnmarshalParam requires a centralized TypeMapper", identity)
 			}
 		}
 	case *types.Slice:
@@ -165,7 +159,7 @@ func (c BindingCodec) ProjectType(request core.ProjectionRequest, project func(t
 		schema.MaxItems = spec.Set(uint64(value.Len()))
 		return schema, true, err
 	case *types.Map, *types.Interface:
-		return nil, true, fmt.Errorf("gin.codec.dynamic: 动态对象与 JSON 文本字段需要明确网络映射")
+		return nil, true, fmt.Errorf("gin.codec.dynamic: dynamic objects and JSON text fields require explicit wire mappings")
 	}
 	return nil, false, nil
 }

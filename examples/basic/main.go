@@ -1,5 +1,3 @@
-// 展示零 tag 业务代码的一次生成与启动层文档挂载。
-
 // Demonstrates generation from tag-free business code and documentation mounting at startup.
 package main
 
@@ -15,48 +13,34 @@ import (
 	"github.com/openapi-golang/openapi"
 )
 
-// 创建用户时提交的信息。
-
 // Information submitted when creating a user.
 type CreateUserRequest struct {
-	// 用户名。
 
 	// User name.
 	// @openapi required nonnull minLength=3 maxLength=32 examples=["alice"]
 	Name string
 }
 
-// 返回给客户端的用户信息。
-
 // User information returned to the client.
 type User struct {
-	// 用户编号。
 
 	// User identifier.
 	// @openapi examples=[1024]
 	ID int64
-	// 用户名。
 
 	// User name.
 	Name string
 }
 
-// 可公开的请求错误。
-
 // A request error that can be returned to clients.
 type APIError struct {
-	// 稳定错误代码。
 
 	// Stable error code.
 	Code string
-	// 错误说明。
 
 	// Error description.
 	Message string
 }
-
-// 创建用户
-// 创建成功后返回用户信息。
 
 // Create a user
 //
@@ -65,18 +49,16 @@ type APIError struct {
 func CreateUser(c *gin.Context) {
 	var req CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, APIError{Code: "INVALID_JSON", Message: "请求体格式错误"})
+		c.JSON(http.StatusBadRequest, APIError{Code: "INVALID_JSON", Message: "Invalid request body format"})
 		return
 	}
 	n := utf8.RuneCountInString(req.Name)
 	if n < 3 || n > 32 {
-		c.JSON(http.StatusBadRequest, APIError{Code: "INVALID_NAME", Message: "用户名长度必须为 3～32 个字符"})
+		c.JSON(http.StatusBadRequest, APIError{Code: "INVALID_NAME", Message: "Username must contain 3 to 32 characters"})
 		return
 	}
 	c.JSON(http.StatusCreated, User{ID: 1024, Name: req.Name})
 }
-
-// 构造与原业务相同的路由，再在启动层挂载一次文档。
 
 // Builds the application routes and mounts documentation once at startup.
 func Router() (*gin.Engine, *openapi.Document, error) {
@@ -96,8 +78,6 @@ func Router() (*gin.Engine, *openapi.Document, error) {
 	doc, err := ginswagger.Mount(r, apidoc.Bundle(), documentationConfig())
 	return r, doc, err
 }
-
-// 允许导出规范供离线验收，默认只监听本地地址。
 
 // Supports exporting the specification for offline verification and listens locally by default.
 func main() {

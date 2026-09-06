@@ -37,7 +37,7 @@ Default repeated header or URI collections cannot be mislabeled as comma-separat
 
 The dedicated integration package compares equivalent engines before and after mounting and validates actual responses through an independent Schema engine. Parameter schemas validate decoded values; their real text serialization is exercised through HTTP requests. Multipart byte representation is checked separately from JSON instance validation. Compiler input files are checked for byte equality before and after generation.
 
-The independent-consumer fixture now includes query binding, repeated byte values, malformed numeric input, first generation, and a stripped application build. Fixed remote validation must explicitly set `GIN_SWAGGER_TEST_VERSION` or install a fixed remote CLI. Development workspace/replacement checks are recorded separately from fixed-version and cold-cache evidence in [verification.md](verification.md).
+The independent-consumer fixture now includes query binding, repeated byte values, malformed numeric input, first generation, and a stripped application build. Fixed remote validation must explicitly set `GIN_SWAGGER_TEST_VERSION` or install a fixed remote CLI. A local replacement validates development changes; a fixed remote version validates independent module consumption.
 
 ## Mandatory binding and committed errors
 
@@ -54,7 +54,6 @@ The implementation does not generalize the default codec's MaxBytesError behavio
 ShouldBind, Bind, and explicitly identified binding.Form now preserve finite method/media conditions in the generated Bundle. Source analysis projects every applicable case and its success/error continuation. Runtime linking uses Engine.Routes() for methods and centralized documentation settings for the intended media scope; no handler, DTO tag, or route registration needs modification.
 
 ```go
-// 为自动绑定声明默认媒体范围，并为上传路由集中覆盖。
 // Declare default automatic-binding media and centrally override the upload route.
 cfg := ginswagger.Config{
     OpenAPI: openapi.Config{Title: "Service", Version: "1"},

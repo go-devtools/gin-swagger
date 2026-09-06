@@ -9,7 +9,6 @@ import (
 	"github.com/openapi-golang/openapi/spec"
 )
 
-// 将常量字段读取转换为中立网络表示，返回值仍遵循真实 Go 签名。
 // Translate constant field reads into neutral wire representations while preserving actual Go result signatures.
 func rawReadOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	if c.Object == nil || c.Object.Pkg() == nil || c.Object.Pkg().Path() != ginPackage {
@@ -20,14 +19,13 @@ func rawReadOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 		return nil, nil
 	}
 	name := c.Object.Name()
-	// 应用上下文读取和文件保存不是 HTTP 输出；只传播可确定的返回值形态。
 	// Application-context reads and file saving are not HTTP writes; propagate only known result shapes.
 	if name == "GetString" {
 		return []core.CallOutcome{{Results: []core.Value{{}}}}, nil
 	}
 	if name == "SaveUploadedFile" {
 		if len(c.Arguments) > 0 && c.Arguments[0].Nil {
-			return []core.CallOutcome{{Results: []core.Value{{Unknown: true}}, Effects: unresolved(c, "保存目标文件指针为 nil，不能推导正常返回契约")}}, nil
+			return []core.CallOutcome{{Results: []core.Value{{Unknown: true}}, Effects: unresolved(c, "Save target file pointer is nil; a normal return contract cannot be inferred")}}, nil
 		}
 		return []core.CallOutcome{{Results: []core.Value{{Nil: true}}}, {Results: []core.Value{{NonNil: true}}}}, nil
 	}
@@ -61,7 +59,7 @@ func rawReadOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 		values[i].Type = signature.Results().At(i).Type()
 	}
 	if len(c.Arguments) == 0 || c.Arguments[0].Constant == nil || c.Arguments[0].Constant.Kind() != constant.String || literal(c.Arguments[0]) == "" {
-		return []core.CallOutcome{{Results: values, Effects: unresolved(c, "读取字段名称必须是可求值的非空字符串常量")}}, nil
+		return []core.CallOutcome{{Results: values, Effects: unresolved(c, "field name must be an evaluable nonempty string constant")}}, nil
 	}
 	schema := spec.Typed("string")
 	style := "form"
@@ -93,7 +91,6 @@ func rawReadOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	if file {
 		effect.WireSchema = &spec.Schema{SchemaObject: &spec.SchemaObject{ContentMediaType: "application/octet-stream"}}
 		effect.Encoding = &spec.Encoding{ContentType: "application/octet-stream"}
-		// 文件读取不提交 HTTP 错误，nil 与非 nil 返回值只控制业务后续分支。
 		// File reads do not commit HTTP errors; nil and non-nil results only control subsequent business branches.
 		return []core.CallOutcome{{Results: []core.Value{{NonNil: true}, {Nil: true}}, Effects: []core.Effect{effect}}, {Results: []core.Value{{Nil: true}, {NonNil: true}}, Effects: []core.Effect{effect}}}, nil
 	}
@@ -101,7 +98,6 @@ func rawReadOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	encoded.MediaType = "application/x-www-form-urlencoded"
 	encoded.Source.Rule += ".body-only.urlencoded"
 	effect.Source.Rule += ".body-only.multipart"
-	// net/http 只在 POST、PUT、PATCH 读取 URL 编码体；multipart 不受此方法限制。
 	// net/http reads URL-encoded bodies only for POST, PUT, and PATCH; multipart has no such method restriction.
 	return []core.CallOutcome{
 		{When: openapi.RequestCondition{Methods: []string{"POST", "PUT", "PATCH"}}, Results: values, Effects: []core.Effect{encoded, effect}},
@@ -109,7 +105,6 @@ func rawReadOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	}, nil
 }
 
-// 先分派依赖响应状态的重定向，再处理原始读取与绑定器的有限备选。
 // Dispatch state-dependent redirects before raw reads and finite binder outcomes.
 func requestOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	results, err := streamWriterOutcomes(c)

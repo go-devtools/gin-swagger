@@ -18,14 +18,12 @@ import (
 	"github.com/openapi-golang/openapi/spec"
 )
 
-// 使用外部 CLI 从本消费者真实源码生成的 Bundle。
 // Use the Bundle generated from this consumer's actual source by the external CLI.
 func rawRequestBundle(t *testing.T) openapi.Bundle {
 	t.Helper()
 	return apidoc.Bundle()
 }
 
-// 对 URL 编码及 multipart 的真实读取逐项断言，再用独立 Schema 验证正文表示。
 // Assert real URL-encoded and multipart reads and independently validate the body representation.
 func TestRawFormGetters(t *testing.T) {
 	bundle := rawRequestBundle(t)
@@ -139,7 +137,6 @@ func TestRawFormGetters(t *testing.T) {
 	}
 }
 
-// 上传原始二进制及缺失文件，验证错误分支和 FileHeader 返回值关联。
 // Upload raw binary data and missing files to verify error branches and FileHeader result correlation.
 func TestRawFormFile(t *testing.T) {
 	bundle := rawRequestBundle(t)
@@ -202,7 +199,6 @@ func TestRawFormFile(t *testing.T) {
 	}
 }
 
-// 重复查询值使用 form/explode，输入数组不含 JSON null，缺失返回值仍按真实 JSON 表达。
 // Repeated query values use form/explode with non-null input arrays while absent results retain actual JSON behavior.
 func TestRawQueryArray(t *testing.T) {
 	engine := Router()
@@ -247,7 +243,6 @@ func TestRawQueryArray(t *testing.T) {
 	}
 }
 
-// 字典按方括号键读取，重复值取首项，正文与 query 不互为默认来源。
 // Read bracket-key dictionaries using the first repeated value without mixing body and query sources.
 func TestRawDictionaryGetters(t *testing.T) {
 	bundle := rawRequestBundle(t)
@@ -316,7 +311,6 @@ func TestRawDictionaryGetters(t *testing.T) {
 	}
 }
 
-// 保存文件只产生业务显式选择的状态，编译不得执行文件写入。
 // File saving produces only business-selected statuses, and compilation must not execute filesystem writes.
 func TestRawFileSaving(t *testing.T) {
 	bundle := rawRequestBundle(t)
@@ -386,14 +380,13 @@ func TestRawFileSaving(t *testing.T) {
 	}
 }
 
-// 不支持的动态读取和已知 nil 保存只阻止对应路由，不污染未使用候选。
 // Unsupported dynamic reads and known-nil saves block only their selected routes, not unused candidates.
 func TestRawReadDiagnostics(t *testing.T) {
 	bundle := rawRequestBundle(t)
 	for _, sample := range []struct {
 		handler gin.HandlerFunc
 		message string
-	}{{Dynamic, "字段名称"}, {IgnoreFileError, "文件指针为 nil"}} {
+	}{{Dynamic, "field name"}, {IgnoreFileError, "file pointer is nil"}} {
 		engine := gin.New()
 		engine.POST("/unsupported", sample.handler)
 		_, err := ginswagger.Mount(engine, bundle, ginswagger.Config{OpenAPI: openapi.Config{Title: "Unsupported", Version: "1"}})

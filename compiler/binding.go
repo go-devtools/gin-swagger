@@ -7,16 +7,15 @@ import (
 	"github.com/openapi-golang/openapi/spec"
 )
 
-// 为显式绑定器生成请求事实，绑定失败的业务分支仍由核心控制流分析。
 // Emit facts for explicit binders while the core analyzes business branches after binding failures.
 func bindRequest(c core.CallContext, mode string, payload core.Value) []core.Effect {
 	if payload.Type == nil {
-		return unresolved(c, "绑定目标类型未解决")
+		return unresolved(c, "binding target type is unresolved")
 	}
 	typ := types.Unalias(payload.Type)
 	pointer, ok := typ.(*types.Pointer)
 	if !ok || payload.Nil {
-		return unresolved(c, "绑定目标必须是明确的非 nil 指针")
+		return unresolved(c, "binding target must be an explicit non-nil pointer")
 	}
 	payload.Type = pointer.Elem()
 	payload.Fields = nil
@@ -72,17 +71,16 @@ func bindRequest(c core.CallContext, mode string, payload core.Value) []core.Eff
 		effect.MediaType = "multipart/form-data"
 		effect.Codec = BindingCodec{Mode: mode}
 	default:
-		return unresolved(c, "此绑定器需要明确的方法、媒体类型或编解码规则："+mode)
+		return unresolved(c, "This binder requires an explicit method, media type, or codec rule: "+mode)
 	}
 	return []core.Effect{effect}
 }
 
-// 使用已传播的完整变量身份识别 Gin 导出的绑定器，不按短名称匹配。
 // Identify exported Gin binders by propagated full variable identity instead of short names.
 func explicitBinder(c core.CallContext, value core.Value, payload core.Value, bodyOnly bool) []core.Effect {
 	object, ok := value.Object.(*types.Var)
 	if !ok || object.Pkg() == nil || object.Pkg().Path() != ginPackage+"/binding" || object.Parent() != object.Pkg().Scope() {
-		return unresolved(c, "显式绑定器身份无法确定")
+		return unresolved(c, "explicit binder identity cannot be determined")
 	}
 	mode := ""
 	switch object.Name() {
@@ -97,10 +95,10 @@ func explicitBinder(c core.CallContext, value core.Value, payload core.Value, bo
 	case "FormMultipart":
 		mode = "multipart"
 	default:
-		return unresolved(c, "显式绑定器尚需集中规则："+object.Name())
+		return unresolved(c, "Explicit binder requires a centralized rule: "+object.Name())
 	}
 	if bodyOnly && mode != "json" {
-		return unresolved(c, "缓存请求体绑定器尚需专用编解码规则")
+		return unresolved(c, "cached request-body binder requires a dedicated codec rule")
 	}
 	return bindRequest(c, mode, payload)
 }

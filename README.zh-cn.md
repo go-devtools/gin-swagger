@@ -4,13 +4,13 @@
 
 无业务侵入的 Gin 源码契约生成与原生 OpenAPI 3.2 运行时适配器。
 
-本仓库正在实现。完整验收目标见 [GOAL.md](GOAL.md)，实际证据与未完成工作见[状态](docs/status.md)和[验证记录](docs/verification.md)。当前尚未完成产品验收或发布。
+当前 SDK 尚处于 1.0 之前，接口可能随固定版本更新而变化。请使用公开 API，并先核对各功能指南中的支持范围。
 
 ## 环境要求
 
-- 最低版本验收使用精确 Go 1.27.1。
+- 开发和验证使用 Go 1.27.1。
 - 最低版本验收使用 Gin v1.12.0。
-- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260906025859-a178878ec844`，由 Go 工具从真实远端提交解析。
+- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260906035319-560c9adbb5be`，由 Go 工具从真实远端提交解析。
 
 ## 架构
 
@@ -64,9 +64,9 @@ Fiber 和 Echo 仅为未来扩展方向，本仓库未交付或宣称支持这�
 
 ## 当前模块验证
 
-使用下载到模块缓存的固定核心版本，关闭 workspace 且不设置本地 replace 后，`GOWORK=off make dev`、`go test -race ./...`、`go vet ./...` 和 `go mod verify` 均通过。这证明当前实现可使用真实远端依赖；最终冷缓存、CI 和完整能力验收仍见[验证记录](docs/verification.md)。
+开发检查使用 `GOWORK=off make dev`、`GOWORK=off go test -race ./...`、`GOWORK=off go vet ./...` 和 `GOWORK=off go mod verify`，保持固定核心版本且不设置本地 replace。独立消费者测试可通过 `GIN_SWAGGER_TEST_VERSION` 选择真实远端固定版本。
 
-自有源码注释同时提供简体中文和英文。编译指令及上游资源保留原文；示例与 Schema 测试数据中的伴随翻译通过空行与 Go 声明注释分开，使生成说明保持原有语言。提交信息使用英文。
+自有代码的注释、诊断、CLI 帮助与示例文字统一使用英文；多语言编码测试通过转义字面量保留输入值。上游资源保留原文，提交信息使用英文，本文件提供对应的中文使用说明。
 
 显式 JSON、Query、URI、Header、FormPost、Multipart 与集中自定义解码规则见[请求绑定指南](docs/requests.md)。
 
@@ -83,3 +83,7 @@ HEAD 和重定向响应语义已通过真实 HTTP 服务验证，详见[响应�
 Gin SSEvent 和标准 sse.Event 渲染器生成原生事件 itemSchema，保留实际文本/JSON 载荷及已发送元数据。真实 HTTP 矩阵与尚待完成的流回调边界见[响应指南](docs/responses.md)。
 
 Stream 回调与面向 Gin 响应 Writer 的 JSON Encoder 通过公开核心回调 SDK 推导，涵盖明确的 NDJSON 分帧及稳定长连接 SSE。已测行为与剩余边界见[响应指南](docs/responses.md)。
+
+## AI 辅助接入
+
+从 [llms.txt](llms.txt) 查看精简文档索引，再阅读 [AI 接入指南](docs/ai-integration.md)，获取真实可执行的命令、结构化诊断说明及公开 API 边界。生成的 JSON 和来源信息可用于核对接入判断。

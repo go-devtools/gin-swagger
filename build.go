@@ -1,4 +1,3 @@
-// 在保持既有 Gin handler 与路由注册不变的前提下构建和挂载文档。
 // Build and mount documentation while preserving existing Gin handlers and routes.
 package ginswagger
 
@@ -13,10 +12,8 @@ import (
 	"github.com/openapi-golang/openapi/swaggerui"
 )
 
-// 将核心文档设置与 Gin 挂载和作用域设置分开。
 // Separate core document settings from Gin scope and mounting options.
 type Config struct {
-	// 默认请求媒体范围及按原始 METHOD /Gin/path 覆盖的声明，仅用于文档链接。
 	// Declare default request media and overrides keyed by original METHOD /Gin/path for documentation linking only.
 	DefaultRequestMediaTypes []string
 	RequestMediaTypes        map[string][]string
@@ -26,13 +23,11 @@ type Config struct {
 	Middlewares              []gin.HandlerFunc
 	Bindings                 map[string]openapi.OperationKey
 	Include                  func(method, path string) bool
-	// 可选的整份文档分类，范围始终与全局 Include 求交集。
 	// Optionally group complete documents, always intersecting their scope with global Include.
 	Groups       []DocumentGroup
 	DefaultGroup string
 }
 
-// 描述右上角文档选择器的一个分类，不改变 Gin 的业务路由注册。
 // Describe one top-right document choice without changing Gin business route registration.
 type DocumentGroup struct {
 	ID      string
@@ -40,11 +35,10 @@ type DocumentGroup struct {
 	Include func(method, path string) bool
 }
 
-// 对真实已注册路由快照并匹配公开模板证据；不注册任何路由。
 // Match a snapshot of registered routes against public template evidence without registering routes.
 func Build(r *gin.Engine, bundle openapi.Bundle, cfg Config) (*openapi.Document, error) {
 	if r == nil {
-		return nil, fmt.Errorf("gin-swagger.engine.nil: 缺少 Engine")
+		return nil, fmt.Errorf("gin-swagger.engine.nil: Engine is required")
 	}
 	if err := bundle.Validate(); err != nil {
 		return nil, err
@@ -70,7 +64,7 @@ func Build(r *gin.Engine, bundle openapi.Bundle, cfg Config) (*openapi.Document,
 		if !bound {
 			matches := symbols[route.Handler]
 			if len(matches) != 1 {
-				return nil, openapi.Report{Diagnostics: []openapi.Diagnostic{{Code: "gin-swagger.handler.ambiguous", Severity: openapi.Error, Message: "无法唯一匹配末位 handler：" + route.Handler, Route: routeName, Fix: "为无法静态消歧的闭包或 receiver 添加一次集中 Config.Bindings"}}}
+				return nil, openapi.Report{Diagnostics: []openapi.Diagnostic{{Code: "gin-swagger.handler.ambiguous", Severity: openapi.Error, Message: "cannot uniquely match the final handler: " + route.Handler, Route: routeName, Fix: "Add a centralized Config.Bindings entry for a closure or receiver whose identity cannot be resolved statically"}}}
 			}
 			key = matches[0]
 		}
@@ -84,13 +78,11 @@ func Build(r *gin.Engine, bundle openapi.Bundle, cfg Config) (*openapi.Document,
 		}
 		selected = append(selected, neutral)
 	}
-	// Gin 文档绑定当前 Engine，始终验证可读取的程序构建条件。
 	// Gin documents bind the current Engine, so always verify observable executable build conditions.
 	cfg.OpenAPI.VerifyRuntimeBuild = true
 	return openapi.Build(bundle, selected, cfg.OpenAPI)
 }
 
-// 检查用于单次文档挂载的前缀，不修改业务路由前缀。
 // Validate the documentation prefix without changing business route prefixes.
 func mountPath(value string) (string, error) {
 	if value == "" {
@@ -98,11 +90,11 @@ func mountPath(value string) (string, error) {
 	}
 	value = strings.TrimSuffix(value, "/")
 	if value == "" || value[0] != '/' || strings.ContainsAny(value, "\\:*{}?#%") || strings.Contains(value, "//") {
-		return "", fmt.Errorf("gin-swagger.mount.path: 非法文档前缀")
+		return "", fmt.Errorf("gin-swagger.mount.path: invalid documentation prefix")
 	}
 	for _, part := range strings.Split(value, "/") {
 		if part == "." || part == ".." {
-			return "", fmt.Errorf("gin-swagger.mount.path: 不允许目录跳转")
+			return "", fmt.Errorf("gin-swagger.mount.path: directory traversal is not allowed")
 		}
 	}
 	return value, nil

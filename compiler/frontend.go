@@ -1,4 +1,3 @@
-// 通过核心公开 SDK 提供 Gin 生成前端；普通业务程序不导入本包。
 // Expose Gin generation rules through the public compiler SDK.
 package compiler
 
@@ -11,11 +10,9 @@ import (
 	"github.com/openapi-golang/openapi/spec"
 )
 
-// 明确限定 Gin 的真实包身份，禁止仅按方法短名匹配。
 // Match the complete Gin package identity rather than short method names.
 const ginPackage = "github.com/gin-gonic/gin"
 
-// 注册静态 Gin 规则，同一个值供 CLI 与项目自定义生成器组合。
 // Provide the same frontend to the CLI and custom generation entry points.
 func Frontend() core.Frontend {
 	return core.Frontend{Name: "gin-v1.12-front-v9", Match: func(f core.Function) bool {
@@ -27,7 +24,6 @@ func Frontend() core.Frontend {
 	}, Call: analyzeCall, Callback: streamCallback, CallOutcomes: requestOutcomes, CarriesEffects: carriesResponseEffects}
 }
 
-// 使用完整类型身份识别 Gin Context，不访问框架私有状态。
 // Recognize Gin Context by full type identity without accessing private state.
 func isContext(t types.Type) bool {
 	if t == nil {
@@ -41,7 +37,6 @@ func isContext(t types.Type) bool {
 	return ok && named.Obj().Pkg() != nil && named.Obj().Pkg().Path() == ginPackage && named.Obj().Name() == "Context"
 }
 
-// 提取无损的可求值整数状态码。
 // Extract an exact constant integer status code.
 func integer(v core.Value) string {
 	if v.Constant != nil && v.Constant.Kind() == constant.Int {
@@ -50,7 +45,6 @@ func integer(v core.Value) string {
 	return ""
 }
 
-// 提取代码中真实的字符串常量。
 // Extract an actual constant string.
 func literal(v core.Value) string {
 	if v.Constant != nil && v.Constant.Kind() == constant.String {
@@ -59,13 +53,11 @@ func literal(v core.Value) string {
 	return ""
 }
 
-// 输出明确的 Gin 能力边界，不能用 default 或空 Schema 隐藏未知。
 // Report unsupported Gin semantics instead of hiding unknowns behind default or empty Schemas.
 func unresolved(c core.CallContext, message string) []core.Effect {
-	return []core.Effect{{Kind: core.Unresolved, Source: c.Source, Message: "gin-swagger.analysis: " + message, Fix: "通过项目生成入口注册集中规则"}}
+	return []core.Effect{{Kind: core.Unresolved, Source: c.Source, Message: "gin-swagger.analysis: " + message, Fix: "Register a centralized rule through the project generation entry point"}}
 }
 
-// 将真实 Gin 调用转换成框架中立效果；控制流由核心调度。
 // Translate Gin calls into neutral effects while the core manages control flow.
 func analyzeCall(c core.CallContext) ([]core.Effect, error) {
 	if c.Object == nil || c.Object.Pkg() == nil || c.Object.Pkg().Path() != ginPackage {
@@ -106,20 +98,20 @@ func analyzeCall(c core.CallContext) ([]core.Effect, error) {
 		return append([]core.Effect{{Kind: core.Abort, Source: source}}, response("application/json", arg(1))...), nil
 	case "Status":
 		if interimStatus(normalizedGinStatus(integer(arg(0)))) {
-			return unresolved(c, "临时状态的最终提交需要明确序列规则"), nil
+			return unresolved(c, "Final commit after an interim status requires an explicit sequence rule"), nil
 		}
 		return []core.Effect{{Kind: core.ResponseStatus, Status: normalizedGinStatus(integer(arg(0))), Source: source}}, nil
 	case "Abort":
 		return []core.Effect{{Kind: core.Abort, Source: source}}, nil
 	case "ShouldBind", "Bind":
-		return unresolved(c, "自动绑定器依赖实际请求方法和媒体类型，需要条件事实"), nil
+		return unresolved(c, "automatic binder depends on the actual request method and media type; conditional facts are required"), nil
 	case "AbortWithStatus", "AbortWithError":
 		if interimStatus(normalizedGinStatus(integer(arg(0)))) {
-			return unresolved(c, "临时状态的最终提交需要明确序列规则"), nil
+			return unresolved(c, "Final commit after an interim status requires an explicit sequence rule"), nil
 		}
 		return []core.Effect{{Kind: core.ResponseCommit, Status: normalizedGinStatus(integer(arg(0))), Source: source}, {Kind: core.Abort, Source: source}}, nil
 	case "SecureJSON", "JSONP":
-		return unresolved(c, "带前缀或回调的输出不能当作普通 JSON"), nil
+		return unresolved(c, "prefixed or callback output cannot be treated as ordinary JSON"), nil
 	case "String":
 		return renderResponse(c, normalizedGinStatus(integer(arg(0))), "text/plain", core.Value{}, spec.Typed("string")), nil
 	case "Data":
@@ -131,19 +123,18 @@ func analyzeCall(c core.CallContext) ([]core.Effect, error) {
 	case "SSEvent":
 		return sseResponse(c, "-1", arg(0), core.Value{Type: types.Typ[types.String], Constant: constant.MakeString("")}, core.Value{Type: types.Typ[types.Uint], Constant: constant.MakeInt64(0)}, arg(1)), nil
 	case "File", "FileAttachment", "FileFromFS", "Stream":
-		return unresolved(c, fmt.Sprintf("%s 需要媒体类型或流式输出投影", name)), nil
+		return unresolved(c, fmt.Sprintf("%s requires a media type or stream output projection", name)), nil
 	case "Next":
-		return unresolved(c, "路由快照仅暴露末位 handler，中间件链需要集中声明"), nil
+		return unresolved(c, "route snapshot only exposes the final handler; middleware chains require a centralized declaration"), nil
 	case "Header":
 		return []core.Effect{{Kind: core.ResponseHeader, Name: literal(arg(0)), Payload: arg(1), DeleteHeader: arg(1).Constant != nil && literal(arg(1)) == "", Source: source}}, nil
 	case "Set", "Get", "MustGet", "GetString", "GetBool", "GetInt", "GetInt64", "GetFloat64", "GetTime", "GetDuration", "GetStringSlice", "GetStringMap", "GetStringMapString", "GetStringMapStringSlice", "Error", "ContentType", "IsAborted", "FullPath", "ClientIP", "RemoteIP":
 		return nil, nil
 	default:
-		return unresolved(c, "尚未识别的 Context 调用："+name), nil
+		return unresolved(c, "Unrecognized Context call: "+name), nil
 	}
 }
 
-// 未识别的响应 Writer 调用仍携带网络效果，不能当作普通纯函数忽略。
 // Unrecognized response-writer calls still carry wire effects and cannot be treated as pure calls.
 func carriesResponseEffects(t types.Type) bool {
 	if isContext(t) {

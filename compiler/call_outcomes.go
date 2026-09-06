@@ -6,7 +6,6 @@ import (
 	core "github.com/openapi-golang/openapi/compiler"
 )
 
-// 将绑定成功与失败作为关联返回值和响应提交的有限备选。
 // Model binding success and failure as finite alternatives correlating results with response commits.
 func bindingOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	if c.Object == nil || c.Object.Pkg() == nil || c.Object.Pkg().Path() != ginPackage {
@@ -49,11 +48,9 @@ func bindingOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	return bindingResults(c, effects, mandatory)
 }
 
-// 将已经选择的绑定事实关联到成功与错误提交。
 // Correlate selected binding facts with success and committed-error results.
 func bindingResults(c core.CallContext, effects []core.Effect, mandatory bool) ([]core.CallOutcome, error) {
 	name := c.Object.Name()
-	// 未解决的绑定器保留原诊断，不制造成功或失败的确定事实。
 	// Preserve unresolved binder diagnostics without inventing known success or failure facts.
 	for _, effect := range effects {
 		if effect.Kind == core.Unresolved {
@@ -69,7 +66,6 @@ func bindingResults(c core.CallContext, effects []core.Effect, mandatory bool) (
 	for _, effect := range effects {
 		canLimit = canLimit || effect.Kind == core.RequestBody
 	}
-	// 自定义文本解码器也可能返回 MaxBytesError；URI 快捷方法固定提交 400。
 	// Custom text decoders may also return MaxBytesError; the URI convenience method always commits 400.
 	canLimit = canLimit || customBindingError(c.Arguments[0].Type, map[types.Type]bool{})
 	if name != "BindUri" && canLimit {
@@ -85,7 +81,6 @@ func bindingResults(c core.CallContext, effects []core.Effect, mandatory bool) (
 	return outcomes, nil
 }
 
-// 识别可引入任意错误类型的自定义文本解码器，递归类型只检查一次。
 // Identify custom text decoders that can introduce arbitrary error types, visiting recursive types once.
 func customBindingError(t types.Type, seen map[types.Type]bool) bool {
 	if t == nil || seen[t] {

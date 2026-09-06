@@ -7,21 +7,18 @@ import (
 	core "github.com/openapi-golang/openapi/compiler"
 )
 
-// 保存前端自己的绑定器选择，Bundle 中仅保留中立条件与已投影契约。
 // Keep frontend binder choices local; only neutral conditions and projected contracts enter the Bundle.
 type bindingDecision struct {
 	when openapi.RequestCondition
 	mode string
 }
 
-// 识别完整包作用域中的显式 Form 绑定器，包括已传播的局部别名。
 // Identify the explicit Form binder by package-scope identity, including propagated local aliases.
 func isFormBinder(value core.Value) bool {
 	object, ok := value.Object.(*types.Var)
 	return ok && object.Pkg() != nil && object.Pkg().Path() == ginPackage+"/binding" && object.Parent() == object.Pkg().Scope() && object.Name() == "Form"
 }
 
-// 描述 Gin Form 对 query、URL 编码体和 multipart 文本字段的实际决策表。
 // Describe Gin Form's actual decision table for query, URL-encoded bodies, and multipart text fields.
 func formDecisions() []bindingDecision {
 	return []bindingDecision{
@@ -32,7 +29,6 @@ func formDecisions() []bindingDecision {
 	}
 }
 
-// 为自动绑定生成有限条件；GET 的 Form 规则与非 GET 的 codec 选择分开。
 // Generate finite automatic-binding conditions, separating GET's Form rules from non-GET codec selection.
 func automaticBinding(c core.CallContext, mandatory, formOnly bool) ([]core.CallOutcome, error) {
 	var decisions []bindingDecision
@@ -63,7 +59,7 @@ func automaticBinding(c core.CallContext, mandatory, formOnly bool) ([]core.Call
 	for _, decision := range decisions {
 		effects := bindRequest(c, decision.mode, c.Arguments[0])
 		if decision.mode == "unsupported" {
-			effects = unresolved(c, "此自动选择的非 JSON codec 需要明确网络映射")
+			effects = unresolved(c, "this automatically selected non-JSON codec requires an explicit wire mapping")
 		}
 		alternatives, err := bindingResults(c, effects, mandatory)
 		if err != nil {

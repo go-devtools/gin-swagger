@@ -2,7 +2,6 @@ package routes
 
 import "testing"
 
-// 验证普通参数和跨斜杠 catch-all 被适配器显式区分。
 // Distinguish ordinary parameters from cross-slash catch-all parameters.
 func TestRoutePath(t *testing.T) {
 	for _, tt := range []struct {
@@ -14,17 +13,16 @@ func TestRoutePath(t *testing.T) {
 			t.Fatal(err)
 		}
 		if p.Path != tt.path || p.CatchAll != tt.catch {
-			t.Fatalf("错误转换 %s：%+v", tt.input, p)
+			t.Fatalf("incorrect conversion of %s: %+v", tt.input, p)
 		}
 	}
 	for _, bad := range []string{"", "users/:id", "/users/:", "/a/*file/more", "/a/:id/:id"} {
 		if _, err := Parse(bad); err == nil {
-			t.Errorf("错误接受 %q", bad)
+			t.Errorf("incorrectly accepted %q", bad)
 		}
 	}
 }
 
-// 对任意路径验证解析不会崩溃或输出不平衡模板。
 // Fuzz path parsing for crashes and unbalanced output templates.
 func FuzzRoutePath(f *testing.F) {
 	for _, path := range []string{"/", "/users/:id", "/assets/*path", "/a/%2F"} {

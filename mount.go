@@ -12,7 +12,6 @@ import (
 	"github.com/openapi-golang/openapi/swaggerui"
 )
 
-// 完成文档、UI 和冲突检查后才挂载；仅在全部业务路由注册后、服务启动前调用。
 // Prepare and validate everything before mounting during application startup.
 func Mount(r *gin.Engine, bundle openapi.Bundle, cfg Config) (*openapi.Document, error) {
 	base, err := mountPath(cfg.Path)
@@ -35,7 +34,6 @@ func Mount(r *gin.Engine, bundle openapi.Bundle, cfg Config) (*openapi.Document,
 	if err = preflight(r, route, cfg.Middlewares); err != nil {
 		return nil, err
 	}
-	// 文档请求只读取已构建缓存，不执行分析器或业务 handler。
 	// Serve cached documentation without invoking analysis or business handlers.
 	handler := func(c *gin.Context) {
 		name := strings.TrimPrefix(c.Param("asset"), "/")
@@ -80,12 +78,11 @@ func Mount(r *gin.Engine, bundle openapi.Bundle, cfg Config) (*openapi.Document,
 	return doc, nil
 }
 
-// 在隔离 Engine 上用公开 API 重放路径，panic 仅来自预检查实例，无需回滚目标 Engine。
 // Replay public routes on an isolated Engine; only the preflight instance can panic.
 func preflight(r *gin.Engine, path string, middlewares []gin.HandlerFunc) (err error) {
 	defer func() {
 		if failure := recover(); failure != nil {
-			err = fmt.Errorf("gin-swagger.mount.conflict: 文档挂载预检查失败：%v", failure)
+			err = fmt.Errorf("gin-swagger.mount.conflict: documentation mount preflight failed: %v", failure)
 		}
 	}()
 	shadow := gin.New()
@@ -100,14 +97,12 @@ func preflight(r *gin.Engine, path string, middlewares []gin.HandlerFunc) (err e
 	return nil
 }
 
-// 每份文档只保存启动时构建的字节和内容标识。
 // Store only startup-built bytes and content identifiers for each document.
 type cachedDocument struct {
 	raw  []byte
 	etag string
 }
 
-// 在任何挂载修改之前完成全部分类构建，默认总览文档仍位于 openapi.json。
 // Build every group before mounting routes; keep the default overview at openapi.json.
 func groupDocuments(r *gin.Engine, bundle openapi.Bundle, main *openapi.Document, cfg Config) (map[string]cachedDocument, swaggerui.Config, error) {
 	documents := map[string]cachedDocument{}
@@ -122,7 +117,7 @@ func groupDocuments(r *gin.Engine, bundle openapi.Bundle, main *openapi.Document
 		return documents, uiConfig, nil
 	}
 	if len(uiConfig.Definitions) != 0 {
-		return nil, uiConfig, fmt.Errorf("gin-swagger.groups.config: Groups 与 UI.Definitions 不能同时配置")
+		return nil, uiConfig, fmt.Errorf("gin-swagger.groups.config: Groups and UI.Definitions cannot be configured together")
 	}
 	ids, names := map[string]bool{}, map[string]bool{}
 	for _, group := range cfg.Groups {
@@ -131,12 +126,12 @@ func groupDocuments(r *gin.Engine, bundle openapi.Bundle, main *openapi.Document
 			valid = valid && ((char >= 'a' && char <= 'z') || (char >= '0' && char <= '9') || char == '-')
 		}
 		if !valid {
-			return nil, uiConfig, fmt.Errorf("gin-swagger.groups.invalid: 分类标识必须是唯一的小写字母数字或连字符，展示名称也必须唯一")
+			return nil, uiConfig, fmt.Errorf("gin-swagger.groups.invalid: group IDs must be unique lowercase letters, digits, or hyphens; display names must also be unique")
 		}
 		ids[group.ID], names[group.Name] = true, true
 	}
 	if cfg.DefaultGroup != "" && !ids[cfg.DefaultGroup] {
-		return nil, uiConfig, fmt.Errorf("gin-swagger.groups.default: 默认分类不存在")
+		return nil, uiConfig, fmt.Errorf("gin-swagger.groups.default: default group does not exist")
 	}
 	for _, group := range cfg.Groups {
 		grouped := cfg

@@ -12,15 +12,14 @@ import (
 	"github.com/openapi-golang/openapi/spec"
 )
 
-// 用 Gin 实际采用的渲染格式构造响应效果，JSON 类型仍由核心投影。
 // Construct response effects from Gin's actual renderer while leaving JSON type projection to the core.
 func renderResponse(c core.CallContext, status, media string, payload core.Value, schema *spec.Schema) []core.Effect {
 	status = normalizedGinStatus(status)
 	if interimStatus(status) {
-		return unresolved(c, "临时响应与最终状态需要完整的 Writer 提交序列规则")
+		return unresolved(c, "Interim responses and final status require a complete Writer commit sequence rule")
 	}
 	if _, _, err := mime.ParseMediaType(media); err != nil {
-		return unresolved(c, "响应媒体类型不是有效的明确值")
+		return unresolved(c, "response media type is not a valid explicit value")
 	}
 	source := c.Source
 	source.Kind = "derived"
@@ -28,34 +27,31 @@ func renderResponse(c core.CallContext, status, media string, payload core.Value
 	return []core.Effect{{Kind: core.ResponseBody, Status: status, MediaType: media, Payload: payload, WireSchema: schema, Source: source}}
 }
 
-// 原始 HTTP 字节使用内容媒体类型注解，不添加 JSON 字符串或 Base64 约束。
 // Describe raw HTTP bytes with a content media type instead of JSON string or Base64 constraints.
 func rawResponse(c core.CallContext, status, media string) []core.Effect {
 	return renderResponse(c, status, media, core.Value{}, &spec.Schema{SchemaObject: &spec.SchemaObject{ContentMediaType: media}})
 }
 
-// 读取器附加头只在原响应头为空时应用，明确长度覆盖同名附加字段。
 // Apply reader headers only when the response header is empty; a known length overrides its extra-header entry.
 func readerResponse(c core.CallContext, status, media string, length, reader, headers core.Value) []core.Effect {
 	status = normalizedGinStatus(status)
 	if status == "-1" {
-		return unresolved(c, "保留现有状态的读取器需要状态相关的头部规则")
+		return unresolved(c, "A reader that preserves the existing status requires status-dependent header rules")
 	}
 	if status == "204" || status == "304" {
-		// Gin 此时只调用 WriteContentType，跳过 Reader.Render 的所有附加头。
 		// Gin only calls WriteContentType here, skipping all extra headers from Reader.Render.
 		return rawResponse(c, status, media)
 	}
 	if reader.Nil {
-		return unresolved(c, "读取器为 nil，不能产生正常响应")
+		return unresolved(c, "reader is nil and cannot produce a normal response")
 	}
 	if !headers.Nil && headers.Fields == nil {
-		return unresolved(c, "读取器附加头需要可分析的字面映射或集中规则")
+		return unresolved(c, "reader extra headers require an analyzable map literal or centralized rule")
 	}
 	knownLength := length.Constant != nil && length.Constant.Kind() == constant.Int
 	withLength := knownLength && constant.Sign(length.Constant) >= 0
 	if !knownLength {
-		return unresolved(c, "读取器长度控制响应头，必须可求值或提供集中规则")
+		return unresolved(c, "reader length controls response headers and must be evaluable or have a centralized rule")
 	}
 	source := c.Source
 	source.Kind, source.Rule = "derived", "gin."+c.Object.Name()
@@ -69,17 +65,16 @@ func readerResponse(c core.CallContext, status, media string, length, reader, he
 	for _, name := range keys {
 		canonical := textproto.CanonicalMIMEHeaderKey(name)
 		if seen[canonical] {
-			return unresolved(c, "附加头含大小写不同的重复名称，写入顺序无法消歧")
+			return unresolved(c, "extra headers have case-insensitive duplicate names; write order is ambiguous")
 		}
 		seen[canonical] = true
 		if withLength && canonical == "Content-Length" {
 			if name != "Content-Length" {
-				return unresolved(c, "长度头与自动生成字段的大小写冲突")
+				return unresolved(c, "length header conflicts with an automatically generated field's case")
 			}
 			continue
 		}
 		if canonical == "Content-Type" {
-			// Renderer 已先写入明确媒体类型，附加头无法覆盖它。
 			// The renderer writes its explicit media type before extra headers can override it.
 			continue
 		}
@@ -91,7 +86,6 @@ func readerResponse(c core.CallContext, status, media string, length, reader, he
 	return append(effects, rawResponse(c, status, media)...)
 }
 
-// 通过完整包和类型身份识别 Renderer，不按短名称猜测自定义实现。
 // Match renderers by full package and type identity rather than custom implementations with matching short names.
 func explicitRenderer(c core.CallContext, status string, renderer core.Value) []core.Effect {
 	status = normalizedGinStatus(status)
@@ -100,7 +94,7 @@ func explicitRenderer(c core.CallContext, status string, renderer core.Value) []
 		return explicitSSE(c, status, renderer)
 	}
 	if typ == nil {
-		return unresolved(c, "Renderer 类型未解决")
+		return unresolved(c, "Renderer type is unresolved")
 	}
 	typ = types.Unalias(typ)
 	if pointer, ok := typ.(*types.Pointer); ok {
@@ -108,10 +102,10 @@ func explicitRenderer(c core.CallContext, status string, renderer core.Value) []
 	}
 	named, ok := typ.(*types.Named)
 	if !ok || named.Obj().Pkg() == nil || named.Obj().Pkg().Path() != ginPackage+"/render" {
-		return unresolved(c, "自定义 Renderer 需要集中编解码规则")
+		return unresolved(c, "custom Renderer requires a centralized codec rule")
 	}
 	if renderer.Fields == nil {
-		return unresolved(c, "Renderer 字段值无法静态确定")
+		return unresolved(c, "Renderer field value cannot be determined statically")
 	}
 	field := func(name string) core.Value {
 		if value, ok := renderer.Fields[name]; ok {
@@ -133,17 +127,15 @@ func explicitRenderer(c core.CallContext, status string, renderer core.Value) []
 		}
 		return readerResponse(c, status, literal(field("ContentType")), length, field("Reader"), field("Headers"))
 	default:
-		return unresolved(c, "尚未识别的 Renderer 编码："+named.Obj().Name())
+		return unresolved(c, "Unrecognized Renderer encoding: "+named.Obj().Name())
 	}
 }
 
-// Gin 包装 Writer 的临时状态不能按普通最终状态推导。
 // Interim statuses in Gin's wrapped writer cannot be inferred as ordinary final statuses.
 func interimStatus(status string) bool {
 	return len(status) == 3 && status[0] == '1'
 }
 
-// Gin 忽略非正数状态，使用中立保留标志表达当前待提交状态。
 // Gin ignores non-positive status codes; use the neutral preservation marker for the current pending status.
 func normalizedGinStatus(status string) string {
 	if code, err := strconv.Atoi(status); err == nil && code <= 0 {
