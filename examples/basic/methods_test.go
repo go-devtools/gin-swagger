@@ -13,7 +13,6 @@ import (
 )
 
 // Validate actual wire bytes for all five methods and preserve the distinction between false and null in partial updates.
-// 五种方法的真实网络字节与生成契约一致，局部更新明确保留 false 和 null 的差别。
 func TestHTTPMethodExamples(t *testing.T) {
 	engine, doc, err := Router()
 	if err != nil {
@@ -31,7 +30,7 @@ func TestHTTPMethodExamples(t *testing.T) {
 		t.Fatal("204 must not declare a response body")
 	}
 	legacy := schema.Paths["/examples/legacy/items/{id}"].Get
-	if !legacy.Deprecated || !strings.Contains(legacy.Description, "GET /examples/items/{id}") {
+	if !legacy.Deprecated.Value || !strings.Contains(legacy.Description, "GET /examples/items/{id}") {
 		t.Fatal("deprecated operation must be marked Deprecated and describe its replacement")
 	}
 	for _, sample := range []struct {
@@ -101,7 +100,6 @@ func TestHTTPMethodExamples(t *testing.T) {
 }
 
 // Load independent specifications from the top selector and show only tags containing operations.
-// 顶部分类加载独立规范，分类内部仅展示有接口的标签。
 func TestExampleDocumentDefinitions(t *testing.T) {
 	engine, _, err := Router()
 	if err != nil {

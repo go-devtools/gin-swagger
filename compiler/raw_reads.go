@@ -10,7 +10,6 @@ import (
 )
 
 // Translate constant field reads into neutral wire representations while preserving actual Go result signatures.
-// 将常量字段读取转换为中立网络表示，返回值仍遵循真实 Go 签名。
 func rawReadOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	if c.Object == nil || c.Object.Pkg() == nil || c.Object.Pkg().Path() != ginPackage {
 		return nil, nil
@@ -21,7 +20,6 @@ func rawReadOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	}
 	name := c.Object.Name()
 	// Application-context reads and file saving are not HTTP writes; propagate only known result shapes.
-	// 应用上下文读取和文件保存不是 HTTP 输出；只传播可确定的返回值形态。
 	if name == "GetString" {
 		return []core.CallOutcome{{Results: []core.Value{{}}}}, nil
 	}
@@ -94,7 +92,6 @@ func rawReadOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 		effect.WireSchema = &spec.Schema{SchemaObject: &spec.SchemaObject{ContentMediaType: "application/octet-stream"}}
 		effect.Encoding = &spec.Encoding{ContentType: "application/octet-stream"}
 		// File reads do not commit HTTP errors; nil and non-nil results only control subsequent business branches.
-		// 文件读取不提交 HTTP 错误，nil 与非 nil 返回值只控制业务后续分支。
 		return []core.CallOutcome{{Results: []core.Value{{NonNil: true}, {Nil: true}}, Effects: []core.Effect{effect}}, {Results: []core.Value{{Nil: true}, {NonNil: true}}, Effects: []core.Effect{effect}}}, nil
 	}
 	encoded := effect
@@ -102,7 +99,6 @@ func rawReadOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	encoded.Source.Rule += ".body-only.urlencoded"
 	effect.Source.Rule += ".body-only.multipart"
 	// net/http reads URL-encoded bodies only for POST, PUT, and PATCH; multipart has no such method restriction.
-	// net/http 只在 POST、PUT、PATCH 读取 URL 编码体；multipart 不受此方法限制。
 	return []core.CallOutcome{
 		{When: openapi.RequestCondition{Methods: []string{"POST", "PUT", "PATCH"}}, Results: values, Effects: []core.Effect{encoded, effect}},
 		{When: openapi.RequestCondition{ExceptMethods: []string{"POST", "PUT", "PATCH"}}, Results: values, Effects: []core.Effect{effect}},
@@ -110,7 +106,6 @@ func rawReadOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 }
 
 // Dispatch state-dependent redirects before raw reads and finite binder outcomes.
-// 先分派依赖响应状态的重定向，再处理原始读取与绑定器的有限备选。
 func requestOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	results, err := streamWriterOutcomes(c)
 	if err != nil || len(results) > 0 {

@@ -17,7 +17,6 @@ import (
 	"github.com/openapi-golang/openapi/contracttest"
 )
 
-// 使用相同业务路由构造独立实例，避免挂载前后的请求状态互相影响。
 // Build equivalent instances so requests before and after mounting cannot share business state.
 func importedRouter() *gin.Engine {
 	r := gin.New()
@@ -27,7 +26,6 @@ func importedRouter() *gin.Engine {
 	return r
 }
 
-// 导入 DTO 的约束、枚举与泛型字段注释应通过真实生成和挂载保留。
 // Preserve imported constraints, enums, and generic field comments through actual generation and mounting.
 func TestImportedDTOContracts(t *testing.T) {
 	before, after := importedRouter(), importedRouter()
@@ -164,7 +162,6 @@ func TestImportedDTOContracts(t *testing.T) {
 	}
 }
 
-// 契约注释不应向业务流量注入校验行为。
 // Contract annotations must not inject validation into ordinary business requests.
 func TestImportedDeclarationsDoNotEnforceRuntimeValidation(t *testing.T) {
 	engine := importedRouter()
@@ -189,7 +186,6 @@ func TestImportedDeclarationsDoNotEnforceRuntimeValidation(t *testing.T) {
 	}
 }
 
-// 各路由的依赖错误保持原始字段来源，失败挂载不得污染路由或 Bundle。
 // Retain dependency field evidence per selected route without mutating routes or the immutable Bundle.
 func TestImportedRouteDiagnosticSources(t *testing.T) {
 	bundle := apidoc.Bundle()

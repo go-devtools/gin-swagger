@@ -8,21 +8,18 @@ import (
 )
 
 // Keep frontend binder choices local; only neutral conditions and projected contracts enter the Bundle.
-// 保存前端自己的绑定器选择，Bundle 中仅保留中立条件与已投影契约。
 type bindingDecision struct {
 	when openapi.RequestCondition
 	mode string
 }
 
 // Identify the explicit Form binder by package-scope identity, including propagated local aliases.
-// 识别完整包作用域中的显式 Form 绑定器，包括已传播的局部别名。
 func isFormBinder(value core.Value) bool {
 	object, ok := value.Object.(*types.Var)
 	return ok && object.Pkg() != nil && object.Pkg().Path() == ginPackage+"/binding" && object.Parent() == object.Pkg().Scope() && object.Name() == "Form"
 }
 
 // Describe Gin Form's actual decision table for query, URL-encoded bodies, and multipart text fields.
-// 描述 Gin Form 对 query、URL 编码体和 multipart 文本字段的实际决策表。
 func formDecisions() []bindingDecision {
 	return []bindingDecision{
 		{openapi.RequestCondition{MediaTypes: []string{"multipart/form-data"}}, "form-multipart"},
@@ -33,7 +30,6 @@ func formDecisions() []bindingDecision {
 }
 
 // Generate finite automatic-binding conditions, separating GET's Form rules from non-GET codec selection.
-// 为自动绑定生成有限条件；GET 的 Form 规则与非 GET 的 codec 选择分开。
 func automaticBinding(c core.CallContext, mandatory, formOnly bool) ([]core.CallOutcome, error) {
 	var decisions []bindingDecision
 	if formOnly {

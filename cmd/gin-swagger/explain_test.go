@@ -9,7 +9,6 @@ import (
 )
 
 // Exercise public explanations against the real example without modifying its business sources.
-// 使用真实示例验证公开来源解释，不修改业务源码。
 func TestExplainBasicCLI(t *testing.T) {
 	prefix := "github.com/openapi-golang/gin-swagger/examples/basic."
 	for _, tc := range []struct {
@@ -70,15 +69,12 @@ func TestExplainBasicCLI(t *testing.T) {
 }
 
 // Simulate an output stream error without external files or processes.
-// 使用本地写入器模拟输出流错误，不依赖外部文件或进程。
 type failedExplainWriter struct{}
 
 // Return a stable write failure for CLI error propagation.
-// 返回稳定写入错误，验证 CLI 错误传播。
 func (failedExplainWriter) Write([]byte) (int, error) { return 0, errors.New("output unavailable") }
 
 // Report JSON encoding failures instead of claiming successful explanation output.
-// JSON 编码写入失败时返回错误，不宣称解释输出成功。
 func TestExplainOutputFailure(t *testing.T) {
 	var errs bytes.Buffer
 	code := run(context.Background(), []string{"explain", "--dir", "../../examples/basic", "--symbol", "github.com/openapi-golang/gin-swagger/examples/basic.CreateUser"}, failedExplainWriter{}, &errs)

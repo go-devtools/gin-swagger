@@ -18,11 +18,9 @@ import (
 )
 
 // Retain read results so benchmarks measure the public defensive-copy allocation.
-// 保留读取结果，确保测量公开接口的防御性复制分配。
 var scaleJSON []byte
 
 // Prepare distinct actual Gin handlers without changing repository source or module files.
-// 准备不同的真实 Gin handler，不修改仓库源码或模块文件。
 func scaleProject(b *testing.B, count int) core.Options {
 	b.Helper()
 	dir := b.TempDir()
@@ -42,7 +40,7 @@ func scaleProject(b *testing.B, count int) core.Options {
 	if err != nil {
 		b.Fatal(err)
 	}
-	start := bytes.Index(fixture, []byte("// 通过既有 Gin 调用读写 JSON。"))
+	start := bytes.Index(fixture, []byte("// Read and write JSON through ordinary Gin calls."))
 	if start < 0 {
 		b.Fatal("compiled benchmark handler is missing")
 	}
@@ -59,7 +57,6 @@ func scaleProject(b *testing.B, count int) core.Options {
 }
 
 // Compare automatic Gin linking with core Build over the same real route snapshot and Bundle.
-// 在相同真实路由快照和 Bundle 上比较 Gin 自动链接与核心 Build。
 func BenchmarkGinScale(b *testing.B) {
 	previousMode := gin.Mode()
 	gin.SetMode(gin.ReleaseMode)

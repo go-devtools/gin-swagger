@@ -53,6 +53,8 @@ github.com/openapi-golang/openapi v0.0.0-20260906102157-f38e600dff06 h1:7rklu1b+
 github.com/openapi-golang/openapi v0.0.0-20260906102157-f38e600dff06/go.mod h1:19ClYRcHJqiA+pxaNTwqwhleVS/xNtb24fmwMoXQNMg=
 github.com/openapi-golang/openapi v0.0.0-20260906103007-e4c9a8721391 h1:jUxUWrf7zM4RmlVUFAwIrlpK5ZE5xVKJnQPIaTKKVL4=
 github.com/openapi-golang/openapi v0.0.0-20260906103007-e4c9a8721391/go.mod h1:19ClYRcHJqiA+pxaNTwqwhleVS/xNtb24fmwMoXQNMg=
+github.com/openapi-golang/openapi v0.0.0-20260906112229-094f7f6d9faf h1:+tacW+kmKKAewjhln+E3VZDAlwrj3y+/XGkYQUzk4yk=
+github.com/openapi-golang/openapi v0.0.0-20260906112229-094f7f6d9faf/go.mod h1:19ClYRcHJqiA+pxaNTwqwhleVS/xNtb24fmwMoXQNMg=
 github.com/pelletier/go-toml/v2 v2.2.4 h1:mye9XuhQ6gvn5h28+VilKrrPoQVanw5PMw/TB0t5Ec4=
 github.com/pelletier/go-toml/v2 v2.2.4/go.mod h1:2gIqNv+qfxSVS7cM2xJQKtLSTLUE9V8t9Stt+h56mCY=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

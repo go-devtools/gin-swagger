@@ -15,7 +15,6 @@ import (
 )
 
 // Model standard redirect bodies and pending status using the actual method and existing response headers.
-// 根据实际方法和已有响应头，表达标准重定向的正文与待提交状态。
 func redirectOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	if c.Object == nil || c.Object.Pkg() == nil || c.Object.Pkg().Path() != ginPackage || c.Object.Name() != "Redirect" {
 		return nil, nil
@@ -55,7 +54,6 @@ func redirectOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 }
 
 // Normalize only targets independent of the request path; relative targets retain their known string wire type.
-// 只归一化不依赖请求路径的目标；相对目标保留已知的字符串网络类型。
 func redirectLocation(target string) (string, bool) {
 	parsed, err := url.Parse(target)
 	if err == nil && parsed.Scheme == "" && parsed.Host == "" {

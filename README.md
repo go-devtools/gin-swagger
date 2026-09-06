@@ -10,7 +10,7 @@ This pre-1.0 SDK evolves between pinned versions. Use the public APIs and check 
 
 - Go 1.27.1 for development and verification.
 - Gin v1.12.0 or the version pinned in go.mod.
-- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260906064212-97b7686b4a0a`, resolved from an actual remote commit.
+- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260906112229-094f7f6d9faf`, resolved from an actual remote commit.
 
 ## Architecture
 
@@ -66,7 +66,7 @@ The frontend derives text, raw data, reader, explicit standard renderer, and imm
 
 New project code is licensed under [MIT](LICENSE). Third-party assets retain their original licenses and notices.
 
-Project-owned source comments include English and Simplified Chinese. OpenAPI descriptions, diagnostics, CLI help, and example text use English; companion translations are kept separate from semantic comments in examples and fixtures. Multilingual encoding tests retain their input values through escaped literals. Upstream assets retain their original form. Commit messages use English; [README.zh-cn.md](README.zh-cn.md) provides corresponding Chinese documentation.
+Project-owned source comments, OpenAPI descriptions, diagnostics, CLI help, example text, and commit messages use English. Multilingual encoding tests preserve their actual input data. Upstream assets retain their original form; [README.zh-cn.md](README.zh-cn.md) provides corresponding Chinese documentation.
 
 See the [request binding guide](docs/requests.md) for explicit JSON, Query, URI, Header, FormPost, Multipart, and centralized custom-decoder rules.
 
@@ -95,3 +95,5 @@ See the [performance guide](docs/performance.md) for reproducible 100/1000-route
 See the [independent CI guide](docs/ci.md) for pinned tools, private module access, offline browser checks, actual platform jobs, and fixed remote-version consumption.
 
 The [explanation commands](docs/ai-integration.md#explain-a-field-or-response) report field and response origins, actual projection rules, and declarations without claiming business enforcement.
+
+The pinned core uses `spec.Optional[bool]` for optional standard boolean fields. Use `spec.Set(false)` to preserve explicit false and read `.Value` when testing a flag; see [native object migration](https://github.com/openapi-golang/openapi/blob/main/docs/native-objects.md).

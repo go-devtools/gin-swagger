@@ -10,7 +10,7 @@
 
 - 开发和验证使用 Go 1.27.1。
 - 最低版本验收使用 Gin v1.12.0。
-- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260906064212-97b7686b4a0a`，由 Go 工具从真实远端提交解析。
+- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260906112229-094f7f6d9faf`，由 Go 工具从真实远端提交解析。
 
 ## 架构
 
@@ -66,7 +66,7 @@ Fiber 和 Echo 仅为未来扩展方向，本仓库未交付或宣称支持这�
 
 开发检查使用 `GOWORK=off make dev`、`GOWORK=off go test -race ./...`、`GOWORK=off go vet ./...` 和 `GOWORK=off go mod verify`，保持固定核心版本且不设置本地 replace。独立消费者测试可通过 `GIN_SWAGGER_TEST_VERSION` 选择真实远端固定版本。
 
-自有源码注释使用中英双语。OpenAPI 描述、诊断、CLI 帮助与示例文字使用英文；示例与测试夹具中的译文和语义注释分开。多语言编码测试通过转义字面量保留输入值。上游资源保留原文，提交信息使用英文，本文件提供对应的中文使用说明。
+自有源码注释、OpenAPI 描述、诊断、CLI 帮助、示例文字和提交信息使用英文。多语言编码测试保留其真实输入数据，上游资源保留原文，本文件提供对应的中文使用说明。
 
 显式 JSON、Query、URI、Header、FormPost、Multipart 与集中自定义解码规则见[请求绑定指南](docs/requests.md)。
 
@@ -95,3 +95,5 @@ Stream 回调与面向 Gin 响应 Writer 的 JSON Encoder 通过公开核心回�
 参见[独立 CI 指南](docs/ci.md)，了解固定工具链、私有模块访问、离线浏览器检查、真实平台任务和固定远端版本消费验证。
 
 [来源解释命令](docs/ai-integration.md#explain-a-field-or-response) 可查询字段和响应来源、实际投影规则及声明，并明确区分契约与业务实施证据。
+
+当前固定核心版本使用 `spec.Optional[bool]` 表示可选标准布尔字段。通过 `spec.Set(false)` 保留显式假值，判断标志时读取 `.Value`；详见[原生对象迁移](https://github.com/openapi-golang/openapi/blob/main/docs/native-objects.md)。

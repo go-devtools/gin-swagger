@@ -24,7 +24,6 @@ import (
 )
 
 // Generate real SSE fixtures statically and check that generation leaves business source unchanged.
-// 静态生成真实 SSE 样本，并检查生成器没有改写业务源码。
 func sseBundle(t *testing.T) openapi.Bundle {
 	t.Helper()
 	path := "testdata/sseevents/app.go"
@@ -44,7 +43,6 @@ func sseBundle(t *testing.T) openapi.Bundle {
 }
 
 // Record hand-checked protocol events without deriving expectations from production encoders or schemas.
-// 记录手工确认的协议事件，不复用生产编码或 Schema 生成逻辑计算期望值。
 func expectedEvent(name, data string) map[string]any {
 	value := map[string]any{"data": data}
 	if name != "" {
@@ -54,7 +52,6 @@ func expectedEvent(name, data string) map[string]any {
 }
 
 // Verify SSE contracts, actual frames, and unchanged business behavior through real HTTP servers before/after mounting.
-// 经真实 HTTP 服务验证 SSE 文档、实际帧和挂载前后业务行为一致。
 func TestSSEWireContract(t *testing.T) {
 	bundle := sseBundle(t)
 	for _, sample := range []struct {
@@ -218,7 +215,6 @@ func TestSSEWireContract(t *testing.T) {
 }
 
 // Unsupported JSON data, renderer pointers, or mixed bodies block only selected business routes.
-// 不支持的 JSON 数据、Renderer 指针或正文混写仅阻断被选中的业务路由。
 func TestSSEDiagnostics(t *testing.T) {
 	bundle := sseBundle(t)
 	engineForMedia := gin.New()

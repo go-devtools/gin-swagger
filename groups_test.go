@@ -12,7 +12,6 @@ import (
 )
 
 // Build independent grouped documents while preserving caching and HEAD behavior.
-// 整体分类分别构建独立文档，并沿用缓存与 HEAD 行为。
 func TestDocumentGroups(t *testing.T) {
 	r := gin.New()
 	r.GET("/users/:id", userHandler)
@@ -59,7 +58,6 @@ func TestDocumentGroups(t *testing.T) {
 }
 
 // Reject invalid group options before registering documentation routes.
-// 错误分类配置必须在注册文档路由前失败。
 func TestInvalidGroupsLeaveRoutesUnchanged(t *testing.T) {
 	for _, groups := range [][]DocumentGroup{{{ID: "../x", Name: "Invalid"}}, {{ID: "same", Name: "One"}, {ID: "same", Name: "Two"}}, {{ID: "a", Name: "Same"}, {ID: "b", Name: "Same"}}} {
 		r := gin.New()
@@ -82,7 +80,6 @@ func TestInvalidGroupsLeaveRoutesUnchanged(t *testing.T) {
 }
 
 // Prevent groups from restoring globally excluded routes and retain per-document validators for conditional requests.
-// 分类不能重新包含被全局范围排除的路由，条件请求沿用各自的内容标识。
 func TestGroupScopeIntersectionAndCache(t *testing.T) {
 	r := gin.New()
 	r.GET("/users/:id", userHandler)

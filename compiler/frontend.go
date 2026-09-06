@@ -1,5 +1,4 @@
 // Expose Gin generation rules through the public compiler SDK.
-// 通过核心公开 SDK 提供 Gin 生成前端；普通业务程序不导入本包。
 package compiler
 
 import (
@@ -12,11 +11,9 @@ import (
 )
 
 // Match the complete Gin package identity rather than short method names.
-// 明确限定 Gin 的真实包身份，禁止仅按方法短名匹配。
 const ginPackage = "github.com/gin-gonic/gin"
 
 // Provide the same frontend to the CLI and custom generation entry points.
-// 注册静态 Gin 规则，同一个值供 CLI 与项目自定义生成器组合。
 func Frontend() core.Frontend {
 	return core.Frontend{Name: "gin-v1.12-front-v9", Match: func(f core.Function) bool {
 		return f.Signature.Params().Len() == 1 && isContext(f.Signature.Params().At(0).Type())
@@ -28,7 +25,6 @@ func Frontend() core.Frontend {
 }
 
 // Recognize Gin Context by full type identity without accessing private state.
-// 使用完整类型身份识别 Gin Context，不访问框架私有状态。
 func isContext(t types.Type) bool {
 	if t == nil {
 		return false
@@ -42,7 +38,6 @@ func isContext(t types.Type) bool {
 }
 
 // Extract an exact constant integer status code.
-// 提取无损的可求值整数状态码。
 func integer(v core.Value) string {
 	if v.Constant != nil && v.Constant.Kind() == constant.Int {
 		return v.Constant.ExactString()
@@ -51,7 +46,6 @@ func integer(v core.Value) string {
 }
 
 // Extract an actual constant string.
-// 提取代码中真实的字符串常量。
 func literal(v core.Value) string {
 	if v.Constant != nil && v.Constant.Kind() == constant.String {
 		return constant.StringVal(v.Constant)
@@ -60,13 +54,11 @@ func literal(v core.Value) string {
 }
 
 // Report unsupported Gin semantics instead of hiding unknowns behind default or empty Schemas.
-// 输出明确的 Gin 能力边界，不能用 default 或空 Schema 隐藏未知。
 func unresolved(c core.CallContext, message string) []core.Effect {
 	return []core.Effect{{Kind: core.Unresolved, Source: c.Source, Message: "gin-swagger.analysis: " + message, Fix: "Register a centralized rule through the project generation entry point"}}
 }
 
 // Translate Gin calls into neutral effects while the core manages control flow.
-// 将真实 Gin 调用转换成框架中立效果；控制流由核心调度。
 func analyzeCall(c core.CallContext) ([]core.Effect, error) {
 	if c.Object == nil || c.Object.Pkg() == nil || c.Object.Pkg().Path() != ginPackage {
 		return nil, nil
@@ -144,7 +136,6 @@ func analyzeCall(c core.CallContext) ([]core.Effect, error) {
 }
 
 // Unrecognized response-writer calls still carry wire effects and cannot be treated as pure calls.
-// 未识别的响应 Writer 调用仍携带网络效果，不能当作普通纯函数忽略。
 func carriesResponseEffects(t types.Type) bool {
 	if isContext(t) {
 		return true

@@ -8,7 +8,6 @@ import (
 )
 
 // Emit facts for explicit binders while the core analyzes business branches after binding failures.
-// 为显式绑定器生成请求事实，绑定失败的业务分支仍由核心控制流分析。
 func bindRequest(c core.CallContext, mode string, payload core.Value) []core.Effect {
 	if payload.Type == nil {
 		return unresolved(c, "binding target type is unresolved")
@@ -78,7 +77,6 @@ func bindRequest(c core.CallContext, mode string, payload core.Value) []core.Eff
 }
 
 // Identify exported Gin binders by propagated full variable identity instead of short names.
-// 使用已传播的完整变量身份识别 Gin 导出的绑定器，不按短名称匹配。
 func explicitBinder(c core.CallContext, value core.Value, payload core.Value, bodyOnly bool) []core.Effect {
 	object, ok := value.Object.(*types.Var)
 	if !ok || object.Pkg() == nil || object.Pkg().Path() != ginPackage+"/binding" || object.Parent() != object.Pkg().Scope() {

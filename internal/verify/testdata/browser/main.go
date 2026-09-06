@@ -1,5 +1,4 @@
 // Exercise generated Gin contracts through the shared offline browser resources.
-// 通过共享离线浏览器资源验证生成的 Gin 契约。
 package main
 
 import (
@@ -21,43 +20,30 @@ import (
 	"github.com/openapi-golang/openapi/swaggerui"
 )
 
-// 可选择的角色。
-
 // Supported roles.
 // @openapi enum
 type Role string
 
-// 声明允许的角色与说明。
-
 // Declare allowed roles and their descriptions.
 const (
-	// 管理员
 
 	// Administrator
 	RoleAdmin Role = "admin"
-	// 编辑者
 
 	// Editor
 	RoleEditor Role = "editor"
 )
 
-// 提交的角色信息。
-
 // Submitted role information.
 type Request struct {
-	// 选择的角色。
 
 	// Selected role.
 	// @openapi required examples=["admin"]
 	Role Role
 }
 
-// 可公开的请求错误。
-
 // A public request error.
 type APIError struct{ Message string }
-
-// 提交角色。
 
 // Submit a role.
 // @openapi tags=["Browser"]
@@ -71,7 +57,6 @@ func Submit(c *gin.Context) {
 }
 
 // Start only the test-owned service, preserving the ordinary registered handler.
-// 仅启动测试独占服务，并保留普通 handler 的路由注册。
 func main() {
 	gin.SetMode(gin.ReleaseMode)
 	listener, err := net.Listen("tcp", "127.0.0.1:0")

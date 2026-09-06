@@ -23,7 +23,6 @@ import (
 )
 
 // Generate HTTP response samples from real source and preserve business source bytes.
-// 从真实源码生成 HTTP 响应样本，生成前后保持业务源码逐字节一致。
 func httpResponseBundle(t *testing.T) openapi.Bundle {
 	t.Helper()
 	path := "testdata/httpresponses/app.go"
@@ -43,7 +42,6 @@ func httpResponseBundle(t *testing.T) openapi.Bundle {
 }
 
 // Compare real HTTP responses before/after mounting with automatic redirect following disabled.
-// 经真实 HTTP 服务比较挂载前后结果，关闭自动重定向以观察原始响应。
 func TestHTTPRedirects(t *testing.T) {
 	bundle := httpResponseBundle(t)
 	for _, method := range []string{"GET", "HEAD", "POST", "PUT", "PATCH", "DELETE"} {
@@ -177,7 +175,6 @@ func TestHTTPRedirects(t *testing.T) {
 }
 
 // Read the operation for the actual HTTP method rather than substituting one GET result for the matrix.
-// 按真实 HTTP 方法读取规范操作，避免用一个 GET 结果代替整个矩阵。
 func httpOperation(path *spec.PathItem, method string) *spec.Operation {
 	switch method {
 	case "GET":
@@ -197,7 +194,6 @@ func httpOperation(path *spec.PathItem, method string) *spec.Operation {
 }
 
 // Convert known matrix statuses to document keys.
-// 将矩阵中的已知状态转换为文档键。
 func httpStatus(status int) string {
 	switch status {
 	case 200:
@@ -223,7 +219,6 @@ func httpStatus(status int) string {
 }
 
 // Distinguish continued redirect writes from two complete bodies and isolate unselected invalid routes.
-// 区分重定向后的继续写入与两次完整正文，并验证未选中异常路由隔离。
 func TestRedirectContinuation(t *testing.T) {
 	bundle := httpResponseBundle(t)
 	for _, method := range []string{"POST", "GET"} {
@@ -264,7 +259,6 @@ func TestRedirectContinuation(t *testing.T) {
 }
 
 // A real HTTP server suppresses HEAD bodies while retaining GET representation for the same handler.
-// 真实 HTTP 服务抑制 HEAD 正文，同时保留同一业务函数的 GET 表示。
 func TestHEADWireResponse(t *testing.T) {
 	bundle := httpResponseBundle(t)
 	engine := gin.New()

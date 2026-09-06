@@ -16,7 +16,6 @@ import (
 )
 
 // Binding failures and body limits must follow automatic conditions without importing inapplicable error statuses.
-// 错误和体积限制也必须服从自动绑定条件，不能沿用不适用的错误状态。
 func TestAutomaticBindingErrorPaths(t *testing.T) {
 	bundle := automaticBundle(t)
 	for _, sample := range []struct {
@@ -84,7 +83,6 @@ func TestAutomaticBindingErrorPaths(t *testing.T) {
 }
 
 // Default media and route overrides select documentation conditions and appear as declared provenance.
-// 默认媒体设置与路由覆盖只决定文档条件，声明会被记录在来源报告中。
 func TestAutomaticMediaScopeConfiguration(t *testing.T) {
 	bundle := automaticBundle(t)
 	engine := gin.New()

@@ -18,12 +18,8 @@ import (
 	"github.com/openapi-golang/openapi/spec"
 )
 
-// 复用已安装外部 CLI 从本消费者源码生成的 Bundle。
-
 // Reuse the Bundle generated from this consumer by the installed external CLI.
 func httpResponseBundle(t *testing.T) openapi.Bundle { t.Helper(); return apidoc.Bundle() }
-
-// 经真实 HTTP 服务比较挂载前后结果，关闭自动重定向以观察原始响应。
 
 // Compare real HTTP responses before/after mounting with automatic redirect following disabled.
 func TestHTTPRedirects(t *testing.T) {
@@ -158,8 +154,6 @@ func TestHTTPRedirects(t *testing.T) {
 	}
 }
 
-// 按真实 HTTP 方法读取规范操作，避免用一个 GET 结果代替整个矩阵。
-
 // Read the operation for the actual HTTP method rather than substituting one GET result for the matrix.
 func httpOperation(path *spec.PathItem, method string) *spec.Operation {
 	switch method {
@@ -178,8 +172,6 @@ func httpOperation(path *spec.PathItem, method string) *spec.Operation {
 	}
 	return nil
 }
-
-// 将矩阵中的已知状态转换为文档键。
 
 // Convert known matrix statuses to document keys.
 func httpStatus(status int) string {
@@ -205,8 +197,6 @@ func httpStatus(status int) string {
 	}
 	return "invalid"
 }
-
-// 区分重定向后的继续写入与两次完整正文，并验证未选中异常路由隔离。
 
 // Distinguish continued redirect writes from two complete bodies and isolate unselected invalid routes.
 func TestRedirectContinuation(t *testing.T) {
@@ -247,8 +237,6 @@ func TestRedirectContinuation(t *testing.T) {
 		t.Fatalf("invalid redirect status: %v", err)
 	}
 }
-
-// 真实 HTTP 服务抑制 HEAD 正文，同时保留同一业务函数的 GET 表示。
 
 // A real HTTP server suppresses HEAD bodies while retaining GET representation for the same handler.
 func TestHEADWireResponse(t *testing.T) {
