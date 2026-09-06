@@ -112,7 +112,11 @@ func rawReadOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 // 先分派依赖响应状态的重定向，再处理原始读取与绑定器的有限备选。
 // Dispatch state-dependent redirects before raw reads and finite binder outcomes.
 func requestOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
-	results, err := redirectOutcomes(c)
+	results, err := streamWriterOutcomes(c)
+	if err != nil || len(results) > 0 {
+		return results, err
+	}
+	results, err = redirectOutcomes(c)
 	if err != nil || len(results) > 0 {
 		return results, err
 	}

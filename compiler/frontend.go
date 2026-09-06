@@ -18,13 +18,13 @@ const ginPackage = "github.com/gin-gonic/gin"
 // 注册静态 Gin 规则，同一个值供 CLI 与项目自定义生成器组合。
 // Provide the same frontend to the CLI and custom generation entry points.
 func Frontend() core.Frontend {
-	return core.Frontend{Name: "gin-v1.12-front-v8", Match: func(f core.Function) bool {
+	return core.Frontend{Name: "gin-v1.12-front-v9", Match: func(f core.Function) bool {
 		return f.Signature.Params().Len() == 1 && isContext(f.Signature.Params().At(0).Type())
 	}, Entry: func(f core.Function) []core.Effect {
 		source := f.Source
 		source.Kind, source.Rule = "derived", "gin.default.status"
 		return []core.Effect{{Kind: core.ResponseStatus, Status: "200", Source: source}}
-	}, Call: analyzeCall, CallOutcomes: requestOutcomes, CarriesEffects: carriesResponseEffects}
+	}, Call: analyzeCall, Callback: streamCallback, CallOutcomes: requestOutcomes, CarriesEffects: carriesResponseEffects}
 }
 
 // 使用完整类型身份识别 Gin Context，不访问框架私有状态。

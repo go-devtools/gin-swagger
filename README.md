@@ -10,7 +10,7 @@ This repository is under active implementation. The full acceptance target is re
 
 - Exactly Go 1.27.1 for minimum-version acceptance.
 - Gin v1.12.0 for minimum-version acceptance.
-- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260906015801-b3e75677466f`, resolved from an actual remote commit.
+- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260906025859-a178878ec844`, resolved from an actual remote commit.
 
 ## Architecture
 
@@ -81,3 +81,5 @@ Raw PostForm, array/dictionary getters, FormFile, and SaveUploadedFile now prese
 HEAD and redirect response semantics are validated against real HTTP servers; see the [response guide](docs/responses.md).
 
 Gin SSEvent and standard sse.Event renderers produce native event itemSchema, preserving actual text/JSON payloads and transmitted metadata. See the [response guide](docs/responses.md) for the real HTTP matrix and remaining streaming callback boundaries.
+
+Stream callbacks and JSON Encoder writes to the Gin response writer are supported through the public core callback SDK, including explicit NDJSON framing and stable long-lived SSE. See the [response guide](docs/responses.md) for tested behavior and remaining boundaries.

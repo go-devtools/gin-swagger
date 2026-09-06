@@ -35,3 +35,5 @@
 核心依赖现固定为 `v0.0.0-20260906005919-bc9182815e96`，提供经公开外部 SDK 验证的 ResponseItem、内层 codec 和编译期 Schema 包装。该固定远端核心的 40 项 SDK race 测试与实际 CLI 安装/导出通过。适配器 GOWORK=off dev、完整 race、vet、模块校验、新鲜度和示例构建通过；13 个业务/路由函数体、152 处英文说明和 Bearer-only 配置保持一致。此依赖更新尚未增加 Gin SSEvent/Stream 自动推导，完整流式验收继续保留。
 
 Gin SSEvent 与标准 sse.Event 已通过公开核心 SDK 推导原生 itemSchema；108 组真实 HTTP 样本验证文本/JSON、nil、元数据、状态及提交头。关闭 workspace、固定真实远端核心后的 dev 已通过，原有业务与路由函数体不变。完整 race、vet、依赖校验、新鲜度检查和示例构建也已通过，实际导出保留 152 处英文说明、三点二版本与仅 Bearer 授权。真实远端适配器消费者结果在同步后另行记录；Stream 回调、任意 Writer、NDJSON 生成及完整 Goal 的剩余矩阵继续保留。
+
+新增 Stream 同步回调、捕获单元与稳定重复支持，并跟踪 JSON Encoder 的响应 Writer 身份来生成明确媒体类型的 NDJSON itemSchema。18 组真实 HTTP 样本与实际长连接断连测试通过；未知接口 Writer 明确诊断。固定真实远端核心、关闭 workspace 的 dev 已通过，46 项外部核心 SDK race 与真实 CLI 验证通过；完整 Gin race、vet、依赖校验、新鲜度和示例构建也已通过；真实远端适配器结果在同步后记录。原完整能力矩阵继续保留。
