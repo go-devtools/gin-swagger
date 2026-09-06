@@ -10,6 +10,7 @@ import (
 )
 
 // Construct the writer argument from Context's actual public field type without core-private state.
+// 从 Context 的实际公开字段类型构造 Writer 实参，不引入核心私有状态。
 func contextWriter(context core.Value) (core.Value, bool) {
 	if value, ok := context.Fields["Writer"]; ok {
 		return value, !value.Unknown
@@ -35,6 +36,7 @@ func contextWriter(context core.Value) (core.Value, bool) {
 }
 
 // Gin Stream checks disconnection, invokes step, flushes, and then repeats according to the boolean result.
+// Gin Stream 先检查断连，再调用 step、Flush，最后按布尔结果重复。
 func streamCallback(c core.CallContext) (*core.CallbackPlan, error) {
 	if c.Object == nil || c.Object.Pkg() == nil || c.Object.Pkg().Path() != ginPackage || c.Object.Name() != "Stream" || !isContext(c.Receiver.Type) {
 		return nil, nil
@@ -51,6 +53,7 @@ func streamCallback(c core.CallContext) (*core.CallbackPlan, error) {
 }
 
 // Recognize Gin writers by full type identity without treating ordinary file or log writers as responses.
+// 使用完整类型身份识别 Gin Writer，普通文件或日志 Writer 不作为响应。
 func isGinWriter(t types.Type) bool {
 	if t == nil {
 		return false
@@ -64,6 +67,7 @@ func isGinWriter(t types.Type) bool {
 }
 
 // Propagate a standard JSON encoder's writer identity through its result and preserve Encode error branches.
+// 将标准 JSON 编码器的 Writer 身份随返回值传播，并保留 Encode 的错误分支。
 func streamWriterOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 	if c.Object == nil || c.Object.Pkg() == nil || c.Object.Pkg().Path() != "encoding/json" {
 		return nil, nil

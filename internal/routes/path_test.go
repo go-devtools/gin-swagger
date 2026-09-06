@@ -3,6 +3,7 @@ package routes
 import "testing"
 
 // Distinguish ordinary parameters from cross-slash catch-all parameters.
+// 验证普通参数和跨斜杠 catch-all 被适配器显式区分。
 func TestRoutePath(t *testing.T) {
 	for _, tt := range []struct {
 		input, path string
@@ -24,6 +25,7 @@ func TestRoutePath(t *testing.T) {
 }
 
 // Fuzz path parsing for crashes and unbalanced output templates.
+// 对任意路径验证解析不会崩溃或输出不平衡模板。
 func FuzzRoutePath(f *testing.F) {
 	for _, path := range []string{"/", "/users/:id", "/assets/*path", "/a/%2F"} {
 		f.Add(path)

@@ -22,6 +22,7 @@ import (
 )
 
 // Compile real raw-read samples while verifying that generation does not change business source.
+// 静态编译真实原始读取样本，同时验证生成器未改变业务源码。
 func rawRequestBundle(t *testing.T) openapi.Bundle {
 	t.Helper()
 	path := "testdata/rawrequests/app.go"
@@ -41,6 +42,7 @@ func rawRequestBundle(t *testing.T) openapi.Bundle {
 }
 
 // Assert real URL-encoded and multipart reads and independently validate the body representation.
+// 对 URL 编码及 multipart 的真实读取逐项断言，再用独立 Schema 验证正文表示。
 func TestRawFormGetters(t *testing.T) {
 	bundle := rawRequestBundle(t)
 	for _, method := range []string{"GET", "POST", "PUT", "PATCH", "DELETE"} {
@@ -154,6 +156,7 @@ func TestRawFormGetters(t *testing.T) {
 }
 
 // Upload raw binary data and missing files to verify error branches and FileHeader result correlation.
+// 上传原始二进制及缺失文件，验证错误分支和 FileHeader 返回值关联。
 func TestRawFormFile(t *testing.T) {
 	bundle := rawRequestBundle(t)
 	engine := rawrequests.Router()
@@ -216,6 +219,7 @@ func TestRawFormFile(t *testing.T) {
 }
 
 // Repeated query values use form/explode with non-null input arrays while absent results retain actual JSON behavior.
+// 重复查询值使用 form/explode，输入数组不含 JSON null，缺失返回值仍按真实 JSON 表达。
 func TestRawQueryArray(t *testing.T) {
 	engine := rawrequests.Router()
 	doc, err := ginswagger.Mount(engine, rawRequestBundle(t), ginswagger.Config{OpenAPI: openapi.Config{Title: "Query", Version: "1"}, Include: func(_, p string) bool { return p == "/query" }})
@@ -260,6 +264,7 @@ func TestRawQueryArray(t *testing.T) {
 }
 
 // Read bracket-key dictionaries using the first repeated value without mixing body and query sources.
+// 字典按方括号键读取，重复值取首项，正文与 query 不互为默认来源。
 func TestRawDictionaryGetters(t *testing.T) {
 	bundle := rawRequestBundle(t)
 	for _, multipartBody := range []bool{false, true} {
@@ -328,6 +333,7 @@ func TestRawDictionaryGetters(t *testing.T) {
 }
 
 // File saving produces only business-selected statuses, and compilation must not execute filesystem writes.
+// 保存文件只产生业务显式选择的状态，编译不得执行文件写入。
 func TestRawFileSaving(t *testing.T) {
 	bundle := rawRequestBundle(t)
 	for _, invalidDestination := range []bool{false, true} {
@@ -397,6 +403,7 @@ func TestRawFileSaving(t *testing.T) {
 }
 
 // Unsupported dynamic reads and known-nil saves block only their selected routes, not unused candidates.
+// 不支持的动态读取和已知 nil 保存只阻止对应路由，不污染未使用候选。
 func TestRawReadDiagnostics(t *testing.T) {
 	bundle := rawRequestBundle(t)
 	for _, sample := range []struct {

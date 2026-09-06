@@ -9,6 +9,7 @@ import (
 )
 
 // Help must succeed without loading an application or generating files.
+// 帮助命令应成功返回，且不加载应用或生成文件。
 func TestSubcommandHelp(t *testing.T) {
 	for _, command := range []string{"generate", "check", "explain"} {
 		t.Run(command, func(t *testing.T) {
@@ -22,6 +23,7 @@ func TestSubcommandHelp(t *testing.T) {
 }
 
 // Reject stray positional arguments before they can trigger source loading or generation.
+// 在触发源码加载或生成前拒绝多余的位置参数。
 func TestRejectPositionalArguments(t *testing.T) {
 	for _, command := range []string{"generate", "check", "explain"} {
 		t.Run(command, func(t *testing.T) {

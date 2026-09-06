@@ -1,4 +1,5 @@
 // Verify public generation and mounting boundaries against real Gin responses.
+// 用真实 Gin 响应验证生成与挂载的公开边界。
 package integration
 
 import (
@@ -22,6 +23,7 @@ import (
 )
 
 // Compile a real fixture and prove generation leaves its source bytes unchanged.
+// 编译真实 fixture，并证明源码在生成过程中保持逐字节不变。
 func responseBundle(t *testing.T) openapi.Bundle {
 	t.Helper()
 	before, err := os.ReadFile("testdata/responses/app.go")
@@ -40,6 +42,7 @@ func responseBundle(t *testing.T) openapi.Bundle {
 }
 
 // Validate text or JSON independently and ensure raw binary is not described as Base64.
+// 独立验证字符串或 JSON 样本，并检查原始二进制没有被描述为 Base64。
 func validateResponse(t *testing.T, document []byte, path, media string, status int, body []byte) {
 	t.Helper()
 	var raw map[string]any
@@ -91,6 +94,7 @@ func validateResponse(t *testing.T, document []byte, path, media string, status 
 }
 
 // Compare real status, headers, bytes, and contracts on equivalent engines before and after mounting.
+// 挂载前后使用等价 Engine，核对真实状态、头、字节与文档契约。
 func TestResponseRenderingAndCommit(t *testing.T) {
 	bundle := responseBundle(t)
 	for _, sample := range []struct {
@@ -166,6 +170,7 @@ func TestResponseRenderingAndCommit(t *testing.T) {
 }
 
 // Invalid consecutive output and unknown renderers must still block selected-route construction.
+// 非法连续输出及未知 Renderer 仍必须阻断所选路由的构建。
 func TestUnresolvedRenderersRemainDiagnostics(t *testing.T) {
 	bundle := responseBundle(t)
 	for _, path := range []string{"/multiple", "/unknown-render", "/unknown-writer", "/reader-pending"} {
@@ -177,6 +182,7 @@ func TestUnresolvedRenderersRemainDiagnostics(t *testing.T) {
 }
 
 // Interim and final statuses are not one ordinary commit; reject the contract until that sequence is modeled.
+// 临时响应与最终状态不是一次普通提交，未建模前必须阻断错误契约。
 func TestInterimResponseNeedsSequenceModel(t *testing.T) {
 	server := httptest.NewServer(responses.Router())
 	defer server.Close()
@@ -199,6 +205,7 @@ func TestInterimResponseNeedsSequenceModel(t *testing.T) {
 }
 
 // Use actual committed headers to ensure a bodyless reader does not declare skipped header writes.
+// 用真实提交头确认无内容 Reader 不会声明尚未执行的头设置。
 func TestBodylessReaderHeaders(t *testing.T) {
 	bundle := responseBundle(t)
 	for _, sample := range []struct {

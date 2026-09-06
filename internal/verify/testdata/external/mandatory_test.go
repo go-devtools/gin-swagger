@@ -16,6 +16,8 @@ import (
 	"github.com/openapi-golang/openapi/contracttest"
 )
 
+// 固定远端 CLI 的产物必须保留真实 400/413 提交和后续 JSON 响应。
+
 // Output from the fixed remote CLI must preserve actual 400/413 commits and subsequent JSON responses.
 func TestMandatoryRemoteContract(t *testing.T) {
 	before, after := gin.New(), gin.New()

@@ -26,6 +26,7 @@ import (
 )
 
 // Generate a Bundle from real callback source and verify that business source remains byte-identical.
+// 从真实回调源码生成 Bundle，逐字节确认业务源码未修改。
 func streamCallbackBundle(t *testing.T) openapi.Bundle {
 	t.Helper()
 	path := "testdata/streamcalls/app.go"
@@ -45,6 +46,7 @@ func streamCallbackBundle(t *testing.T) openapi.Bundle {
 }
 
 // Validate SSE and NDJSON over real HTTP and compare status, headers, and body before and after mounting.
+// 用真实 HTTP 逐项校验 SSE 与 NDJSON，并比较挂载前后的状态、头和正文。
 func TestStreamCallbacksWire(t *testing.T) {
 	bundle := streamCallbackBundle(t)
 	for _, sample := range []struct {
@@ -139,6 +141,7 @@ func TestStreamCallbacksWire(t *testing.T) {
 }
 
 // Unresolved callbacks, invalid line framing, and late media headers must block selected routes.
+// 不确定回调、错误逐行编码或晚写媒体头必须阻断选中路由。
 func TestStreamCallbacksDiagnostics(t *testing.T) {
 	bundle := streamCallbackBundle(t)
 	for _, handler := range []gin.HandlerFunc{streamcalls.StreamMissingMedia, streamcalls.StreamIndented, streamcalls.StreamNil, streamcalls.StreamLateMedia, streamcalls.StreamUnknownWriter} {
@@ -151,6 +154,7 @@ func TestStreamCallbacksDiagnostics(t *testing.T) {
 }
 
 // A stable long-lived stream generates a native contract and its handler terminates promptly after the real client closes.
+// 状态稳定的长连接生成原生契约，真实客户端关闭后 handler 及时结束。
 func TestStreamCallbackCancellation(t *testing.T) {
 	bundle := streamCallbackBundle(t)
 	engine := gin.New()

@@ -12,15 +12,19 @@ import (
 )
 
 // Select explicit Gin text-binding field rules for reuse by project generation entry points.
+// 明确选择 Gin 文本绑定字段规则，可供项目生成入口复用。
 type BindingCodec struct {
 	// Mode is query, uri, header, form-post, or multipart.
+	// 模式为 query、uri、header、form-post 或 multipart。
 	Mode string
 }
 
 // Include the mode in codec identity to isolate JSON and other location projections.
+// 编解码身份包含模式，避免与 JSON 或其他位置的组件共用缓存。
 func (c BindingCodec) Name() string { return "gin-v1.12-binding-" + c.Mode + "-v1" }
 
 // Validate the explicit mode and select the tag actually read by Gin.
+// 校验明确模式并选择 Gin 实际读取的 tag 名称。
 func (c BindingCodec) fieldTag() (string, error) {
 	switch c.Mode {
 	case "query", "form", "form-post", "multipart":
@@ -34,6 +38,7 @@ func (c BindingCodec) fieldTag() (string, error) {
 }
 
 // Follow Gin's recursive field traversal and existing names without imposing JSON field precedence.
+// 按 Gin 的递归字段遍历读取现有名称，不套用 JSON 字段优先级。
 func (c BindingCodec) Fields(root *types.Struct) ([]core.WireField, error) {
 	tag, err := c.fieldTag()
 	if err != nil {
@@ -112,6 +117,7 @@ func (c BindingCodec) Fields(root *types.Struct) ([]core.WireField, error) {
 }
 
 // Actual Gin text and multipart binding determines input types instead of JSON null or Base64 representations.
+// 文本和 multipart 输入由实际 Gin 绑定规则决定，不继承 JSON 的 null 或 Base64 表示。
 func (c BindingCodec) ProjectType(request core.ProjectionRequest, project func(types.Type) (*spec.Schema, error)) (*spec.Schema, bool, error) {
 	if _, err := c.fieldTag(); err != nil {
 		return nil, true, err

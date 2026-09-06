@@ -10,7 +10,7 @@ This pre-1.0 SDK evolves between pinned versions. Use the public APIs and check 
 
 - Go 1.27.1 for development and verification.
 - Gin v1.12.0 or the version pinned in go.mod.
-- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260906044503-8d888f89ecea`, resolved from an actual remote commit.
+- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260906053231-a2b9ccc7da6f`, resolved from an actual remote commit.
 
 ## Architecture
 
@@ -66,7 +66,7 @@ The frontend derives text, raw data, reader, explicit standard renderer, and imm
 
 New project code is licensed under [MIT](LICENSE). Third-party assets retain their original licenses and notices.
 
-Project-owned code comments, diagnostics, CLI help, and example text use English. Multilingual encoding tests retain their input values through escaped literals. Upstream assets retain their original form. Commit messages use English; [README.zh-cn.md](README.zh-cn.md) provides corresponding Chinese documentation.
+Project-owned source comments include English and Simplified Chinese. OpenAPI descriptions, diagnostics, CLI help, and example text use English; companion translations are kept separate from semantic comments in examples and fixtures. Multilingual encoding tests retain their input values through escaped literals. Upstream assets retain their original form. Commit messages use English; [README.zh-cn.md](README.zh-cn.md) provides corresponding Chinese documentation.
 
 See the [request binding guide](docs/requests.md) for explicit JSON, Query, URI, Header, FormPost, Multipart, and centralized custom-decoder rules.
 

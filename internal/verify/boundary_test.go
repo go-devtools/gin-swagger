@@ -1,4 +1,5 @@
 // Verify independent modules, runtime dependency boundaries, and real first-generation CLI flows.
+// 验证独立 module、运行时依赖边界和真实 CLI 首次生成链路。
 package verify
 
 import (
@@ -16,6 +17,7 @@ import (
 )
 
 // Locate this adapter checkout without using neighboring product repositories.
+// 定位当前适配器 checkout，不借用相邻产品仓库。
 func checkoutRoot(t *testing.T) string {
 	t.Helper()
 	root, err := filepath.Abs("../..")
@@ -26,6 +28,7 @@ func checkoutRoot(t *testing.T) string {
 }
 
 // Bound each subprocess, disable workspaces, and preserve full output on failure.
+// 每个子进程有时间预算并关闭 workspace；失败保留完整输出。
 func execute(t *testing.T, dir, program string, args ...string) string {
 	t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
@@ -41,6 +44,7 @@ func execute(t *testing.T, dir, program string, args ...string) string {
 }
 
 // Ordinary Mount consumers must not link analyzers or the independent test engine.
+// 普通 Mount 用户不能链接分析器或独立测试引擎。
 func TestRuntimeDependencyBoundary(t *testing.T) {
 	output := execute(t, checkoutRoot(t), "go", "list", "-deps", "-f", "{{.ImportPath}}", ".")
 	for _, forbidden := range []string{"github.com/openapi-golang/gin-swagger/compiler", "github.com/openapi-golang/openapi/compiler", "github.com/openapi-golang/openapi/contracttest", "golang.org/x/tools/", "github.com/santhosh-tekuri/jsonschema/"} {
@@ -51,6 +55,7 @@ func TestRuntimeDependencyBoundary(t *testing.T) {
 }
 
 // Generate from real source, build a stripped application, and verify its public runtime and contracts.
+// 从真实源码首次生成、构建裁剪符号的程序并验证公开运行时与契约。
 func TestExternalModule(t *testing.T) {
 	root, dir := checkoutRoot(t), t.TempDir()
 	version := os.Getenv("GIN_SWAGGER_TEST_VERSION")
@@ -145,6 +150,7 @@ func TestExternalModule(t *testing.T) {
 	}
 	execute(t, dir, cli, "check", "--spec", specPath)
 	// Build the real application with different tags and reject its stale Bundle before writing a document.
+	// 用不同 tags 构建真实应用，旧 Bundle 必须在写出文档前被拒绝。
 	mismatched := filepath.Join(t.TempDir(), "consumer-mismatched")
 	execute(t, dir, "go", "build", "-tags=openapi_runtime_mismatch", "-trimpath", "-ldflags=-s -w", "-o", mismatched, ".")
 	rejectedPath := filepath.Join(dir, "rejected.json")

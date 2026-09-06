@@ -12,6 +12,8 @@ import (
 	"github.com/openapi-golang/openapi/contracttest"
 )
 
+// 生成契约与真实请求相符，文档挂载不改变业务响应。
+
 // Match generated contracts to actual requests without changing business responses through mounting.
 func TestGeneratedContract(t *testing.T) {
 	before, _, err := router(false)

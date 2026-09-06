@@ -22,6 +22,7 @@ import (
 )
 
 // Check mandatory-binding success, failure, and size-limit commits without changing actual responses.
+// 核对强制绑定的成功、错误与限流提交，文档挂载不能改变真实响应。
 func TestMandatoryBindingOutcomes(t *testing.T) {
 	beforeSource, err := os.ReadFile("testdata/mustbind/app.go")
 	if err != nil {

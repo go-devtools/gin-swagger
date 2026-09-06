@@ -14,6 +14,8 @@ import (
 	"github.com/openapi-golang/openapi/contracttest"
 )
 
+// 通过已安装的 CLI、真实 Gin 挂载及独立校验验证共享声明。
+
 // Verify shared declarations through the installed CLI, actual Gin mounting, and independent validation.
 func TestDeclaredRequestResponseContract(t *testing.T) {
 	_, document, err := router(true)
@@ -72,6 +74,8 @@ func TestDeclaredRequestResponseContract(t *testing.T) {
 		t.Fatal("bodyless declaration disappeared")
 	}
 }
+
+// 无效声明在对应 Gin 路由被选中前保持隔离。
 
 // Invalid declarations remain isolated until their actual Gin routes are selected.
 func TestDeclaredRouteFailures(t *testing.T) {

@@ -13,6 +13,7 @@ import (
 )
 
 // Recognize only the actual dependency's event type, rejecting custom renderers with the same short name.
+// 只识别实际依赖的标准事件类型，拒绝同名的自定义 Renderer。
 func isSSEEvent(t types.Type) bool {
 	if t == nil {
 		return false
@@ -26,6 +27,7 @@ func isSSEEvent(t types.Type) bool {
 }
 
 // Read propagated standard-event fields, using actual Go zero values for omitted fields.
+// 读取标准事件已传播的字段；未提供的字段采用真实 Go 零值。
 func explicitSSE(c core.CallContext, status string, event core.Value) []core.Effect {
 	if _, ok := types.Unalias(event.Type).(*types.Pointer); ok {
 		if event.Nil || event.DynamicNil || !concreteNonNil(event) {
@@ -46,6 +48,7 @@ func explicitSSE(c core.CallContext, status string, event core.Value) []core.Eff
 }
 
 // Translate SSE headers, protocol items, and inner JSON payloads into neutral effects.
+// 将 SSE 的响应头、逐项协议对象及 JSON 内层载荷转换为中立效果。
 func sseResponse(c core.CallContext, status string, name, id, retry, payload core.Value) []core.Effect {
 	status = normalizedGinStatus(status)
 	if interimStatus(status) {
@@ -61,6 +64,7 @@ func sseResponse(c core.CallContext, status string, name, id, retry, payload cor
 		effects = append(effects, header("Cache-Control", "no-cache"))
 	}
 	// An explicit bodyless Render writes only headers without invoking the event encoder.
+	// 显式无正文 Render 只写响应头，不调用事件编码器。
 	if status == "204" || status == "304" {
 		return append(effects, core.Effect{Kind: core.ResponseCommit, Status: status, Source: source})
 	}
@@ -87,6 +91,7 @@ func sseResponse(c core.CallContext, status string, name, id, retry, payload cor
 		item.Payload = payload
 		item.PayloadMediaType = "application/json"
 		// Only known nil collections use null on the JSON path; interface non-nil identity cannot replace payload identity.
+		// JSON 分支只有已知具体 nil 集合使用 null；接口自身的非空标志不能改写动态载荷。
 		if payload.DynamicNil {
 			item.Payload.Nil = true
 		}
@@ -145,6 +150,7 @@ func sseResponse(c core.CallContext, status string, name, id, retry, payload cor
 }
 
 // Distinguish interface identity from the concrete payload so boxing cannot make an unknown pointer definitely non-nil.
+// 区分接口身份和其内部具体值，避免装箱把未知指针变成确定非 nil。
 func concreteNonNil(value core.Value) bool {
 	if value.Boxed {
 		return value.DynamicNonNil
@@ -153,6 +159,7 @@ func concreteNonNil(value core.Value) bool {
 }
 
 // Select encoding using gin-contrib/sse's exact byte assertion and single pointer dereference.
+// 按 gin-contrib/sse 的精确字节断言及一次指针解引用选择编码路径。
 func ssePayload(value core.Value) (wire *spec.Schema, project, nonNull, maybeNil bool, message string) {
 	if value.Unknown || value.Type == nil {
 		return nil, false, false, false, "The actual type of SSE data is unresolved"
@@ -190,6 +197,7 @@ func ssePayload(value core.Value) (wire *spec.Schema, project, nonNull, maybeNil
 }
 
 // Constrain known text only when custom formatters cannot intervene; arrays and other formats retain string wire types.
+// 只在真实格式化方法不参与时约束已知文本；数组和其他格式保持字符串网络表示。
 func sseTextSchema(value core.Value) *spec.Schema {
 	schema := spec.Typed("string")
 	if hasSSEMethods(value.Type, "String", "Error", "Format") {
@@ -217,6 +225,7 @@ func sseTextSchema(value core.Value) *spec.Schema {
 }
 
 // Inspect the actual method set so default constant rules cannot override custom formatting.
+// 检查实际方法集，已知自定义格式不被默认编码的常量规则覆盖。
 func hasSSEMethods(t types.Type, names ...string) bool {
 	if t == nil {
 		return false

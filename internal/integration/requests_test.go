@@ -24,6 +24,7 @@ import (
 )
 
 // Compile real request samples and verify business source remains unchanged.
+// 编译真实请求样本并核对业务源码保持不变。
 func requestBundle(t *testing.T) openapi.Bundle {
 	t.Helper()
 	before, err := os.ReadFile("testdata/requests/app.go")
@@ -42,6 +43,7 @@ func requestBundle(t *testing.T) openapi.Bundle {
 }
 
 // Validate decoded parameter values independently while checking serialization locations separately.
+// 逐个参数用独立引擎验证已解码值，序列化位置另外检查。
 func validateParameters(t *testing.T, document []byte, path, location string, values map[string]any) {
 	t.Helper()
 	var raw map[string]any
@@ -105,6 +107,7 @@ func validateParameters(t *testing.T, document []byte, path, location string, va
 }
 
 // Real requests, responses, and independent contracts must agree before and after mounting.
+// 实际请求、响应和独立契约必须同时匹配，挂载前后保持等价。
 func TestExplicitRequestBinders(t *testing.T) {
 	bundle := requestBundle(t)
 	query := "Role=admin&Name=Ada&Count=7&IDs=1&IDs=2&Limit=3&Pair=1&Pair=2&Active=true&At=2026-01-01T00%3A00%3A00Z&Delay=1s"
@@ -178,6 +181,7 @@ func TestExplicitRequestBinders(t *testing.T) {
 }
 
 // Multipart files retain raw-byte semantics and actual upload results satisfy the response contract.
+// multipart 文件保持原始字节语义，真实上传返回值通过响应契约。
 func TestMultipartRequestBinding(t *testing.T) {
 	engine := requests.Router()
 	doc, err := ginswagger.Mount(engine, requestBundle(t), ginswagger.Config{OpenAPI: openapi.Config{Title: "Upload", Version: "1"}, Include: func(_, path string) bool { return path == "/multipart" }})
@@ -235,6 +239,7 @@ func TestMultipartRequestBinding(t *testing.T) {
 }
 
 // Actual invalid-request paths still satisfy their contracts, and mounting must not alter status or responses.
+// 非法请求的真实错误路径仍满足契约，挂载不能改变原有状态或响应。
 func TestBindingErrorResponses(t *testing.T) {
 	bundle := requestBundle(t)
 	for _, sample := range []struct {
@@ -284,6 +289,7 @@ func TestBindingErrorResponses(t *testing.T) {
 }
 
 // Check embedded fields and unknown binding rules separately so successful samples cannot hide incorrect inference.
+// 嵌入字段和未知绑定规则分别验证，避免成功样本掩盖错误自动推导。
 func TestBindingBoundaries(t *testing.T) {
 	bundle := requestBundle(t)
 	for _, route := range []string{"/xml", "/custom", "/repeated-header"} {
@@ -305,6 +311,7 @@ func TestBindingBoundaries(t *testing.T) {
 }
 
 // A centralized mapper can describe custom parameter decoding without changing DTOs or handlers.
+// 自定义参数解码可以通过一次集中 mapper 补足，无需更改 DTO 或 handler。
 func TestCustomBindingMapper(t *testing.T) {
 	mapper := func(request core.ProjectionRequest) (*spec.Schema, bool, error) {
 		named, ok := types.Unalias(request.Type).(*types.Named)

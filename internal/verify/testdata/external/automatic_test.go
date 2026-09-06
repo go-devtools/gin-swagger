@@ -17,6 +17,8 @@ import (
 	"github.com/openapi-golang/openapi/contracttest"
 )
 
+// 独立生成和挂载必须区分同一 handler 的 GET 表单与 POST JSON 契约。
+
 // Independent generation and mounting must distinguish GET form and POST JSON contracts for one handler.
 func TestAutomaticRemoteContract(t *testing.T) {
 	before, after := gin.New(), gin.New()

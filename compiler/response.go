@@ -13,6 +13,7 @@ import (
 )
 
 // Construct response effects from Gin's actual renderer while leaving JSON type projection to the core.
+// 用 Gin 实际采用的渲染格式构造响应效果，JSON 类型仍由核心投影。
 func renderResponse(c core.CallContext, status, media string, payload core.Value, schema *spec.Schema) []core.Effect {
 	status = normalizedGinStatus(status)
 	if interimStatus(status) {
@@ -28,11 +29,13 @@ func renderResponse(c core.CallContext, status, media string, payload core.Value
 }
 
 // Describe raw HTTP bytes with a content media type instead of JSON string or Base64 constraints.
+// 原始 HTTP 字节使用内容媒体类型注解，不添加 JSON 字符串或 Base64 约束。
 func rawResponse(c core.CallContext, status, media string) []core.Effect {
 	return renderResponse(c, status, media, core.Value{}, &spec.Schema{SchemaObject: &spec.SchemaObject{ContentMediaType: media}})
 }
 
 // Apply reader headers only when the response header is empty; a known length overrides its extra-header entry.
+// 读取器附加头只在原响应头为空时应用，明确长度覆盖同名附加字段。
 func readerResponse(c core.CallContext, status, media string, length, reader, headers core.Value) []core.Effect {
 	status = normalizedGinStatus(status)
 	if status == "-1" {
@@ -40,6 +43,7 @@ func readerResponse(c core.CallContext, status, media string, length, reader, he
 	}
 	if status == "204" || status == "304" {
 		// Gin only calls WriteContentType here, skipping all extra headers from Reader.Render.
+		// Gin 此时只调用 WriteContentType，跳过 Reader.Render 的所有附加头。
 		return rawResponse(c, status, media)
 	}
 	if reader.Nil {
@@ -76,6 +80,7 @@ func readerResponse(c core.CallContext, status, media string, length, reader, he
 		}
 		if canonical == "Content-Type" {
 			// The renderer writes its explicit media type before extra headers can override it.
+			// Renderer 已先写入明确媒体类型，附加头无法覆盖它。
 			continue
 		}
 		effects = append(effects, core.Effect{Kind: core.ResponseHeader, Name: name, Payload: headers.Fields[name], HeaderIfEmpty: true, Source: source})
@@ -87,6 +92,7 @@ func readerResponse(c core.CallContext, status, media string, length, reader, he
 }
 
 // Match renderers by full package and type identity rather than custom implementations with matching short names.
+// 通过完整包和类型身份识别 Renderer，不按短名称猜测自定义实现。
 func explicitRenderer(c core.CallContext, status string, renderer core.Value) []core.Effect {
 	status = normalizedGinStatus(status)
 	typ := renderer.Type
@@ -132,11 +138,13 @@ func explicitRenderer(c core.CallContext, status string, renderer core.Value) []
 }
 
 // Interim statuses in Gin's wrapped writer cannot be inferred as ordinary final statuses.
+// Gin 包装 Writer 的临时状态不能按普通最终状态推导。
 func interimStatus(status string) bool {
 	return len(status) == 3 && status[0] == '1'
 }
 
 // Gin ignores non-positive status codes; use the neutral preservation marker for the current pending status.
+// Gin 忽略非正数状态，使用中立保留标志表达当前待提交状态。
 func normalizedGinStatus(status string) string {
 	if code, err := strconv.Atoi(status); err == nil && code <= 0 {
 		return "-1"

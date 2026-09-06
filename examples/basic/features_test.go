@@ -13,6 +13,7 @@ import (
 )
 
 // Configure groups and security at startup while keeping the existing user endpoint unauthenticated.
+// 分组和安全声明来自启动层配置；既有用户接口保持无需鉴权。
 func TestExampleGroupsAndSecurity(t *testing.T) {
 	engine, doc, err := Router()
 	if err != nil {
@@ -85,6 +86,7 @@ func TestExampleGroupsAndSecurity(t *testing.T) {
 }
 
 // Escape one document-pointer path key without interpreting route separators as schema levels.
+// 编码文档指针中的单个路径键，避免把路由分隔符当作 Schema 层级。
 func escapePointer(value string) string {
 	var out []byte
 	for _, c := range []byte(value) {
@@ -100,6 +102,7 @@ func escapePointer(value string) string {
 }
 
 // Keep named examples consistent with actual enum validation, including zero and default states.
+// 命名示例与真实枚举校验一致，数字零值和缺省状态均有明确语义。
 func TestEnumRequestExamples(t *testing.T) {
 	engine, doc, err := Router()
 	if err != nil {
