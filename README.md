@@ -91,3 +91,5 @@ Start with [llms.txt](llms.txt) for a compact documentation index and the [AI in
 Function comments can declare request and response types through the shared core. Local and fully qualified generic types retain actual Go identities; matching declarations must agree with derived schemas. Unknown behavior still requires a centralized rule. See [request declarations](docs/requests.md#explicit-request-and-response-types).
 
 See the [performance guide](docs/performance.md) for reproducible 100/1000-route generation, startup Build, document-read, and allocation benchmarks.
+
+See the [independent CI guide](docs/ci.md) for pinned tools, private module access, offline browser checks, actual platform jobs, and fixed remote-version consumption.

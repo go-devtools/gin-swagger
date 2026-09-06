@@ -91,3 +91,5 @@ Stream 回调与面向 Gin 响应 Writer 的 JSON Encoder 通过公开核心回�
 函数注释可以通过共享核心声明请求和响应类型。当前包类型和完整模块路径的泛型类型保留真实 Go 类型身份；同一位置的声明必须与已推导 Schema 一致。未知行为仍需集中规则补充，详见[请求与响应类型声明](docs/requests.md#explicit-request-and-response-types)。
 
 参见[性能指南](docs/performance.md)，运行可复现的 100／1000 路由生成、启动 Build、文档读取与内存分配基准。
+
+参见[独立 CI 指南](docs/ci.md)，了解固定工具链、私有模块访问、离线浏览器检查、真实平台任务和固定远端版本消费验证。
