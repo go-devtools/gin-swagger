@@ -113,6 +113,9 @@ case "${1:-test}" in
       go mod tidy
       "$GOBIN/openapi" schema --dir . --type Request --projection request --output "$ci_artifacts/request.schema.json"
     else
+      # Materialize the newly added consumer dependency checksum before read-only generation.
+      # 在只读生成前写入消费者新增依赖的实际校验和。
+      go mod download "$ci_module@$ci_version"
       go mod download
       ci_before="$(find . -type f -name '*.go' -exec shasum -a 256 {} \; | LC_ALL=C sort)"
       "$GOBIN/gin-swagger" generate --dir . --timeout=2m
