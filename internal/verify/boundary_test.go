@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -54,9 +55,56 @@ func TestRuntimeDependencyBoundary(t *testing.T) {
 	}
 }
 
+// Reject module replacements and verify the core selected by Go matches the declared fixed dependency.
+// 拒绝模块替换，并确认 Go 实际选择的核心版本与声明的固定依赖一致。
+func TestNoLocalReplace(t *testing.T) {
+	root := checkoutRoot(t)
+	var manifest struct {
+		Require []struct{ Path, Version string }
+	}
+	if err := json.Unmarshal([]byte(execute(t, root, "go", "mod", "edit", "-json")), &manifest); err != nil {
+		t.Fatal(err)
+	}
+	pinned := ""
+	for _, dependency := range manifest.Require {
+		if dependency.Path == "github.com/openapi-golang/openapi" {
+			pinned = dependency.Version
+		}
+	}
+	if pinned == "" {
+		t.Fatal("the adapter has no fixed core dependency")
+	}
+	decoder := json.NewDecoder(strings.NewReader(execute(t, root, "go", "list", "-m", "-json", "all")))
+	found := false
+	for {
+		var module struct {
+			Path, Version string
+			Replace       *json.RawMessage
+		}
+		if err := decoder.Decode(&module); err != nil {
+			if err == io.EOF {
+				break
+			}
+			t.Fatal(err)
+		}
+		if module.Replace != nil {
+			t.Fatalf("module replacement bypasses independent consumption: %s", module.Path)
+		}
+		if module.Path == "github.com/openapi-golang/openapi" {
+			found = true
+			if module.Version != pinned {
+				t.Fatalf("selected core %s differs from pinned %s", module.Version, pinned)
+			}
+		}
+	}
+	if !found {
+		t.Fatal("the core is missing from the selected module graph")
+	}
+}
+
 // Generate from real source, build a stripped application, and verify its public runtime and contracts.
 // 从真实源码首次生成、构建裁剪符号的程序并验证公开运行时与契约。
-func TestExternalModule(t *testing.T) {
+func TestGeneratorBootstrap(t *testing.T) {
 	root, dir := checkoutRoot(t), t.TempDir()
 	version := os.Getenv("GIN_SWAGGER_TEST_VERSION")
 	remote := version != ""
@@ -71,7 +119,8 @@ func TestExternalModule(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "go.mod"), module, 0600); err != nil {
 		t.Fatal(err)
 	}
-	for _, name := range []string{"go.sum", "main.go", "main_test.go", "mandatory.go", "mandatory_test.go", "automatic.go", "automatic_test.go", "raw.go", "raw_test.go", "http.go", "http_test.go", "sse.go", "sse_test.go", "stream_callbacks.go", "stream_callbacks_test.go", "declarations.go", "declarations_test.go"} {
+	sourceFiles := map[string][]byte{}
+	for _, name := range []string{"go.sum", "main.go", "main_test.go", "mandatory.go", "mandatory_test.go", "automatic.go", "automatic_test.go", "raw.go", "raw_test.go", "http.go", "http_test.go", "sse.go", "sse_test.go", "stream_callbacks.go", "stream_callbacks_test.go", "declarations.go", "declarations_test.go", "imported.go", "imported_test.go", "testdata/contracts/dto.go"} {
 		source := filepath.Join(root, name)
 		if name != "go.sum" {
 			source = filepath.Join("testdata", "external", name)
@@ -80,7 +129,14 @@ func TestExternalModule(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if err := os.WriteFile(filepath.Join(dir, name), raw, 0600); err != nil {
+		if strings.HasSuffix(name, ".go") {
+			sourceFiles[name] = append([]byte(nil), raw...)
+		}
+		target := filepath.Join(dir, name)
+		if err := os.MkdirAll(filepath.Dir(target), 0700); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(target, raw, 0600); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -117,10 +173,6 @@ func TestExternalModule(t *testing.T) {
 	if _, err := os.Stat(generated); !os.IsNotExist(err) {
 		t.Fatal("first-generation fixture already contains generated output")
 	}
-	before, err := os.ReadFile(filepath.Join(dir, "main.go"))
-	if err != nil {
-		t.Fatal(err)
-	}
 	execute(t, dir, cli, "generate", "--dir", dir, "--timeout=2m")
 	first, err := os.ReadFile(generated)
 	if err != nil {
@@ -132,9 +184,11 @@ func TestExternalModule(t *testing.T) {
 	if err != nil || !bytes.Equal(first, second) {
 		t.Fatal("repeated generation changed its output")
 	}
-	after, err := os.ReadFile(filepath.Join(dir, "main.go"))
-	if err != nil || !bytes.Equal(before, after) {
-		t.Fatal("generation changed business source")
+	for name, before := range sourceFiles {
+		after, err := os.ReadFile(filepath.Join(dir, name))
+		if err != nil || !bytes.Equal(before, after) {
+			t.Fatalf("generation changed business source: %s", name)
+		}
 	}
 	t.Log(execute(t, dir, "go", "test", "-count=1", "-v", "./..."))
 	application := filepath.Join(t.TempDir(), "consumer")

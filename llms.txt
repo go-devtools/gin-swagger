@@ -24,3 +24,5 @@ The module is github.com/openapi-golang/gin-swagger and the root package is gins
 
 - [External consumer](internal/verify/testdata/external/main_test.go): Generation and runtime use from an independent module.
 - [Chinese README](README.zh-cn.md): Corresponding Chinese documentation.
+
+Imported DTO annotations reuse the loaded dependency graph. Query, JSON, and explicit FormPost bindings share metadata without widening handler discovery; see docs/requests.md. Declared constraints do not install runtime validation.

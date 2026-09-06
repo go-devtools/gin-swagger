@@ -121,3 +121,13 @@ Matching declared and derived wire schemas must agree. Declaring body presence a
 The independent consumer verifies the declaration path using real valid/malformed JSON requests, a bodyless DELETE response, preserved provenance, and independent Schema sample validation. It separately selects a conflicting type declaration and an unknown dynamic-status handler to confirm failure. No adapter access to core internal packages is required.
 
 See the core's [request and response declaration reference](https://github.com/openapi-golang/openapi/blob/main/docs/request-response-declarations.md) for exact syntax, scoped type expressions, codec reuse, conservative conflict checks, and structured diagnostics.
+
+## Imported DTO metadata
+
+Request DTOs can live in packages already imported by the application. Their type, field, and constant comments are indexed from the same build-selected dependency graph. They do not need to be added to source-root patterns solely for metadata. A package named only in an annotation still needs explicit loading; annotations never download missing packages.
+
+The external consumer fixture in `internal/verify/testdata/external/testdata/contracts` stays outside `./...` source-root discovery while being imported by actual handlers. JSON, Query, and explicit FormPost binding preserve its field descriptions, declared presence/length constraints, closed enums and aligned labels, and open named strings. A generic response retains the original field comments after type substitution. Binding continues to use the actual Gin codec; no DTO tags or per-route schemas are added.
+
+A malformed annotation on an unused dependency type does not poison valid routes. Selecting its handler exposes a structured source diagnostic with the logical import-path filename, owning type/field symbol, actual route, calling facts, and a repair hint. The same Bundle reports each selected route independently, and failed Mount calls leave the engine's routes unchanged.
+
+Declared constraints describe the client contract. They do not install runtime validation: the fixture explicitly verifies that its unchanged handler can still accept input outside those declarations. Successful wire samples are checked independently, alongside negative instances rejected by the generated contract. Generation checks preserve every fixture source file, including nested imported DTOs.
