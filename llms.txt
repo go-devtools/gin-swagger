@@ -26,3 +26,5 @@ The module is github.com/openapi-golang/gin-swagger and the root package is gins
 - [Chinese README](README.zh-cn.md): Corresponding Chinese documentation.
 
 Imported DTO annotations reuse the loaded dependency graph. Query, JSON, and explicit FormPost bindings share metadata without widening handler discovery; see docs/requests.md. Declared constraints do not install runtime validation.
+
+- [Performance](docs/performance.md): Reproducible 100/1000-route benchmarks, measured stages, and allocation boundaries.
