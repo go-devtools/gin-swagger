@@ -18,7 +18,7 @@ const ginPackage = "github.com/gin-gonic/gin"
 // 注册静态 Gin 规则，同一个值供 CLI 与项目自定义生成器组合。
 // Provide the same frontend to the CLI and custom generation entry points.
 func Frontend() core.Frontend {
-	return core.Frontend{Name: "gin-v1.12-front-v7", Match: func(f core.Function) bool {
+	return core.Frontend{Name: "gin-v1.12-front-v8", Match: func(f core.Function) bool {
 		return f.Signature.Params().Len() == 1 && isContext(f.Signature.Params().At(0).Type())
 	}, Entry: func(f core.Function) []core.Effect {
 		source := f.Source
@@ -87,7 +87,7 @@ func analyzeCall(c core.CallContext) ([]core.Effect, error) {
 		return args[i]
 	}
 	response := func(media string, payload core.Value) []core.Effect {
-		return renderResponse(c, integer(arg(0)), media, payload, nil)
+		return renderResponse(c, normalizedGinStatus(integer(arg(0))), media, payload, nil)
 	}
 	switch name {
 	case "ShouldBindJSON", "ShouldBindBodyWithJSON":
@@ -105,30 +105,32 @@ func analyzeCall(c core.CallContext) ([]core.Effect, error) {
 	case "AbortWithStatusJSON", "AbortWithStatusPureJSON":
 		return append([]core.Effect{{Kind: core.Abort, Source: source}}, response("application/json", arg(1))...), nil
 	case "Status":
-		if interimStatus(integer(arg(0))) {
+		if interimStatus(normalizedGinStatus(integer(arg(0)))) {
 			return unresolved(c, "临时状态的最终提交需要明确序列规则"), nil
 		}
-		return []core.Effect{{Kind: core.ResponseStatus, Status: integer(arg(0)), Source: source}}, nil
+		return []core.Effect{{Kind: core.ResponseStatus, Status: normalizedGinStatus(integer(arg(0))), Source: source}}, nil
 	case "Abort":
 		return []core.Effect{{Kind: core.Abort, Source: source}}, nil
 	case "ShouldBind", "Bind":
 		return unresolved(c, "自动绑定器依赖实际请求方法和媒体类型，需要条件事实"), nil
 	case "AbortWithStatus", "AbortWithError":
-		if interimStatus(integer(arg(0))) {
+		if interimStatus(normalizedGinStatus(integer(arg(0)))) {
 			return unresolved(c, "临时状态的最终提交需要明确序列规则"), nil
 		}
-		return []core.Effect{{Kind: core.ResponseCommit, Status: integer(arg(0)), Source: source}, {Kind: core.Abort, Source: source}}, nil
+		return []core.Effect{{Kind: core.ResponseCommit, Status: normalizedGinStatus(integer(arg(0))), Source: source}, {Kind: core.Abort, Source: source}}, nil
 	case "SecureJSON", "JSONP":
 		return unresolved(c, "带前缀或回调的输出不能当作普通 JSON"), nil
 	case "String":
-		return renderResponse(c, integer(arg(0)), "text/plain", core.Value{}, spec.Typed("string")), nil
+		return renderResponse(c, normalizedGinStatus(integer(arg(0))), "text/plain", core.Value{}, spec.Typed("string")), nil
 	case "Data":
-		return rawResponse(c, integer(arg(0)), literal(arg(1))), nil
+		return rawResponse(c, normalizedGinStatus(integer(arg(0))), literal(arg(1))), nil
 	case "DataFromReader":
-		return readerResponse(c, integer(arg(0)), literal(arg(2)), arg(1), arg(3), arg(4)), nil
+		return readerResponse(c, normalizedGinStatus(integer(arg(0))), literal(arg(2)), arg(1), arg(3), arg(4)), nil
 	case "Render":
-		return explicitRenderer(c, integer(arg(0)), arg(1)), nil
-	case "File", "FileAttachment", "FileFromFS", "SSEvent", "Stream":
+		return explicitRenderer(c, normalizedGinStatus(integer(arg(0))), arg(1)), nil
+	case "SSEvent":
+		return sseResponse(c, "-1", arg(0), core.Value{Type: types.Typ[types.String], Constant: constant.MakeString("")}, core.Value{Type: types.Typ[types.Uint], Constant: constant.MakeInt64(0)}, arg(1)), nil
+	case "File", "FileAttachment", "FileFromFS", "Stream":
 		return unresolved(c, fmt.Sprintf("%s 需要媒体类型或流式输出投影", name)), nil
 	case "Next":
 		return unresolved(c, "路由快照仅暴露末位 handler，中间件链需要集中声明"), nil

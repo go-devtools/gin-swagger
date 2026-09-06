@@ -6,6 +6,7 @@ import (
 	"mime"
 	"net/textproto"
 	"sort"
+	"strconv"
 
 	core "github.com/openapi-golang/openapi/compiler"
 	"github.com/openapi-golang/openapi/spec"
@@ -14,6 +15,7 @@ import (
 // 用 Gin 实际采用的渲染格式构造响应效果，JSON 类型仍由核心投影。
 // Construct response effects from Gin's actual renderer while leaving JSON type projection to the core.
 func renderResponse(c core.CallContext, status, media string, payload core.Value, schema *spec.Schema) []core.Effect {
+	status = normalizedGinStatus(status)
 	if interimStatus(status) {
 		return unresolved(c, "临时响应与最终状态需要完整的 Writer 提交序列规则")
 	}
@@ -35,6 +37,7 @@ func rawResponse(c core.CallContext, status, media string) []core.Effect {
 // 读取器附加头只在原响应头为空时应用，明确长度覆盖同名附加字段。
 // Apply reader headers only when the response header is empty; a known length overrides its extra-header entry.
 func readerResponse(c core.CallContext, status, media string, length, reader, headers core.Value) []core.Effect {
+	status = normalizedGinStatus(status)
 	if status == "-1" {
 		return unresolved(c, "保留现有状态的读取器需要状态相关的头部规则")
 	}
@@ -91,7 +94,11 @@ func readerResponse(c core.CallContext, status, media string, length, reader, he
 // 通过完整包和类型身份识别 Renderer，不按短名称猜测自定义实现。
 // Match renderers by full package and type identity rather than custom implementations with matching short names.
 func explicitRenderer(c core.CallContext, status string, renderer core.Value) []core.Effect {
+	status = normalizedGinStatus(status)
 	typ := renderer.Type
+	if isSSEEvent(typ) {
+		return explicitSSE(c, status, renderer)
+	}
 	if typ == nil {
 		return unresolved(c, "Renderer 类型未解决")
 	}
@@ -134,4 +141,13 @@ func explicitRenderer(c core.CallContext, status string, renderer core.Value) []
 // Interim statuses in Gin's wrapped writer cannot be inferred as ordinary final statuses.
 func interimStatus(status string) bool {
 	return len(status) == 3 && status[0] == '1'
+}
+
+// Gin 忽略非正数状态，使用中立保留标志表达当前待提交状态。
+// Gin ignores non-positive status codes; use the neutral preservation marker for the current pending status.
+func normalizedGinStatus(status string) string {
+	if code, err := strconv.Atoi(status); err == nil && code <= 0 {
+		return "-1"
+	}
+	return status
 }

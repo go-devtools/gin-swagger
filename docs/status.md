@@ -33,3 +33,5 @@
 本轮新增方法与头条件化 Redirect，基于核心公开响应状态快照区分待提交状态、当前头存储与已提交网络头。HEAD 去掉正文但保留元数据及同一 handler 的 GET 表示。72 组真实 HTTP 重定向请求、后续写入、晚修改媒体头、Location 空白和无侵入比较通过；核心固定 v0.0.0-20260906001422-3d48d1ee95ce，无本地 replace。完整 dev、全量 race、最终 HTTP 矩阵 race、vet、新鲜度和示例构建通过。实际远端核心的 33 项 SDK race 测试及 CLI 验证通过；本适配器最终远端 CLI 验收独立记录。
 
 核心依赖现固定为 `v0.0.0-20260906005919-bc9182815e96`，提供经公开外部 SDK 验证的 ResponseItem、内层 codec 和编译期 Schema 包装。该固定远端核心的 40 项 SDK race 测试与实际 CLI 安装/导出通过。适配器 GOWORK=off dev、完整 race、vet、模块校验、新鲜度和示例构建通过；13 个业务/路由函数体、152 处英文说明和 Bearer-only 配置保持一致。此依赖更新尚未增加 Gin SSEvent/Stream 自动推导，完整流式验收继续保留。
+
+Gin SSEvent 与标准 sse.Event 已通过公开核心 SDK 推导原生 itemSchema；108 组真实 HTTP 样本验证文本/JSON、nil、元数据、状态及提交头。关闭 workspace、固定真实远端核心后的 dev 已通过，原有业务与路由函数体不变。完整 race、vet、依赖校验、新鲜度检查和示例构建也已通过，实际导出保留 152 处英文说明、三点二版本与仅 Bearer 授权。真实远端适配器消费者结果在同步后另行记录；Stream 回调、任意 Writer、NDJSON 生成及完整 Goal 的剩余矩阵继续保留。

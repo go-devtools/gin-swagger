@@ -10,7 +10,7 @@
 
 - 最低版本验收使用精确 Go 1.27.1。
 - 最低版本验收使用 Gin v1.12.0。
-- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260905213234-136c21287694`，由 Go 工具从真实远端提交解析。
+- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260906015801-b3e75677466f`，由 Go 工具从真实远端提交解析。
 
 ## 架构
 
@@ -79,3 +79,5 @@ Gin 的 `Build` 和 `Mount` 会校验当前程序与生成 Bundle 的构建条�
 原始 PostForm、数组/字典读取、FormFile 和 SaveUploadedFile 已保留正文与查询位置、编码和业务错误分支。已验证行为及剩余边界见[请求指南](docs/requests.md)。
 
 HEAD 和重定向响应语义已通过真实 HTTP 服务验证，详见[响应指南](docs/responses.md)。
+
+Gin SSEvent 和标准 sse.Event 渲染器生成原生事件 itemSchema，保留实际文本/JSON 载荷及已发送元数据。真实 HTTP 矩阵与尚待完成的流回调边界见[响应指南](docs/responses.md)。
