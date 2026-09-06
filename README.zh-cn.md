@@ -10,7 +10,7 @@
 
 - 开发和验证使用 Go 1.27.1。
 - 最低版本验收使用 Gin v1.12.0。
-- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260906035319-560c9adbb5be`，由 Go 工具从真实远端提交解析。
+- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260906044503-8d888f89ecea`，由 Go 工具从真实远端提交解析。
 
 ## 架构
 
@@ -87,3 +87,5 @@ Stream 回调与面向 Gin 响应 Writer 的 JSON Encoder 通过公开核心回�
 ## AI 辅助接入
 
 从 [llms.txt](llms.txt) 查看精简文档索引，再阅读 [AI 接入指南](docs/ai-integration.md)，获取真实可执行的命令、结构化诊断说明及公开 API 边界。生成的 JSON 和来源信息可用于核对接入判断。
+
+函数注释可以通过共享核心声明请求和响应类型。当前包类型和完整模块路径的泛型类型保留真实 Go 类型身份；同一位置的声明必须与已推导 Schema 一致。未知行为仍需集中规则补充，详见[请求与响应类型声明](docs/requests.md#explicit-request-and-response-types)。

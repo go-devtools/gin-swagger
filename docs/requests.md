@@ -99,3 +99,25 @@ FormFile describes generic raw upload content rather than FileHeader metadata or
 Ten real form cases cover five HTTP methods and two media types, including empty strings, defaults, repeated values, and query isolation. Further tests cover repeated/missing query values, both dictionary encodings, binary uploads and missing files, and saving bytes before and after documentation mounting. Saving failures use an occupied regular-file parent, since Gin intentionally creates missing parent directories. Tests verify that compilation and mounting do not write uploaded files. Independent validators check decoded inputs and actual responses; wire behavior is checked through real HTTP requests.
 
 Core composition preserves multiple fields and whole-body constraints, while field required stays separate from body required. Full inference of empty-body rejection from arbitrary error paths, arbitrary MultipartForm map access, all file I/O helpers, all decoder/tag variants, and complete browser Try it out coverage remain work in progress. Read the [OpenAPI 3.2 encoding rules](https://spec.openapis.org/oas/v3.2.0.html#encoding-object) when adding custom serialization.
+
+## Explicit request and response types
+
+The shared core now resolves function-level request and response declarations against actual Go types. Gin uses the same implementation through its pinned core version:
+
+```go
+// Submit a request using the existing handler.
+// @openapi request mediaType="application/json" type="Request" required
+// @openapi response status=201 mediaType="application/json" type="Request"
+// @openapi response status="default" mediaType="application/json" type="Request"
+func Create(c *gin.Context) {
+    // Keep the application's existing binding and response logic here.
+}
+```
+
+Unqualified type names resolve in the handler package. Fully qualified generic references can name other explicitly loaded packages without adding unused imports. The standard CLI loads application source packages; an annotation does not initiate extra module downloads. Central generation tools can use the public `Project.TypeIn` API.
+
+Matching declared and derived wire schemas must agree. Declaring body presence as required is a client constraint, not proof of actual empty-body rejection. Derived error responses remain present, and unknown status/helper diagnostics still prevent selected routes from building. Invalid unused candidates remain isolated. Bodyless responses support `@openapi response status=204`.
+
+The independent consumer verifies the declaration path using real valid/malformed JSON requests, a bodyless DELETE response, preserved provenance, and independent Schema sample validation. It separately selects a conflicting type declaration and an unknown dynamic-status handler to confirm failure. No adapter access to core internal packages is required.
+
+See the core's [request and response declaration reference](https://github.com/openapi-golang/openapi/blob/main/docs/request-response-declarations.md) for exact syntax, scoped type expressions, codec reuse, conservative conflict checks, and structured diagnostics.

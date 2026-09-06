@@ -10,7 +10,7 @@ This pre-1.0 SDK evolves between pinned versions. Use the public APIs and check 
 
 - Go 1.27.1 for development and verification.
 - Gin v1.12.0 or the version pinned in go.mod.
-- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260906035319-560c9adbb5be`, resolved from an actual remote commit.
+- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260906044503-8d888f89ecea`, resolved from an actual remote commit.
 
 ## Architecture
 
@@ -87,3 +87,5 @@ Stream callbacks and JSON Encoder writes to the Gin response writer are supporte
 ## AI-assisted integration
 
 Start with [llms.txt](llms.txt) for a compact documentation index and the [AI integration guide](docs/ai-integration.md) for actual commands, structured diagnostics, and public API boundaries. Generated JSON and provenance provide evidence for integration decisions.
+
+Function comments can declare request and response types through the shared core. Local and fully qualified generic types retain actual Go identities; matching declarations must agree with derived schemas. Unknown behavior still requires a centralized rule. See [request declarations](docs/requests.md#explicit-request-and-response-types).

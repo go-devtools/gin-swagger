@@ -14,7 +14,7 @@ The module is github.com/openapi-golang/gin-swagger and the root package is gins
 
 ## Supported behavior
 
-- [Request guide](docs/requests.md): Automatic and explicit binding, raw fields, files, and limits.
+- [Request guide](docs/requests.md): Automatic and explicit binding, typed request/response declarations, raw fields, files, and limits.
 - [Response guide](docs/responses.md): Actual rendering, HEAD, redirects, SSE, Stream, and NDJSON.
 - [HTTP method examples](examples/basic/methods.go): GET, POST, PUT, PATCH, DELETE, and deprecation.
 - [Type examples](examples/basic/types.go): Wire types and enums with source descriptions.

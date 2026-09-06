@@ -18,6 +18,9 @@ type Request struct {
 }
 
 // Submit a request and return the result through ordinary business code.
+// @openapi request mediaType="application/json" type="Request" required
+// @openapi response status=201 mediaType="application/json" type="Request"
+// @openapi response status="default" mediaType="application/json" type="Request"
 func Create(c *gin.Context) {
 	var request Request
 	if err := c.ShouldBindJSON(&request); err != nil {
