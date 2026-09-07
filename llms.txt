@@ -11,6 +11,7 @@ The module is github.com/openapi-golang/gin-swagger and the root package is gins
 - [Basic application](examples/basic/main.go): Tag-free source, generated Bundle import, and startup mounting.
 - [Runtime API](build.go): Config, scope selection, request media, and explicit operation bindings.
 - [Mounting](mount.go): Cached documents, route preflight, and document-group endpoints.
+- [Handler identity](docs/identity.md): Complete symbols, declared constructors, centralized bindings, receiver state and stripped-build verification.
 - [Path guide](docs/paths.md): Engine encoding modes, original route snapshots, initialization timing and conditional raw-path limits.
 
 ## Supported behavior

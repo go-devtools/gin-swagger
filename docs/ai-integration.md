@@ -41,6 +41,8 @@ Successful commands exit 0. Runtime, loading, generation, or document errors exi
 
 Use diagnostic codes and structured fields rather than matching translated prose. For a build-profile mismatch, regenerate under the application's actual target and tags. For gin-swagger.handler.ambiguous, inspect real handler identity and the Bundle index before supplying one centralized Config.Bindings mapping keyed by the original METHOD /Gin/path. Do not guess operation keys or wrap existing handlers to change their identity.
 
+Read [handler identity](identity.md) for closures, method values, generic instances and stripped builds. A binding chooses a contract; it cannot supply unknown capture values or erase unresolved behavior. Constructor contracts require explicit frontend nomination and declared provenance.
+
 ## Keep the application contract intact
 
 Ordinary comments provide business meaning and explicit semantic constraints. Type names, field names, and wire structure come from source and actual codecs. A declaration is not evidence that the server enforces it. Unknown custom renderers, unresolved writers, and unsupported asynchronous behavior require explicit centralized rules.

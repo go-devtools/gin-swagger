@@ -114,11 +114,8 @@ func TestGeneratorBootstrap(t *testing.T) {
 		t.Fatal(err)
 	}
 	sourceFiles := map[string][]byte{}
-	for _, name := range []string{"go.sum", "main.go", "main_test.go", "mandatory.go", "mandatory_test.go", "automatic.go", "automatic_test.go", "raw.go", "raw_test.go", "http.go", "http_test.go", "sse.go", "sse_test.go", "stream_callbacks.go", "stream_callbacks_test.go", "declarations.go", "declarations_test.go", "imported.go", "imported_test.go", "testdata/contracts/dto.go"} {
-		source := filepath.Join(root, name)
-		if name != "go.sum" {
-			source = filepath.Join("testdata", "external", name)
-		}
+	// Copy the complete owned fixture tree so new consumer cases cannot silently disappear locally.
+	copySource := func(name, source string) {
 		raw, err := os.ReadFile(source)
 		if err != nil {
 			t.Fatal(err)
@@ -133,6 +130,27 @@ func TestGeneratorBootstrap(t *testing.T) {
 		if err := os.WriteFile(target, raw, 0600); err != nil {
 			t.Fatal(err)
 		}
+	}
+	copySource("go.sum", filepath.Join(root, "go.sum"))
+	fixture := filepath.Join("testdata", "external")
+	if err := filepath.WalkDir(fixture, func(path string, entry os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if entry.IsDir() {
+			return nil
+		}
+		if !entry.Type().IsRegular() {
+			t.Fatalf("consumer fixture must contain regular files: %s", path)
+		}
+		name, err := filepath.Rel(fixture, path)
+		if err != nil {
+			return err
+		}
+		copySource(name, path)
+		return nil
+	}); err != nil {
+		t.Fatal(err)
 	}
 	execute(t, dir, "go", "mod", "edit", "-require=github.com/openapi-golang/gin-swagger@"+version)
 	if !remote {

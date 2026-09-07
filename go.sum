@@ -47,6 +47,10 @@ github.com/modern-go/reflect2 v1.0.2 h1:xBagoLtFs94CBntxluKeaWgTMpvLxC4ur3nMaC9G
 github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjYzDa0/r8luk=
 github.com/openapi-golang/openapi v0.0.0-20260907041221-f019ef8848aa h1:r/fTaiByL8v3DvkhwCw73awVHN1BaiHm+alm3va3BBo=
 github.com/openapi-golang/openapi v0.0.0-20260907041221-f019ef8848aa/go.mod h1:19ClYRcHJqiA+pxaNTwqwhleVS/xNtb24fmwMoXQNMg=
+github.com/openapi-golang/openapi v0.0.0-20260907060131-58edd99bac34 h1:pbEcrNTC9KDvJo3J4qs78DC+TGE/8lR2VkOSh/7xejg=
+github.com/openapi-golang/openapi v0.0.0-20260907060131-58edd99bac34/go.mod h1:19ClYRcHJqiA+pxaNTwqwhleVS/xNtb24fmwMoXQNMg=
+github.com/openapi-golang/openapi v0.0.0-20260907060857-63dfa4a12bad h1:NDwOs9Qkx3T1YlT72ChmJ6Yr9L2YXP1NAi7//9mvYw0=
+github.com/openapi-golang/openapi v0.0.0-20260907060857-63dfa4a12bad/go.mod h1:19ClYRcHJqiA+pxaNTwqwhleVS/xNtb24fmwMoXQNMg=
 github.com/pelletier/go-toml/v2 v2.2.4 h1:mye9XuhQ6gvn5h28+VilKrrPoQVanw5PMw/TB0t5Ec4=
 github.com/pelletier/go-toml/v2 v2.2.4/go.mod h1:2gIqNv+qfxSVS7cM2xJQKtLSTLUE9V8t9Stt+h56mCY=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
