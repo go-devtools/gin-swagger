@@ -10,7 +10,7 @@
 
 - 开发和验证使用 Go 1.27.1。
 - 最低版本验收使用 Gin v1.12.0。
-- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260907071604-72140a9a7490`，由 Go 工具从真实远端提交解析。
+- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260907074029-365458867d54`，由 Go 工具从真实远端提交解析。
 
 ## 架构
 
@@ -98,14 +98,16 @@ Stream 回调与面向 Gin 响应 Writer 的 JSON Encoder 通过公开核心回�
 
 当前固定核心版本使用 `spec.Optional[bool]` 表示可选标准布尔字段。通过 `spec.Set(false)` 保留显式假值，判断标志时读取 `.Value`；详见[原生对象迁移](https://github.com/openapi-golang/openapi/blob/main/docs/native-objects.md)。
 
-固定核心版本会校验原生 HTTP 对象结构与引用解析后的参数上下文，包括 Path Item 继承、操作级覆盖、整段查询冲突及离线文档间的 Link 操作身份。`spec.Parameter.Name` 保留原生查询参数的显式空名称。这些检查不会改变 Gin 路由或业务 handler；详见 [HTTP 验证边界](https://github.com/openapi-golang/openapi/blob/72140a9a7490829eea427274c3b317916cb2376d/docs/native-objects.md#http-objects-and-parameter-contexts)。
+固定核心版本会校验原生 HTTP 对象结构与引用解析后的参数上下文，包括 Path Item 继承、操作级覆盖、整段查询冲突及离线文档间的 Link 操作身份。`spec.Parameter.Name` 保留原生查询参数的显式空名称。这些检查不会改变 Gin 路由或业务 handler；详见 [HTTP 验证边界](https://github.com/openapi-golang/openapi/blob/365458867d54082e317bbb1f1770e6b34cdb7f25/docs/native-objects.md#http-objects-and-parameter-contexts)。
 
-固定核心版本同时校验原生元数据字段类型、必填项、组件名称及许可证互斥字段。参阅[元数据规则](https://github.com/openapi-golang/openapi/blob/72140a9a7490829eea427274c3b317916cb2376d/docs/native-objects.md#document-metadata-and-component-names)，其中明确说明了空请求体 content 的处理策略。
+固定核心版本同时校验原生元数据字段类型、必填项、组件名称及许可证互斥字段。参阅[元数据规则](https://github.com/openapi-golang/openapi/blob/365458867d54082e317bbb1f1770e6b34cdb7f25/docs/native-objects.md#document-metadata-and-component-names)，其中明确说明了空请求体 content 的处理策略。
 
 Gin 路径编码遵循 Engine 的实际配置。请在 Gin 初始化前构建文档；含转义静态冒号的路由若需在初始化后构建，应提前保存 `Engine.Routes()` 到 `Config.RegisteredRoutes`。参阅[路径编码与路由快照](docs/paths.md)，了解 raw 路径条件、过期快照诊断及挂载边界。
 
 闭包、接收者方法和泛型 handler 使用运行时证据或集中绑定来关联契约。参阅 [handler 身份](docs/identity.md)，了解已验证的共用契约，以及普通、trimpath 和符号裁剪构建；未知泛型载荷仍会被拒绝。
 
-挂载文档复用核心原生兼容性面板，提示未呈现的扩展方法和标签元数据，同时保留原始文档。参见 [UI 展示与提交边界](https://github.com/openapi-golang/openapi/blob/72140a9a7490829eea427274c3b317916cb2376d/docs/swaggerui-compatibility.md)。
+挂载文档复用核心原生兼容性面板，提示未呈现的扩展方法和标签元数据，同时保留原始文档。参见 [UI 展示与提交边界](https://github.com/openapi-golang/openapi/blob/365458867d54082e317bbb1f1770e6b34cdb7f25/docs/swaggerui-compatibility.md)。
 
 共享 UI 将请求与响应的流式单项 Schema 和完整消息 Schema 分开展示，并保留有限 NDJSON/SSE 的实际字节。由于固定客户端序列化时会省略整段查询参数的值，相关操作保持只读，并提供结构化浏览器诊断说明限制。
+
+[公开适配器 SDK 权威说明](https://github.com/openapi-golang/openapi/blob/365458867d54082e317bbb1f1770e6b34cdb7f25/docs/adapter-sdk.md)固定到当前模块使用的核心提交。

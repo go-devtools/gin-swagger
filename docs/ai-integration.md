@@ -65,3 +65,13 @@ A handler query preserves the previous top-level `key`, `symbol`, `operation`, `
 `--max-explain-bytes` limits additional captured evidence; zero uses sixteen MiB. It does not limit the existing Bundle or total JSON response size. Capture only runs for explain and does not change generated Bundle data. Missing symbols, missing response statuses, evidence overflow, and output write errors return a structured failure with exit 1. A known source-root field excluded from all projected contracts returns empty uses with guidance, not a fabricated Schema.
 
 The implementation uses the core public `Options.Explain` and `Result.Explain` APIs. For unknown helper effects, use centralized frontend rules; for custom wire behavior, use the public WireCodec or TypeMapper boundaries. Keep DTOs, handlers, and routes unchanged, and test enforcement with actual samples.
+
+## Check an exported document with bounded input
+
+```sh
+gin-swagger check --spec ./openapi.json --max-bytes=8388608 --timeout=30s
+```
+
+The spec command uses the core public `checkio.ReadFile` helper before validation. Its default input limit is eight MiB; the exact byte boundary is accepted. Nonpositive limits and timeouts, canceled contexts, directories, devices and oversized regular files fail with a JSON stderr diagnostic and exit 1. `--max-bytes` is only valid with `check --spec`; it does not alter source-generation budgets. No document is fetched from a URI.
+
+The timeout applies to this command as well as source commands. Cancellation is cooperative between filesystem operations, reads and bounded validation stages; it cannot preempt an individual kernel call or a synchronous validation stage. A canceled or expired stage does not report validation success. The default core reference and index budgets remain in effect; the core CLI additionally supports explicit offline resource manifests.

@@ -18,6 +18,7 @@ import (
 
 	front "github.com/openapi-golang/gin-swagger/compiler"
 	"github.com/openapi-golang/openapi"
+	"github.com/openapi-golang/openapi/checkio"
 	core "github.com/openapi-golang/openapi/compiler"
 )
 
@@ -33,6 +34,9 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 	fail := func(err error) int {
 		_ = json.NewEncoder(stderr).Encode(map[string]any{"code": "gin-swagger.cli.failed", "severity": "error", "message": err.Error()})
 		return 1
+	}
+	if err := ctx.Err(); err != nil {
+		return fail(err)
 	}
 	if len(args) == 0 || args[0] == "help" || args[0] == "--help" {
 		fmt.Fprintln(stdout, "gin-swagger generate --dir . --output ./internal/apidoc\ngin-swagger check --dir . --output ./internal/apidoc\ngin-swagger check --spec openapi.json\ngin-swagger explain --dir . --symbol module/pkg.Handler\ngin-swagger explain --dir . --symbol module/pkg.DTO.Field\ngin-swagger explain --dir . --symbol module/pkg.Handler --response 201\ngin-swagger version")
@@ -65,6 +69,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 	output := flags.String("output", "./internal/apidoc", "Output location relative to the application directory")
 	packageName := flags.String("package", "apidoc", "Generated file package name")
 	specFile := flags.String("spec", "", "Independent specification validation file")
+	maxBytes := flags.Int("max-bytes", 8<<20, "Maximum local specification input bytes (check --spec only)")
 	symbol := flags.String("symbol", "", "Fully qualified symbol to explain")
 	response := flags.String("response", "", "Exact response status for the selected handler (explain only)")
 	maxExplainBytes := flags.Int("max-explain-bytes", 0, "Evidence byte limit for explain; zero selects sixteen MiB")
@@ -72,7 +77,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 	maxDepth := flags.Int("max-depth", 12, "Maximum cross-function depth")
 	maxPaths := flags.Int("max-paths", 128, "Maximum path count")
 	maxCalls := flags.Int("max-calls", 10000, "Maximum call count")
-	timeout := flags.Duration("timeout", time.Minute, "Maximum generation duration")
+	timeout := flags.Duration("timeout", time.Minute, "Maximum command duration; cancellation is checked between bounded validation stages")
 	if err := flags.Parse(args[1:]); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
 			return 0
@@ -91,21 +96,44 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 	if *maxExplainBytes < 0 {
 		return fail(fmt.Errorf("--max-explain-bytes must not be negative"))
 	}
+	if *timeout <= 0 || *maxBytes < 1 {
+		return fail(fmt.Errorf("resource budgets must be positive"))
+	}
+	specBudgetSet := false
+	flags.Visit(func(f *flag.Flag) {
+		if f.Name == "max-bytes" {
+			specBudgetSet = true
+		}
+	})
+	if specBudgetSet && (args[0] != "check" || *specFile == "") {
+		return fail(fmt.Errorf("--max-bytes requires check --spec"))
+	}
 	if *specFile != "" {
 		if args[0] != "check" {
 			return fail(fmt.Errorf("--spec is only supported by check"))
 		}
-		raw, err := os.ReadFile(*specFile)
+		ctx, cancel := context.WithTimeout(ctx, *timeout)
+		defer cancel()
+		raw, err := checkio.ReadFile(ctx, *specFile, *maxBytes)
 		if err != nil {
 			return fail(err)
 		}
-		report := openapi.Check(raw)
-		_ = json.NewEncoder(stdout).Encode(report)
+		if err = ctx.Err(); err != nil {
+			return fail(err)
+		}
+		report := openapi.CheckWithOptions(raw, openapi.CheckOptions{MaxBytes: *maxBytes})
+		if err = ctx.Err(); err != nil {
+			return fail(err)
+		}
+		if err = json.NewEncoder(stdout).Encode(report); err != nil {
+			return fail(err)
+		}
 		if report.HasErrors() {
 			return 1
 		}
 		return 0
 	}
+
 	if *maxDepth < 1 || *maxPaths < 1 || *maxCalls < 1 || *timeout <= 0 {
 		return fail(fmt.Errorf("resource budgets must be positive"))
 	}
