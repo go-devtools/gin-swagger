@@ -10,7 +10,7 @@
 
 - 开发和验证使用 Go 1.27.1。
 - 最低版本验收使用 Gin v1.12.0。
-- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260906141009-cb0cfbb4dfdc`，由 Go 工具从真实远端提交解析。
+- 核心依赖固定为 `github.com/openapi-golang/openapi v0.0.0-20260907025735-c9afc2b2a8db`，由 Go 工具从真实远端提交解析。
 
 ## 架构
 
@@ -97,3 +97,5 @@ Stream 回调与面向 Gin 响应 Writer 的 JSON Encoder 通过公开核心回�
 [来源解释命令](docs/ai-integration.md#explain-a-field-or-response) 可查询字段和响应来源、实际投影规则及声明，并明确区分契约与业务实施证据。
 
 当前固定核心版本使用 `spec.Optional[bool]` 表示可选标准布尔字段。通过 `spec.Set(false)` 保留显式假值，判断标志时读取 `.Value`；详见[原生对象迁移](https://github.com/openapi-golang/openapi/blob/main/docs/native-objects.md)。
+
+固定核心版本会校验原生 HTTP 对象结构与引用解析后的参数上下文，包括 Path Item 继承、操作级覆盖、整段查询冲突及离线文档间的 Link 操作身份。`spec.Parameter.Name` 保留原生查询参数的显式空名称。这些检查不会改变 Gin 路由或业务 handler；详见 [HTTP 验证边界](https://github.com/openapi-golang/openapi/blob/c9afc2b2a8db6a881fce7f56fbd988e4b198fe44/docs/native-objects.md#http-objects-and-parameter-contexts)。

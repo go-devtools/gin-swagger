@@ -5,7 +5,7 @@ go 1.27.1
 require (
 	github.com/gin-contrib/sse v1.1.0
 	github.com/gin-gonic/gin v1.12.0
-	github.com/openapi-golang/openapi v0.0.0-20260907015838-5a53f75a62b8
+	github.com/openapi-golang/openapi v0.0.0-20260907025735-c9afc2b2a8db
 )
 
 require (
