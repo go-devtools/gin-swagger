@@ -10,7 +10,43 @@ This pre-1.0 SDK evolves between pinned versions. Use the public APIs and check 
 
 - Go 1.27.1 for development and verification.
 - Gin v1.12.0 or the version pinned in go.mod.
-- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260907074029-365458867d54`, resolved from an actual remote commit.
+- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260907083400-2a27bf547b5e`, resolved from an actual remote commit.
+
+## Quick start
+
+From this repository's root, using Go 1.27.1 and the dependencies pinned in `go.mod`:
+
+```sh
+GOWORK=off go mod download
+GOWORK=off go run ./cmd/gin-swagger generate --dir ./examples/basic --output ./internal/apidoc
+GOWORK=off go run ./cmd/gin-swagger check --dir ./examples/basic --output ./internal/apidoc
+GOWORK=off make dev
+LISTEN_ADDR=127.0.0.1:8080 GOWORK=off go run ./examples/basic
+```
+
+Open [the local Swagger UI](http://127.0.0.1:8080/docs/) or [the native document](http://127.0.0.1:8080/docs/openapi.json). Stop the example with Ctrl-C. Its DTOs have no tags; generation writes only `examples/basic/internal/apidoc/zz_openapi.gen.go`. In another terminal, a real request returns HTTP 201 with the created user:
+
+```sh
+curl -i -H 'Content-Type: application/json' -d '{"Name":"alice"}' http://127.0.0.1:8080/users
+```
+
+For an existing application, preserve its handlers and route registration. Add the generated package import and mount once after registration, before starting the server:
+
+```go
+// r already contains the application's business routes.
+document, err := ginswagger.Mount(r, apidoc.Bundle(), ginswagger.Config{
+    OpenAPI: openapi.Config{Title: "User service", Version: "1.0.0"},
+    Path: "/docs",
+})
+if err != nil {
+    return err
+}
+_ = document
+```
+
+This snippet belongs inside an error-returning startup function. Import `github.com/openapi-golang/openapi`, alias `github.com/openapi-golang/gin-swagger` as `ginswagger`, and import **your own module's** generated `internal/apidoc` package. See the [complete example](examples/basic/main.go) for a compilable application. Generate with the CLI at the same fixed adapter version as the application; a missing generated directory is supported during first generation.
+
+`Build(r, bundle, config)` constructs the document without registering routes. `Mount` additionally prepares and mounts the shared UI. The minimal configuration above leaves actual API submission disabled; the demonstration application explicitly enables selected methods. `Document.JSON()`, `Report()` and `WriteFile(path)` expose cached output and diagnostics. Source freshness checking does not know runtime-only routes: export a document from your real Router and also run `gin-swagger check --spec` on it.
 
 ## Architecture
 
@@ -98,16 +134,16 @@ The [explanation commands](docs/ai-integration.md#explain-a-field-or-response) r
 
 The pinned core uses `spec.Optional[bool]` for optional standard boolean fields. Use `spec.Set(false)` to preserve explicit false and read `.Value` when testing a flag; see [native object migration](https://github.com/openapi-golang/openapi/blob/main/docs/native-objects.md).
 
-The pinned core validates native HTTP object shapes and resolved parameter contexts, including Path Item inheritance, operation overrides, whole-query conflicts and Link operation identities across offline documents. `spec.Parameter.Name` preserves explicitly empty native query names. These checks do not alter Gin routes or business handlers; see the [HTTP validation boundaries](https://github.com/openapi-golang/openapi/blob/365458867d54082e317bbb1f1770e6b34cdb7f25/docs/native-objects.md#http-objects-and-parameter-contexts).
+The pinned core validates native HTTP object shapes and resolved parameter contexts, including Path Item inheritance, operation overrides, whole-query conflicts and Link operation identities across offline documents. `spec.Parameter.Name` preserves explicitly empty native query names. These checks do not alter Gin routes or business handlers; see the [HTTP validation boundaries](https://github.com/openapi-golang/openapi/blob/2a27bf547b5e4397bde6289df65caba482b6cd7f/docs/native-objects.md#http-objects-and-parameter-contexts).
 
-The pinned core also validates native metadata field types, required-field presence, component names and license alternatives. See its [metadata rules](https://github.com/openapi-golang/openapi/blob/365458867d54082e317bbb1f1770e6b34cdb7f25/docs/native-objects.md#document-metadata-and-component-names), including the explicit empty Request Body content policy.
+The pinned core also validates native metadata field types, required-field presence, component names and license alternatives. See its [metadata rules](https://github.com/openapi-golang/openapi/blob/2a27bf547b5e4397bde6289df65caba482b6cd7f/docs/native-objects.md#document-metadata-and-component-names), including the explicit empty Request Body content policy.
 
 Gin path encoding follows the actual Engine configuration. Build before Gin initialization, or retain `Config.RegisteredRoutes` from `Engine.Routes()` before initialization when escaped static colons are used. See [path encoding and route snapshots](docs/paths.md) for raw-path conditions, stale-snapshot diagnostics and mounting boundaries.
 
 Closures, receiver methods and generic handlers use evidence-based matching or explicit centralized bindings. See [handler identity](docs/identity.md) for verified common contracts and ordinary, trimpath and stripped builds. Unknown generic payloads remain rejected.
 
-Mounted documentation reuses the core native compatibility panel. It identifies omitted extension methods and tag metadata without rewriting the document. See [UI rendering and submission boundaries](https://github.com/openapi-golang/openapi/blob/365458867d54082e317bbb1f1770e6b34cdb7f25/docs/swaggerui-compatibility.md).
+Mounted documentation reuses the core native compatibility panel. It identifies omitted extension methods and tag metadata without rewriting the document. See [UI rendering and submission boundaries](https://github.com/openapi-golang/openapi/blob/2a27bf547b5e4397bde6289df65caba482b6cd7f/docs/swaggerui-compatibility.md).
 
 The shared UI renders request/response stream item schemas separately from complete-body schemas, preserving finite NDJSON/SSE bytes. Whole-query parameters remain read-only because the pinned client omits their values during serialization; a structured browser diagnostic explains the limitation.
 
-The authoritative [public adapter SDK](https://github.com/openapi-golang/openapi/blob/365458867d54082e317bbb1f1770e6b34cdb7f25/docs/adapter-sdk.md) is referenced at this module's pinned core commit.
+The authoritative [public adapter SDK](https://github.com/openapi-golang/openapi/blob/2a27bf547b5e4397bde6289df65caba482b6cd7f/docs/adapter-sdk.md) is referenced at this module's pinned core commit.

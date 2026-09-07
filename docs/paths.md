@@ -35,10 +35,10 @@ cfg := ginswagger.Config{
     RegisteredRoutes: router.Routes(),
 }
 // Retain cfg before Gin initializes the router; pass it to later Build calls.
-document, err := ginswagger.Build(router, apidoc.Bundle, cfg)
+document, err := ginswagger.Build(router, apidoc.Bundle(), cfg)
 ```
 
-This is documentation configuration, not a replacement router. The saved slice must be the complete, unmodified `Engine.Routes()` result captured after registration and before initialization. Build compares its route count, methods, paths and final-handler evidence with the current Engine. Only Gin's static-colon unescaping is tolerated. Added routes, changed prefixes or changed evidence fail with `gin-swagger.routes.stale`; refresh a snapshot while original registration syntax is still available.
+The snippet assumes the existing `newBusinessRouter` constructor and imports of `openapi`, `ginswagger` and the application's generated `apidoc` package. Handle `err` before using `document`; `apidoc.Bundle()` calls the generated factory. This is documentation configuration, not a replacement router. The saved slice must be the complete, unmodified `Engine.Routes()` result captured after registration and before initialization. Build compares its route count, methods, paths and final-handler evidence with the current Engine. Only Gin's static-colon unescaping is tolerated. Added routes, changed prefixes or changed evidence fail with `gin-swagger.routes.stale`; refresh a snapshot while original registration syntax is still available.
 
 Saved original paths are also the keys used by `Include`, group filters, `Bindings` and request-media overrides. They remain stable across initialization. Mount's isolated preflight uses the same validated original paths, so static and dynamic colon routes can coexist without a false conflict.
 
