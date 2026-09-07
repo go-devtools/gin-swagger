@@ -10,7 +10,7 @@ This pre-1.0 SDK evolves between pinned versions. Use the public APIs and check 
 
 - Go 1.27.1 for development and verification.
 - Gin v1.12.0 or the version pinned in go.mod.
-- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260907025735-c9afc2b2a8db`, resolved from an actual remote commit.
+- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260907033442-3f36f3a8f1bb`, resolved from an actual remote commit.
 
 ## Architecture
 
@@ -98,4 +98,6 @@ The [explanation commands](docs/ai-integration.md#explain-a-field-or-response) r
 
 The pinned core uses `spec.Optional[bool]` for optional standard boolean fields. Use `spec.Set(false)` to preserve explicit false and read `.Value` when testing a flag; see [native object migration](https://github.com/openapi-golang/openapi/blob/main/docs/native-objects.md).
 
-The pinned core validates native HTTP object shapes and resolved parameter contexts, including Path Item inheritance, operation overrides, whole-query conflicts and Link operation identities across offline documents. `spec.Parameter.Name` preserves explicitly empty native query names. These checks do not alter Gin routes or business handlers; see the [HTTP validation boundaries](https://github.com/openapi-golang/openapi/blob/c9afc2b2a8db6a881fce7f56fbd988e4b198fe44/docs/native-objects.md#http-objects-and-parameter-contexts).
+The pinned core validates native HTTP object shapes and resolved parameter contexts, including Path Item inheritance, operation overrides, whole-query conflicts and Link operation identities across offline documents. `spec.Parameter.Name` preserves explicitly empty native query names. These checks do not alter Gin routes or business handlers; see the [HTTP validation boundaries](https://github.com/openapi-golang/openapi/blob/3f36f3a8f1bb202856d50229d9bb998216514919/docs/native-objects.md#http-objects-and-parameter-contexts).
+
+The pinned core also validates native metadata field types, required-field presence, component names and license alternatives. See its [metadata rules](https://github.com/openapi-golang/openapi/blob/3f36f3a8f1bb202856d50229d9bb998216514919/docs/native-objects.md#document-metadata-and-component-names), including the explicit empty Request Body content policy.
