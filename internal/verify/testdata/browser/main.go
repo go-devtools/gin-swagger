@@ -56,6 +56,19 @@ func Submit(c *gin.Context) {
 	c.JSON(200, request)
 }
 
+// One event payload.
+type EventRecord struct {
+	// Text carried by this event.
+	Message string
+}
+
+// Publish two ordered updates.
+// @openapi tags=["Streams"]
+func Events(c *gin.Context) {
+	c.SSEvent("update", EventRecord{Message: "first"})
+	c.SSEvent("update", EventRecord{Message: "second"})
+}
+
 // Start only the test-owned service, preserving the ordinary registered handler.
 func main() {
 	gin.SetMode(gin.ReleaseMode)
@@ -65,8 +78,9 @@ func main() {
 	}
 	engine := gin.New()
 	engine.POST("/submit", Submit)
-	for _, mode := range []string{"safe", "enabled", "metadata"} {
-		cfg := ginswagger.Config{Path: "/" + mode + "/docs", Include: func(method, path string) bool { return path == "/submit" }, OpenAPI: openapi.Config{Title: "Browser API", Version: "1", Configure: func(doc *spec.OpenAPI) error {
+	engine.GET("/events", Events)
+	for _, mode := range []string{"safe", "enabled", "metadata", "stream"} {
+		cfg := ginswagger.Config{Path: "/" + mode + "/docs", Include: func(method, path string) bool { return path == "/submit" || (mode == "stream" && path == "/events") }, OpenAPI: openapi.Config{Title: "Browser API", Version: "1", Configure: func(doc *spec.OpenAPI) error {
 			doc.Components.SecuritySchemes = map[string]spec.RefOr[spec.SecurityScheme]{"BearerAuth": spec.Inline(spec.SecurityScheme{Type: "http", Scheme: "bearer"})}
 			// Declare native tag metadata centrally without changing the registered handler or its source contract.
 			if mode == "metadata" {
@@ -77,6 +91,9 @@ func main() {
 		}}, UI: swaggerui.Config{Title: "Browser contract", DocExpansion: "full"}, Groups: []ginswagger.DocumentGroup{{ID: "all", Name: "All endpoints"}, {ID: "reference", Name: "Reference"}}, DefaultGroup: "all"}
 		if mode == "enabled" {
 			cfg.UI.SubmitMethods = []string{"post"}
+		}
+		if mode == "stream" {
+			cfg.UI.SubmitMethods = []string{"get"}
 		}
 		if _, err := ginswagger.Mount(engine, apidoc.Bundle(), cfg); err != nil {
 			panic(err)

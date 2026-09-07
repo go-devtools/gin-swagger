@@ -71,3 +71,29 @@ test('Gin mounting serves shared native compatibility diagnostics', async ({ pag
  await expect(page.getByRole('button', { name: 'Execute', exact: true })).toHaveCount(0);
  await expect(page.getByRole('button', { name: 'Try it out', exact: true })).toHaveCount(0);
 });
+
+// Compile an actual Gin SSE handler and verify the shared item panel against finite event bytes.
+test('generated Gin SSE contracts show item schemas and preserve event payloads', async ({ page, request }) => {
+ await page.goto('/stream/docs/');
+ const operation = page.locator('.opblock').filter({ hasText: '/events' });
+ const panel = operation.getByRole('region', { name: 'Response 200 stream item schema' });
+ await expect(panel).toBeVisible();
+ await expect(panel).toContainText('text/event-stream');
+ await expect(panel).toContainText('data');
+ await expect(panel).toContainText('string');
+ const original = await (await request.get('/stream/docs/groups/all.json')).json();
+ const content = original.paths['/events'].get.responses['200'].content['text/event-stream'];
+ expect(content.itemSchema).toBeDefined();
+ expect(content.schema).toBeUndefined();
+ const received = page.waitForResponse(response => new URL(response.url()).pathname === '/events');
+ await operation.getByRole('button', { name: 'Execute', exact: true }).click();
+ const response = await received;
+ expect(response.status()).toBe(200);
+ expect(response.headers()['content-type']).toContain('text/event-stream');
+ const events = (await response.text()).split('\n\n').filter(Boolean).map(block => {
+  const lines = block.split('\n');
+  return { event: lines.find(line => line.startsWith('event:')).slice(6).trim(), data: JSON.parse(lines.find(line => line.startsWith('data:')).slice(5)) };
+ });
+ expect(events).toEqual([{ event: 'update', data: { Message: 'first' } }, { event: 'update', data: { Message: 'second' } }]);
+ expect(await page.evaluate(() => window.ui.specSelectors.specJson().toJS())).toEqual(original);
+});
