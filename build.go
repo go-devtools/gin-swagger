@@ -2,6 +2,7 @@
 package ginswagger
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -23,6 +24,9 @@ type Config struct {
 	Middlewares              []gin.HandlerFunc
 	Bindings                 map[string]openapi.OperationKey
 	Include                  func(method, path string) bool
+	// Preserve an Engine.Routes snapshot taken after registration and before Gin initializes escaped colons.
+	// Build verifies the complete snapshot against the current Engine; nil uses the current public routes.
+	RegisteredRoutes gin.RoutesInfo
 	// Optionally group complete documents, always intersecting their scope with global Include.
 	Groups       []DocumentGroup
 	DefaultGroup string
@@ -35,7 +39,8 @@ type DocumentGroup struct {
 	Include func(method, path string) bool
 }
 
-// Match a snapshot of registered routes against public template evidence without registering routes.
+// Match registered routes against public template evidence without registering routes.
+// Call before Gin initialization, or preserve Config.RegisteredRoutes when routes contain escaped colons.
 func Build(r *gin.Engine, bundle openapi.Bundle, cfg Config) (*openapi.Document, error) {
 	if r == nil {
 		return nil, fmt.Errorf("gin-swagger.engine.nil: Engine is required")
@@ -51,15 +56,25 @@ func Build(r *gin.Engine, bundle openapi.Bundle, cfg Config) (*openapi.Document,
 		}
 	}
 	selected := []openapi.Route{}
-	for _, route := range r.Routes() {
+	registered, err := registeredRoutes(r, cfg.RegisteredRoutes)
+	if err != nil {
+		return nil, err
+	}
+	profile := routes.Profile{UseRawPath: r.UseRawPath, UseEscapedPath: r.UseEscapedPath}
+	seen := make(map[string]bool, len(registered))
+	for _, route := range registered {
 		if cfg.Include != nil && !cfg.Include(route.Method, route.Path) {
 			continue
 		}
-		normalized, err := routes.Parse(route.Path)
+		routeName := route.Method + " " + route.Path
+		if seen[routeName] {
+			return nil, fmt.Errorf("gin-swagger.routes.ambiguous: initialized routes share %s; provide Config.RegisteredRoutes captured before Run or ServeHTTP", routeName)
+		}
+		seen[routeName] = true
+		normalized, err := routes.ParseWithProfile(route.Path, profile)
 		if err != nil {
 			return nil, err
 		}
-		routeName := route.Method + " " + route.Path
 		key, bound := cfg.Bindings[routeName]
 		if !bound {
 			matches := symbols[route.Handler]
@@ -75,6 +90,20 @@ func Build(r *gin.Engine, bundle openapi.Bundle, cfg Config) (*openapi.Document,
 		}
 		if normalized.CatchAll {
 			neutral.Extensions = spec.Extensions{"x-gin-catch-all": []byte(`true`), "x-gin-catch-all-note": []byte(`"The Gin catch-all may span slashes; OpenAPI path parameters and generated clients may not preserve this behavior."`)}
+		}
+		if r.UseRawPath || r.UseEscapedPath {
+			if neutral.Extensions == nil {
+				neutral.Extensions = spec.Extensions{}
+			}
+			mode := "raw"
+			if r.UseEscapedPath {
+				mode = "escaped"
+			}
+			neutral.Extensions["x-gin-path-mode"], _ = json.Marshal(mode)
+			neutral.Extensions["x-gin-unescape-path-values"], _ = json.Marshal(r.UnescapePathValues)
+		}
+		if normalized.RawPathConditional {
+			neutral.Extensions["x-gin-raw-path-note"] = []byte(`"This path documents Gin's decoded URL.Path fallback. Noncanonical parameter escapes populate URL.RawPath and can prevent the encoded static prefix from matching; use canonical parameter escaping for this route."`)
 		}
 		selected = append(selected, neutral)
 	}

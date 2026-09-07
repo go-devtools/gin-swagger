@@ -31,7 +31,11 @@ func Mount(r *gin.Engine, bundle openapi.Bundle, cfg Config) (*openapi.Document,
 		return nil, err
 	}
 	route := base + "/*asset"
-	if err = preflight(r, route, cfg.Middlewares); err != nil {
+	registered, err := registeredRoutes(r, cfg.RegisteredRoutes)
+	if err != nil {
+		return nil, err
+	}
+	if err = preflight(r, registered, route, cfg.Middlewares); err != nil {
 		return nil, err
 	}
 	// Serve cached documentation without invoking analysis or business handlers.
@@ -79,7 +83,7 @@ func Mount(r *gin.Engine, bundle openapi.Bundle, cfg Config) (*openapi.Document,
 }
 
 // Replay public routes on an isolated Engine; only the preflight instance can panic.
-func preflight(r *gin.Engine, path string, middlewares []gin.HandlerFunc) (err error) {
+func preflight(r *gin.Engine, registered gin.RoutesInfo, path string, middlewares []gin.HandlerFunc) (err error) {
 	defer func() {
 		if failure := recover(); failure != nil {
 			err = fmt.Errorf("gin-swagger.mount.conflict: documentation mount preflight failed: %v", failure)
@@ -88,7 +92,7 @@ func preflight(r *gin.Engine, path string, middlewares []gin.HandlerFunc) (err e
 	shadow := gin.New()
 	shadow.Use(r.Handlers...)
 	noop := func(*gin.Context) {}
-	for _, route := range r.Routes() {
+	for _, route := range registered {
 		shadow.Handle(route.Method, route.Path, noop)
 	}
 	chain := append(append([]gin.HandlerFunc(nil), middlewares...), noop)

@@ -8,6 +8,8 @@ The compiler reads actual Go source and emits a static Bundle factory. At startu
 
 Gin rules belong in this module's compiler frontend. Shared type projection, comments, budgets, neutral effects, and document models belong in the public core SDK. An adapter must not import core internal packages. Runtime Build and Mount must not import the compiler.
 
+Read the [path guide](paths.md) before integrating an initialized Engine or nondefault path settings. Capture Config.RegisteredRoutes from the complete public Engine.Routes result before Run/ServeHTTP when static escaped colons must survive later builds. Do not reconstruct missing escapes from handler names. A stale snapshot must be refreshed while original syntax is available; an immutable document should be reused after mounting. Raw-path fallback is conditional and documented through explicit extensions.
+
 ## Try the existing application
 
 From this repository checkout:
