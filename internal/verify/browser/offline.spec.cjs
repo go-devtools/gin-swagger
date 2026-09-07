@@ -49,3 +49,25 @@ test('explicit submission sends the Bearer token and typed JSON', async ({ page,
  expect(state.authorization).toBe('Bearer ci-demo-token');
  await page.screenshot({ path: testInfo.outputPath('explicit-submit.png'), fullPage: true });
 });
+
+// Consume the shared renderer from the pinned core, preserving native metadata and default-disabled submission.
+test('Gin mounting serves shared native compatibility diagnostics', async ({ page, request }) => {
+ await page.goto('/metadata/docs/');
+ await expect(page.locator('.info .title')).toContainText('Browser API');
+ const notes = page.getByRole('region', { name: 'Swagger UI compatibility' });
+ await expect(notes).toBeVisible();
+ await notes.locator('summary').click();
+ await expect(notes).toContainText('summary: "Browser examples", parent: "Platform", kind: "nav"');
+ const original = await (await request.get('/metadata/docs/groups/all.json')).json();
+ expect(original.openapi).toBe('3.2.0');
+ expect(original.tags.find(tag => tag.name === 'Browser')).toMatchObject({ summary: 'Browser examples', parent: 'Platform', kind: 'nav' });
+ expect(await page.evaluate(() => window.ui.specSelectors.specJson().toJS())).toEqual(original);
+ const diagnostics = await page.evaluate(() => window.ui.fn.openapiUICompatibility(window.ui.specSelectors.specJson().toJS()).diagnostics);
+ expect(diagnostics.map(d => d.code)).toEqual(['openapi.ui.tagMetadata', 'openapi.ui.tagMetadata']);
+ const resource = await request.get('/metadata/docs/native-compatibility.js');
+ expect(resource.status()).toBe(200);
+ expect(resource.headers()['content-type']).toContain('javascript');
+ expect(resource.headers()['x-content-type-options']).toBe('nosniff');
+ await expect(page.getByRole('button', { name: 'Execute', exact: true })).toHaveCount(0);
+ await expect(page.getByRole('button', { name: 'Try it out', exact: true })).toHaveCount(0);
+});

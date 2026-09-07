@@ -65,9 +65,13 @@ func main() {
 	}
 	engine := gin.New()
 	engine.POST("/submit", Submit)
-	for _, mode := range []string{"safe", "enabled"} {
+	for _, mode := range []string{"safe", "enabled", "metadata"} {
 		cfg := ginswagger.Config{Path: "/" + mode + "/docs", Include: func(method, path string) bool { return path == "/submit" }, OpenAPI: openapi.Config{Title: "Browser API", Version: "1", Configure: func(doc *spec.OpenAPI) error {
 			doc.Components.SecuritySchemes = map[string]spec.RefOr[spec.SecurityScheme]{"BearerAuth": spec.Inline(spec.SecurityScheme{Type: "http", Scheme: "bearer"})}
+			// Declare native tag metadata centrally without changing the registered handler or its source contract.
+			if mode == "metadata" {
+				doc.Tags = []spec.Tag{{Name: "Platform", Summary: "Platform services", Kind: "nav"}, {Name: "Browser", Summary: "Browser examples", Parent: spec.Set("Platform"), Kind: "nav"}}
+			}
 			doc.Security = spec.Set([]spec.SecurityRequirement{{"BearerAuth": {}}})
 			return nil
 		}}, UI: swaggerui.Config{Title: "Browser contract", DocExpansion: "full"}, Groups: []ginswagger.DocumentGroup{{ID: "all", Name: "All endpoints"}, {ID: "reference", Name: "Reference"}}, DefaultGroup: "all"}
