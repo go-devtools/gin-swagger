@@ -3,7 +3,7 @@ module github.com/go-devtools/gin-swagger
 go 1.27.1
 
 require (
-	github.com/gin-contrib/sse v1.1.0
+	github.com/gin-contrib/sse v1.1.2
 	github.com/gin-gonic/gin v1.12.0
 	github.com/go-devtools/openapi v0.0.1
 )
