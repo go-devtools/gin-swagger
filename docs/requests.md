@@ -124,7 +124,7 @@ Matching declared and derived wire schemas must agree. Declaring body presence a
 
 The independent consumer verifies the declaration path using real valid/malformed JSON requests, a bodyless DELETE response, preserved provenance, and independent Schema sample validation. It separately selects a conflicting type declaration and an unknown dynamic-status handler to confirm failure. No adapter access to core internal packages is required.
 
-See the core's [request and response declaration reference](https://github.com/openapi-golang/openapi/blob/main/docs/request-response-declarations.md) for exact syntax, scoped type expressions, codec reuse, conservative conflict checks, and structured diagnostics.
+See the core's [request and response declaration reference](https://github.com/openapi-golang/openapi/blob/8e5783bf170eeb2db98771ebf1e8856c7a635928/docs/request-response-declarations.md) for exact syntax, scoped type expressions, codec reuse, conservative conflict checks, and structured diagnostics.
 
 ## Imported DTO metadata
 

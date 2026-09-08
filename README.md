@@ -10,7 +10,7 @@ This pre-1.0 SDK evolves between pinned versions. Use the public APIs and check 
 
 - Go 1.27.1 for development and verification.
 - Gin v1.12.0 or the version pinned in go.mod.
-- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260907083400-2a27bf547b5e`, resolved from an actual remote commit.
+- The module pins `github.com/openapi-golang/openapi` to `v0.0.0-20260908014618-8e5783bf170e`, resolved from an actual remote commit.
 
 ## Quick start
 
@@ -132,18 +132,18 @@ See the [independent CI guide](docs/ci.md) for pinned tools, private module acce
 
 The [explanation commands](docs/ai-integration.md#explain-a-field-or-response) report field and response origins, actual projection rules, and declarations without claiming business enforcement.
 
-The pinned core uses `spec.Optional[bool]` for optional standard boolean fields. Use `spec.Set(false)` to preserve explicit false and read `.Value` when testing a flag; see [native object migration](https://github.com/openapi-golang/openapi/blob/main/docs/native-objects.md).
+The pinned core uses `spec.Optional[bool]` for optional standard boolean fields. Use `spec.Set(false)` to preserve explicit false and read `.Value` when testing a flag; see [native object migration](https://github.com/openapi-golang/openapi/blob/8e5783bf170eeb2db98771ebf1e8856c7a635928/docs/native-objects.md).
 
-The pinned core validates native HTTP object shapes and resolved parameter contexts, including Path Item inheritance, operation overrides, whole-query conflicts and Link operation identities across offline documents. `spec.Parameter.Name` preserves explicitly empty native query names. These checks do not alter Gin routes or business handlers; see the [HTTP validation boundaries](https://github.com/openapi-golang/openapi/blob/2a27bf547b5e4397bde6289df65caba482b6cd7f/docs/native-objects.md#http-objects-and-parameter-contexts).
+The pinned core validates native HTTP object shapes and resolved parameter contexts, including Path Item inheritance, operation overrides, whole-query conflicts and Link operation identities across offline documents. `spec.Parameter.Name` preserves explicitly empty native query names. These checks do not alter Gin routes or business handlers; see the [HTTP validation boundaries](https://github.com/openapi-golang/openapi/blob/8e5783bf170eeb2db98771ebf1e8856c7a635928/docs/native-objects.md#http-objects-and-parameter-contexts).
 
-The pinned core also validates native metadata field types, required-field presence, component names and license alternatives. See its [metadata rules](https://github.com/openapi-golang/openapi/blob/2a27bf547b5e4397bde6289df65caba482b6cd7f/docs/native-objects.md#document-metadata-and-component-names), including the explicit empty Request Body content policy.
+The pinned core also validates native metadata field types, required-field presence, component names and license alternatives. See its [metadata rules](https://github.com/openapi-golang/openapi/blob/8e5783bf170eeb2db98771ebf1e8856c7a635928/docs/native-objects.md#document-metadata-and-component-names), including the explicit empty Request Body content policy.
 
 Gin path encoding follows the actual Engine configuration. Build before Gin initialization, or retain `Config.RegisteredRoutes` from `Engine.Routes()` before initialization when escaped static colons are used. See [path encoding and route snapshots](docs/paths.md) for raw-path conditions, stale-snapshot diagnostics and mounting boundaries.
 
 Closures, receiver methods and generic handlers use evidence-based matching or explicit centralized bindings. See [handler identity](docs/identity.md) for verified common contracts and ordinary, trimpath and stripped builds. Unknown generic payloads remain rejected.
 
-Mounted documentation reuses the core native compatibility panel. It identifies omitted extension methods and tag metadata without rewriting the document. See [UI rendering and submission boundaries](https://github.com/openapi-golang/openapi/blob/2a27bf547b5e4397bde6289df65caba482b6cd7f/docs/swaggerui-compatibility.md).
+Mounted documentation reuses the core native compatibility panel. It identifies omitted extension methods and tag metadata without rewriting the document. See [UI rendering and submission boundaries](https://github.com/openapi-golang/openapi/blob/8e5783bf170eeb2db98771ebf1e8856c7a635928/docs/swaggerui-compatibility.md).
 
 The shared UI renders request/response stream item schemas separately from complete-body schemas, preserving finite NDJSON/SSE bytes. Whole-query parameters remain read-only because the pinned client omits their values during serialization; a structured browser diagnostic explains the limitation.
 
-The authoritative [public adapter SDK](https://github.com/openapi-golang/openapi/blob/2a27bf547b5e4397bde6289df65caba482b6cd7f/docs/adapter-sdk.md) is referenced at this module's pinned core commit.
+The authoritative [public adapter SDK](https://github.com/openapi-golang/openapi/blob/8e5783bf170eeb2db98771ebf1e8856c7a635928/docs/adapter-sdk.md) is referenced at this module's pinned core commit.
