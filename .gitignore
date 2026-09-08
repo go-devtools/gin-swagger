@@ -5,3 +5,6 @@
 
 /node_modules/
 /internal/verify/testdata/browser/internal/apidoc/
+
+/dist/
+/release-notices/

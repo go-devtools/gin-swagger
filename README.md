@@ -6,11 +6,24 @@ Non-invasive Gin source contract generation and runtime integration for native O
 
 This pre-1.0 SDK evolves between pinned versions. Use the public APIs and check the documented capability boundaries before depending on advanced behavior.
 
+## Installation and versions
+
+The first release is **v0.0.1**. Import the public Go module directly; no token, workspace or local replacement is needed:
+
+```sh
+go get github.com/go-devtools/gin-swagger@v0.0.1
+go install github.com/go-devtools/gin-swagger/cmd/gin-swagger@v0.0.1
+```
+
+Run `gin-swagger version` to inspect the installed version. Prebuilt CLIs, source archives and SHA-256 checksums are available in [GitHub Releases](https://github.com/go-devtools/gin-swagger/releases). Pin the library and CLI to the same version.
+
+See [contribution and release rules](CONTRIBUTING.md) for main, develop, release and hotfix branches. The v0 API is evolving; review release notes before upgrading.
+
 ## Requirements
 
 - Go 1.27.1 for development and verification.
 - Gin v1.12.0 or the version pinned in go.mod.
-- The module pins `github.com/go-devtools/openapi` to `v0.0.0-20260908050439-fb93d0a624f7`, resolved from an actual remote commit.
+- The module pins `github.com/go-devtools/openapi` to `v0.0.1`, resolved from its immutable release tag.
 
 ## Quick start
 
@@ -128,22 +141,22 @@ Function comments can declare request and response types through the shared core
 
 See the [performance guide](docs/performance.md) for reproducible 100/1000-route generation, startup Build, document-read, and allocation benchmarks.
 
-See the [independent CI guide](docs/ci.md) for pinned tools, private module access, offline browser checks, actual platform jobs, and fixed remote-version consumption.
+See the [independent CI guide](docs/ci.md) for pinned tools, public module consumption, offline browser checks, actual platform jobs, and fixed remote-version consumption.
 
 The [explanation commands](docs/ai-integration.md#explain-a-field-or-response) report field and response origins, actual projection rules, and declarations without claiming business enforcement.
 
-The pinned core uses `spec.Optional[bool]` for optional standard boolean fields. Use `spec.Set(false)` to preserve explicit false and read `.Value` when testing a flag; see [native object migration](https://github.com/go-devtools/openapi/blob/fb93d0a624f7945a0509243c5ed99fea1fbf34ea/docs/native-objects.md).
+The pinned core uses `spec.Optional[bool]` for optional standard boolean fields. Use `spec.Set(false)` to preserve explicit false and read `.Value` when testing a flag; see [native object migration](https://github.com/go-devtools/openapi/blob/8daf8d2e4d56822ea2969fcd12cdea395bd73c89/docs/native-objects.md).
 
-The pinned core validates native HTTP object shapes and resolved parameter contexts, including Path Item inheritance, operation overrides, whole-query conflicts and Link operation identities across offline documents. `spec.Parameter.Name` preserves explicitly empty native query names. These checks do not alter Gin routes or business handlers; see the [HTTP validation boundaries](https://github.com/go-devtools/openapi/blob/fb93d0a624f7945a0509243c5ed99fea1fbf34ea/docs/native-objects.md#http-objects-and-parameter-contexts).
+The pinned core validates native HTTP object shapes and resolved parameter contexts, including Path Item inheritance, operation overrides, whole-query conflicts and Link operation identities across offline documents. `spec.Parameter.Name` preserves explicitly empty native query names. These checks do not alter Gin routes or business handlers; see the [HTTP validation boundaries](https://github.com/go-devtools/openapi/blob/8daf8d2e4d56822ea2969fcd12cdea395bd73c89/docs/native-objects.md#http-objects-and-parameter-contexts).
 
-The pinned core also validates native metadata field types, required-field presence, component names and license alternatives. See its [metadata rules](https://github.com/go-devtools/openapi/blob/fb93d0a624f7945a0509243c5ed99fea1fbf34ea/docs/native-objects.md#document-metadata-and-component-names), including the explicit empty Request Body content policy.
+The pinned core also validates native metadata field types, required-field presence, component names and license alternatives. See its [metadata rules](https://github.com/go-devtools/openapi/blob/8daf8d2e4d56822ea2969fcd12cdea395bd73c89/docs/native-objects.md#document-metadata-and-component-names), including the explicit empty Request Body content policy.
 
 Gin path encoding follows the actual Engine configuration. Build before Gin initialization, or retain `Config.RegisteredRoutes` from `Engine.Routes()` before initialization when escaped static colons are used. See [path encoding and route snapshots](docs/paths.md) for raw-path conditions, stale-snapshot diagnostics and mounting boundaries.
 
 Closures, receiver methods and generic handlers use evidence-based matching or explicit centralized bindings. See [handler identity](docs/identity.md) for verified common contracts and ordinary, trimpath and stripped builds. Unknown generic payloads remain rejected.
 
-Mounted documentation reuses the core native compatibility panel. It identifies omitted extension methods and tag metadata without rewriting the document. See [UI rendering and submission boundaries](https://github.com/go-devtools/openapi/blob/fb93d0a624f7945a0509243c5ed99fea1fbf34ea/docs/swaggerui-compatibility.md).
+Mounted documentation reuses the core native compatibility panel. It identifies omitted extension methods and tag metadata without rewriting the document. See [UI rendering and submission boundaries](https://github.com/go-devtools/openapi/blob/8daf8d2e4d56822ea2969fcd12cdea395bd73c89/docs/swaggerui-compatibility.md).
 
 The shared UI renders request/response stream item schemas separately from complete-body schemas, preserving finite NDJSON/SSE bytes. Whole-query parameters remain read-only because the pinned client omits their values during serialization; a structured browser diagnostic explains the limitation.
 
-The authoritative [public adapter SDK](https://github.com/go-devtools/openapi/blob/fb93d0a624f7945a0509243c5ed99fea1fbf34ea/docs/adapter-sdk.md) is referenced at this module's pinned core commit.
+The authoritative [public adapter SDK](https://github.com/go-devtools/openapi/blob/8daf8d2e4d56822ea2969fcd12cdea395bd73c89/docs/adapter-sdk.md) is referenced at this module's pinned core commit.

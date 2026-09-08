@@ -22,6 +22,14 @@ import (
 	core "github.com/go-devtools/openapi/compiler"
 )
 
+// releaseVersion 由发布构建注入；go install 保留 Go 自身的模块版本。
+// releaseVersion is injected into archives; go install keeps native module metadata.
+var releaseVersion string
+
+// releaseCommit 记录发布文件对应的完整提交。
+// releaseCommit identifies the exact source commit of release archives.
+var releaseCommit string
+
 // Handle interruption and expose automation-friendly exit codes.
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
@@ -56,6 +64,12 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 					revision = setting.Value
 				}
 			}
+		}
+		if releaseVersion != "" {
+			version = releaseVersion
+		}
+		if releaseCommit != "" {
+			revision = releaseCommit
 		}
 		_ = json.NewEncoder(stdout).Encode(map[string]any{"module": "github.com/go-devtools/gin-swagger", "version": version, "core": coreVersion, "frontend": front.Frontend().Name, "revision": revision, "go": runtime.Version(), "bundle": openapi.BundleFormatVersion, "openapi": "3.2.0"})
 		return 0
