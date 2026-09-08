@@ -7,10 +7,10 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/openapi-golang/gin-swagger/internal/routes"
-	"github.com/openapi-golang/openapi"
-	"github.com/openapi-golang/openapi/spec"
-	"github.com/openapi-golang/openapi/swaggerui"
+	"github.com/go-devtools/gin-swagger/internal/routes"
+	"github.com/go-devtools/openapi"
+	"github.com/go-devtools/openapi/spec"
+	"github.com/go-devtools/openapi/swaggerui"
 )
 
 // Separate core document settings from Gin scope and mounting options.

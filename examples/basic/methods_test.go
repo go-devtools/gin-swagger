@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/openapi-golang/openapi/contracttest"
-	"github.com/openapi-golang/openapi/spec"
+	"github.com/go-devtools/openapi/contracttest"
+	"github.com/go-devtools/openapi/spec"
 )
 
 // Validate actual wire bytes for all five methods and preserve the distinction between false and null in partial updates.

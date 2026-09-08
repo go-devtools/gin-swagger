@@ -14,13 +14,13 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	ginswagger "github.com/openapi-golang/gin-swagger"
-	front "github.com/openapi-golang/gin-swagger/compiler"
-	"github.com/openapi-golang/gin-swagger/internal/integration/testdata/requests"
-	"github.com/openapi-golang/openapi"
-	core "github.com/openapi-golang/openapi/compiler"
-	"github.com/openapi-golang/openapi/contracttest"
-	"github.com/openapi-golang/openapi/spec"
+	ginswagger "github.com/go-devtools/gin-swagger"
+	front "github.com/go-devtools/gin-swagger/compiler"
+	"github.com/go-devtools/gin-swagger/internal/integration/testdata/requests"
+	"github.com/go-devtools/openapi"
+	core "github.com/go-devtools/openapi/compiler"
+	"github.com/go-devtools/openapi/contracttest"
+	"github.com/go-devtools/openapi/spec"
 )
 
 // Compile real request samples and verify business source remains unchanged.
@@ -308,7 +308,7 @@ func TestBindingBoundaries(t *testing.T) {
 func TestCustomBindingMapper(t *testing.T) {
 	mapper := func(request core.ProjectionRequest) (*spec.Schema, bool, error) {
 		named, ok := types.Unalias(request.Type).(*types.Named)
-		if !ok || request.Direction != core.Input || named.Obj().Pkg() == nil || named.Obj().Pkg().Path() != "github.com/openapi-golang/gin-swagger/internal/integration/testdata/requests" || named.Obj().Name() != "CustomParam" {
+		if !ok || request.Direction != core.Input || named.Obj().Pkg() == nil || named.Obj().Pkg().Path() != "github.com/go-devtools/gin-swagger/internal/integration/testdata/requests" || named.Obj().Name() != "CustomParam" {
 			return nil, false, nil
 		}
 		schema := spec.Typed("string")

@@ -2,7 +2,7 @@
 
 > Generate native OpenAPI 3.2 contracts from existing Gin source and mount shared offline Swagger UI at startup.
 
-The module is github.com/openapi-golang/gin-swagger and the root package is ginswagger. Use Go 1.27.1 and Gin v1.12.0 with the core version pinned in go.mod. Generate source contracts, then link the actual Engine.Routes snapshot. Preserve DTOs, handlers, and existing route registration. Runtime packages do not import the compiler or access core internal packages.
+The module is github.com/go-devtools/gin-swagger and the root package is ginswagger. Use Go 1.27.1 and Gin v1.12.0 with the core version pinned in go.mod. Generate source contracts, then link the actual Engine.Routes snapshot. Preserve DTOs, handlers, and existing route registration. Runtime packages do not import the compiler or access core internal packages.
 
 ## Integration
 

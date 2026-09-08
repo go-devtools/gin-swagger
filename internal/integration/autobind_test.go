@@ -13,12 +13,12 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	ginswagger "github.com/openapi-golang/gin-swagger"
-	front "github.com/openapi-golang/gin-swagger/compiler"
-	"github.com/openapi-golang/gin-swagger/internal/integration/testdata/autobind"
-	"github.com/openapi-golang/openapi"
-	core "github.com/openapi-golang/openapi/compiler"
-	"github.com/openapi-golang/openapi/contracttest"
+	ginswagger "github.com/go-devtools/gin-swagger"
+	front "github.com/go-devtools/gin-swagger/compiler"
+	"github.com/go-devtools/gin-swagger/internal/integration/testdata/autobind"
+	"github.com/go-devtools/openapi"
+	core "github.com/go-devtools/openapi/compiler"
+	"github.com/go-devtools/openapi/contracttest"
 )
 
 // Compile actual automatic-binding source and verify compilation leaves business files unchanged.

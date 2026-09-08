@@ -12,10 +12,10 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	ginswagger "github.com/openapi-golang/gin-swagger"
-	"github.com/openapi-golang/openapi"
-	"github.com/openapi-golang/openapi/contracttest"
-	"github.com/openapi-golang/openapi/spec"
+	ginswagger "github.com/go-devtools/gin-swagger"
+	"github.com/go-devtools/openapi"
+	"github.com/go-devtools/openapi/contracttest"
+	"github.com/go-devtools/openapi/spec"
 )
 
 // Use the Bundle generated from this consumer's actual source by the external CLI.

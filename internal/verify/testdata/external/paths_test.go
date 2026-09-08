@@ -8,8 +8,8 @@ import (
 
 	"example.test/gin-consumer/internal/apidoc"
 	"github.com/gin-gonic/gin"
-	ginswagger "github.com/openapi-golang/gin-swagger"
-	"github.com/openapi-golang/openapi"
+	ginswagger "github.com/go-devtools/gin-swagger"
+	"github.com/go-devtools/openapi"
 )
 
 // Verify the public path configuration against generated real-source templates in an independent module.

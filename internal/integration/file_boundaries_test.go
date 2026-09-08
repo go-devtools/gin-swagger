@@ -18,13 +18,13 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	ginswagger "github.com/openapi-golang/gin-swagger"
-	front "github.com/openapi-golang/gin-swagger/compiler"
-	"github.com/openapi-golang/gin-swagger/internal/integration/testdata/protocolbounds"
-	"github.com/openapi-golang/openapi"
-	core "github.com/openapi-golang/openapi/compiler"
-	"github.com/openapi-golang/openapi/contracttest"
-	"github.com/openapi-golang/openapi/spec"
+	ginswagger "github.com/go-devtools/gin-swagger"
+	front "github.com/go-devtools/gin-swagger/compiler"
+	"github.com/go-devtools/gin-swagger/internal/integration/testdata/protocolbounds"
+	"github.com/go-devtools/openapi"
+	core "github.com/go-devtools/openapi/compiler"
+	"github.com/go-devtools/openapi/contracttest"
+	"github.com/go-devtools/openapi/spec"
 )
 
 // Declare the verified fixed-file profile through public SDK alternatives without changing its handlers.
@@ -33,7 +33,7 @@ func fixedFileFrontend() core.Frontend {
 	frontend.Name += "+declared-fixed-text-file-v1"
 	original := frontend.CallOutcomes
 	frontend.CallOutcomes = func(c core.CallContext) ([]core.CallOutcome, error) {
-		if c.Object == nil || c.Object.Pkg() == nil || c.Object.Pkg().Path() != "github.com/gin-gonic/gin" || c.Function.Object.Pkg().Path() != "github.com/openapi-golang/gin-swagger/internal/integration/testdata/protocolbounds" {
+		if c.Object == nil || c.Object.Pkg() == nil || c.Object.Pkg().Path() != "github.com/gin-gonic/gin" || c.Function.Object.Pkg().Path() != "github.com/go-devtools/gin-swagger/internal/integration/testdata/protocolbounds" {
 			return original(c)
 		}
 		method := c.Object.FullName()

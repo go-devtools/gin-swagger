@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/openapi-golang/openapi"
+	"github.com/go-devtools/openapi"
 )
 
 // Reject mismatched build conditions before mounting any documentation routes.

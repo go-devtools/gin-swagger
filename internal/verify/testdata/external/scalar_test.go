@@ -12,10 +12,10 @@ import (
 
 	"example.test/gin-consumer/internal/apidoc"
 	"github.com/gin-gonic/gin"
-	ginswagger "github.com/openapi-golang/gin-swagger"
-	"github.com/openapi-golang/openapi"
-	"github.com/openapi-golang/openapi/contracttest"
-	"github.com/openapi-golang/openapi/spec"
+	ginswagger "github.com/go-devtools/gin-swagger"
+	"github.com/go-devtools/openapi"
+	"github.com/go-devtools/openapi/contracttest"
+	"github.com/go-devtools/openapi/spec"
 )
 
 // scalarReadBundle uses the Bundle generated from unchanged consumer source by the installed CLI.

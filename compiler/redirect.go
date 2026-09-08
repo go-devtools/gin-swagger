@@ -9,9 +9,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/openapi-golang/openapi"
-	core "github.com/openapi-golang/openapi/compiler"
-	"github.com/openapi-golang/openapi/spec"
+	"github.com/go-devtools/openapi"
+	core "github.com/go-devtools/openapi/compiler"
+	"github.com/go-devtools/openapi/spec"
 )
 
 // Model standard redirect bodies and pending status using the actual method and existing response headers.

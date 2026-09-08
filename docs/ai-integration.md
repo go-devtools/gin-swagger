@@ -19,7 +19,7 @@ GOWORK=off go mod download
 GOWORK=off go run ./cmd/gin-swagger version
 GOWORK=off go run ./cmd/gin-swagger generate --dir ./examples/basic --output ./internal/apidoc
 GOWORK=off go run ./cmd/gin-swagger check --dir ./examples/basic --output ./internal/apidoc
-GOWORK=off go run ./cmd/gin-swagger explain --dir ./examples/basic --symbol github.com/openapi-golang/gin-swagger/examples/basic.CreateUser
+GOWORK=off go run ./cmd/gin-swagger explain --dir ./examples/basic --symbol github.com/go-devtools/gin-swagger/examples/basic.CreateUser
 GOWORK=off make dev
 ```
 
@@ -54,8 +54,8 @@ Validate the existing routes before and after mounting and compare actual sample
 ## Explain a field or response
 
 ```sh
-GOWORK=off go run ./cmd/gin-swagger explain --dir ./examples/basic --symbol github.com/openapi-golang/gin-swagger/examples/basic.User.Name
-GOWORK=off go run ./cmd/gin-swagger explain --dir ./examples/basic --symbol github.com/openapi-golang/gin-swagger/examples/basic.CreateUser --response 201
+GOWORK=off go run ./cmd/gin-swagger explain --dir ./examples/basic --symbol github.com/go-devtools/gin-swagger/examples/basic.User.Name
+GOWORK=off go run ./cmd/gin-swagger explain --dir ./examples/basic --symbol github.com/go-devtools/gin-swagger/examples/basic.CreateUser --response 201
 ```
 
 A field explanation reports its original declaration, actual wire name, handler/media/status uses, applied codec and type rules, and semantic declarations. `implementation: "not-proven"` preserves the difference between a contract and verified business enforcement. Imported and generic origins use their original declaration identity. The source snapshot is captured during compilation; queries do not execute business handlers.

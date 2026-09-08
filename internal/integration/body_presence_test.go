@@ -12,13 +12,13 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	ginswagger "github.com/openapi-golang/gin-swagger"
-	front "github.com/openapi-golang/gin-swagger/compiler"
-	"github.com/openapi-golang/gin-swagger/internal/integration/testdata/bodypresence"
-	"github.com/openapi-golang/openapi"
-	core "github.com/openapi-golang/openapi/compiler"
-	"github.com/openapi-golang/openapi/contracttest"
-	"github.com/openapi-golang/openapi/spec"
+	ginswagger "github.com/go-devtools/gin-swagger"
+	front "github.com/go-devtools/gin-swagger/compiler"
+	"github.com/go-devtools/gin-swagger/internal/integration/testdata/bodypresence"
+	"github.com/go-devtools/openapi"
+	core "github.com/go-devtools/openapi/compiler"
+	"github.com/go-devtools/openapi/contracttest"
+	"github.com/go-devtools/openapi/spec"
 )
 
 // Compare inferred body presence with real empty and nonempty requests without changing business source.
@@ -72,7 +72,7 @@ func TestBodyPresenceFromBindingOutcomes(t *testing.T) {
 				t.Fatal(err)
 			}
 			if sample.name == "checked" {
-				explanation, err := result.Explain(core.ExplainQuery{Symbol: "github.com/openapi-golang/gin-swagger/internal/integration/testdata/bodypresence.Checked"})
+				explanation, err := result.Explain(core.ExplainQuery{Symbol: "github.com/go-devtools/gin-swagger/internal/integration/testdata/bodypresence.Checked"})
 				if err != nil {
 					t.Fatal(err)
 				}

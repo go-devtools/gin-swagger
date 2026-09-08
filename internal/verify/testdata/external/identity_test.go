@@ -16,11 +16,11 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	ginswagger "github.com/openapi-golang/gin-swagger"
-	gincompiler "github.com/openapi-golang/gin-swagger/compiler"
-	"github.com/openapi-golang/openapi"
-	core "github.com/openapi-golang/openapi/compiler"
-	"github.com/openapi-golang/openapi/contracttest"
+	ginswagger "github.com/go-devtools/gin-swagger"
+	gincompiler "github.com/go-devtools/gin-swagger/compiler"
+	"github.com/go-devtools/openapi"
+	core "github.com/go-devtools/openapi/compiler"
+	"github.com/go-devtools/openapi/contracttest"
 )
 
 // Keep source identity tied to the independent consumer's actual module path.

@@ -9,9 +9,9 @@ import (
 
 	"example.test/gin-consumer/internal/apidoc"
 	"github.com/gin-gonic/gin"
-	ginswagger "github.com/openapi-golang/gin-swagger"
-	"github.com/openapi-golang/openapi"
-	"github.com/openapi-golang/openapi/contracttest"
+	ginswagger "github.com/go-devtools/gin-swagger"
+	"github.com/go-devtools/openapi"
+	"github.com/go-devtools/openapi/contracttest"
 )
 
 // Verify shared declarations through the installed CLI, actual Gin mounting, and independent validation.

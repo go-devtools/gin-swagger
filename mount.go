@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/openapi-golang/openapi"
-	"github.com/openapi-golang/openapi/swaggerui"
+	"github.com/go-devtools/openapi"
+	"github.com/go-devtools/openapi/swaggerui"
 )
 
 // Prepare and validate everything before mounting during application startup.

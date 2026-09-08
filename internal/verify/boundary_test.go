@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/openapi-golang/openapi"
+	"github.com/go-devtools/openapi"
 )
 
 // Locate this adapter checkout without using neighboring product repositories.
@@ -44,7 +44,7 @@ func execute(t *testing.T, dir, program string, args ...string) string {
 // Ordinary Mount consumers must not link analyzers or the independent test engine.
 func TestRuntimeDependencyBoundary(t *testing.T) {
 	output := execute(t, checkoutRoot(t), "go", "list", "-deps", "-f", "{{.ImportPath}}", ".")
-	for _, forbidden := range []string{"github.com/openapi-golang/gin-swagger/compiler", "github.com/openapi-golang/openapi/compiler", "github.com/openapi-golang/openapi/contracttest", "golang.org/x/tools/", "github.com/santhosh-tekuri/jsonschema/"} {
+	for _, forbidden := range []string{"github.com/go-devtools/gin-swagger/compiler", "github.com/go-devtools/openapi/compiler", "github.com/go-devtools/openapi/contracttest", "golang.org/x/tools/", "github.com/santhosh-tekuri/jsonschema/"} {
 		if strings.Contains(output, forbidden) {
 			t.Fatalf("runtime imports %s", forbidden)
 		}
@@ -62,7 +62,7 @@ func TestNoLocalReplace(t *testing.T) {
 	}
 	pinned := ""
 	for _, dependency := range manifest.Require {
-		if dependency.Path == "github.com/openapi-golang/openapi" {
+		if dependency.Path == "github.com/go-devtools/openapi" {
 			pinned = dependency.Version
 		}
 	}
@@ -85,7 +85,7 @@ func TestNoLocalReplace(t *testing.T) {
 		if module.Replace != nil {
 			t.Fatalf("module replacement bypasses independent consumption: %s", module.Path)
 		}
-		if module.Path == "github.com/openapi-golang/openapi" {
+		if module.Path == "github.com/go-devtools/openapi" {
 			found = true
 			if module.Version != pinned {
 				t.Fatalf("selected core %s differs from pinned %s", module.Version, pinned)
@@ -109,7 +109,7 @@ func TestGeneratorBootstrap(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	module = bytes.Replace(module, []byte("module github.com/openapi-golang/gin-swagger"), []byte("module example.test/gin-consumer"), 1)
+	module = bytes.Replace(module, []byte("module github.com/go-devtools/gin-swagger"), []byte("module example.test/gin-consumer"), 1)
 	if err := os.WriteFile(filepath.Join(dir, "go.mod"), module, 0600); err != nil {
 		t.Fatal(err)
 	}
@@ -152,18 +152,18 @@ func TestGeneratorBootstrap(t *testing.T) {
 	}); err != nil {
 		t.Fatal(err)
 	}
-	execute(t, dir, "go", "mod", "edit", "-require=github.com/openapi-golang/gin-swagger@"+version)
+	execute(t, dir, "go", "mod", "edit", "-require=github.com/go-devtools/gin-swagger@"+version)
 	if !remote {
-		execute(t, dir, "go", "mod", "edit", "-replace=github.com/openapi-golang/gin-swagger="+root)
+		execute(t, dir, "go", "mod", "edit", "-replace=github.com/go-devtools/gin-swagger="+root)
 		t.Log("development consumer uses this adapter checkout; core remains a fixed remote dependency")
 	} else {
-		execute(t, dir, "go", "mod", "download", "github.com/openapi-golang/gin-swagger@"+version)
+		execute(t, dir, "go", "mod", "download", "github.com/go-devtools/gin-swagger@"+version)
 	}
 	var dependency struct {
 		Version string
 		Replace *struct{}
 	}
-	if err := json.Unmarshal([]byte(execute(t, dir, "go", "list", "-m", "-json", "github.com/openapi-golang/gin-swagger")), &dependency); err != nil {
+	if err := json.Unmarshal([]byte(execute(t, dir, "go", "list", "-m", "-json", "github.com/go-devtools/gin-swagger")), &dependency); err != nil {
 		t.Fatal(err)
 	}
 	if remote && (dependency.Version != version || dependency.Replace != nil) {
@@ -173,7 +173,7 @@ func TestGeneratorBootstrap(t *testing.T) {
 		Version string
 		Replace *struct{}
 	}{}
-	if err := json.Unmarshal([]byte(execute(t, dir, "go", "list", "-m", "-json", "github.com/openapi-golang/openapi")), &dependency); err != nil {
+	if err := json.Unmarshal([]byte(execute(t, dir, "go", "list", "-m", "-json", "github.com/go-devtools/openapi")), &dependency); err != nil {
 		t.Fatal(err)
 	}
 	if dependency.Replace != nil {

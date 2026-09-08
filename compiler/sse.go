@@ -8,8 +8,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	core "github.com/openapi-golang/openapi/compiler"
-	"github.com/openapi-golang/openapi/spec"
+	core "github.com/go-devtools/openapi/compiler"
+	"github.com/go-devtools/openapi/spec"
 )
 
 // Recognize only the actual dependency's event type, rejecting custom renderers with the same short name.

@@ -3,8 +3,8 @@ package compiler
 import (
 	"go/types"
 
-	"github.com/openapi-golang/openapi"
-	core "github.com/openapi-golang/openapi/compiler"
+	"github.com/go-devtools/openapi"
+	core "github.com/go-devtools/openapi/compiler"
 )
 
 // Keep frontend binder choices local; only neutral conditions and projected contracts enter the Bundle.

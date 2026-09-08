@@ -15,15 +15,15 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	ginswagger "github.com/openapi-golang/gin-swagger"
-	gincompiler "github.com/openapi-golang/gin-swagger/compiler"
-	"github.com/openapi-golang/gin-swagger/internal/integration/testdata/identity"
-	"github.com/openapi-golang/openapi"
-	core "github.com/openapi-golang/openapi/compiler"
+	ginswagger "github.com/go-devtools/gin-swagger"
+	gincompiler "github.com/go-devtools/gin-swagger/compiler"
+	"github.com/go-devtools/gin-swagger/internal/integration/testdata/identity"
+	"github.com/go-devtools/openapi"
+	core "github.com/go-devtools/openapi/compiler"
 )
 
 // Keep source identity tied to the real fixture package rather than reconstructed runtime suffixes.
-const identityPackage = "github.com/openapi-golang/gin-swagger/internal/integration/testdata/identity"
+const identityPackage = "github.com/go-devtools/gin-swagger/internal/integration/testdata/identity"
 
 // Nominate a known constructor through the public SDK and preserve its declared response provenance.
 func identityBundle(t *testing.T) openapi.Bundle {

@@ -3,8 +3,8 @@ package compiler
 import (
 	"go/types"
 
-	core "github.com/openapi-golang/openapi/compiler"
-	"github.com/openapi-golang/openapi/spec"
+	core "github.com/go-devtools/openapi/compiler"
+	"github.com/go-devtools/openapi/spec"
 )
 
 // Emit facts for explicit binders while the core analyzes business branches after binding failures.

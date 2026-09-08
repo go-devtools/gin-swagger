@@ -16,7 +16,7 @@ concurrency:
 env:
   GOWORK: 'off'
   GOTOOLCHAIN: local
-  GOPRIVATE: github.com/openapi-golang/*
+  GOPRIVATE: github.com/go-devtools/*
   GIT_TERMINAL_PROMPT: '0'
   CI_REPOSITORY: ${{ github.repository }}
   CI_REPOSITORY_TOKEN: ${{ github.token }}
@@ -54,7 +54,7 @@ jobs:
       - name: Require private core read access
         run: |
           if [[ -z "$OPENAPI_READ_TOKEN" ]]; then
-            echo 'ci.auth.missing: Set OPENAPI_READ_TOKEN with Contents read access to openapi-golang/openapi.'
+            echo 'ci.auth.missing: Set OPENAPI_READ_TOKEN with Contents read access to go-devtools/openapi.'
             exit 2
           fi
       - name: Run test gates
@@ -87,7 +87,7 @@ jobs:
       - name: Require private core read access
         run: |
           if [[ -z "$OPENAPI_READ_TOKEN" ]]; then
-            echo 'ci.auth.missing: Set OPENAPI_READ_TOKEN with Contents read access to openapi-golang/openapi.'
+            echo 'ci.auth.missing: Set OPENAPI_READ_TOKEN with Contents read access to go-devtools/openapi.'
             exit 2
           fi
       - name: Run fuzz gates
@@ -120,7 +120,7 @@ jobs:
       - name: Require private core read access
         run: |
           if [[ -z "$OPENAPI_READ_TOKEN" ]]; then
-            echo 'ci.auth.missing: Set OPENAPI_READ_TOKEN with Contents read access to openapi-golang/openapi.'
+            echo 'ci.auth.missing: Set OPENAPI_READ_TOKEN with Contents read access to go-devtools/openapi.'
             exit 2
           fi
       - name: Run security gates
@@ -153,7 +153,7 @@ jobs:
       - name: Require private core read access
         run: |
           if [[ -z "$OPENAPI_READ_TOKEN" ]]; then
-            echo 'ci.auth.missing: Set OPENAPI_READ_TOKEN with Contents read access to openapi-golang/openapi.'
+            echo 'ci.auth.missing: Set OPENAPI_READ_TOKEN with Contents read access to go-devtools/openapi.'
             exit 2
           fi
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -208,7 +208,7 @@ jobs:
       - name: Require private core read access
         run: |
           if [[ -z "$OPENAPI_READ_TOKEN" ]]; then
-            echo 'ci.auth.missing: Set OPENAPI_READ_TOKEN with Contents read access to openapi-golang/openapi.'
+            echo 'ci.auth.missing: Set OPENAPI_READ_TOKEN with Contents read access to go-devtools/openapi.'
             exit 2
           fi
       - name: Run remote gates

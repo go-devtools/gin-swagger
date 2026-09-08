@@ -6,7 +6,7 @@ import (
 	"go/types"
 	"mime"
 
-	core "github.com/openapi-golang/openapi/compiler"
+	core "github.com/go-devtools/openapi/compiler"
 )
 
 // Construct the writer argument from Context's actual public field type without core-private state.

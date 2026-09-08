@@ -7,11 +7,11 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	ginswagger "github.com/openapi-golang/gin-swagger"
-	"github.com/openapi-golang/gin-swagger/examples/basic/internal/apidoc"
-	"github.com/openapi-golang/openapi"
-	"github.com/openapi-golang/openapi/spec"
-	"github.com/openapi-golang/openapi/swaggerui"
+	ginswagger "github.com/go-devtools/gin-swagger"
+	"github.com/go-devtools/gin-swagger/examples/basic/internal/apidoc"
+	"github.com/go-devtools/openapi"
+	"github.com/go-devtools/openapi/spec"
+	"github.com/go-devtools/openapi/swaggerui"
 )
 
 // Demonstrates string and numeric enums in the same request and response.
@@ -118,7 +118,7 @@ func configureExamples(doc *spec.OpenAPI) error {
 		// Reuses the generated APIError contract so each document group can be built independently.
 		var unauthorized spec.Response
 		for _, template := range apidoc.Bundle().Snapshot().Templates {
-			if template.Key == openapi.OperationKey("github.com/openapi-golang/gin-swagger/examples/basic.CreateUser") {
+			if template.Key == openapi.OperationKey("github.com/go-devtools/gin-swagger/examples/basic.CreateUser") {
 				unauthorized = *template.Operation.Responses["400"].Value
 			}
 		}

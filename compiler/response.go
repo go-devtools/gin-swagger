@@ -8,8 +8,8 @@ import (
 	"sort"
 	"strconv"
 
-	core "github.com/openapi-golang/openapi/compiler"
-	"github.com/openapi-golang/openapi/spec"
+	core "github.com/go-devtools/openapi/compiler"
+	"github.com/go-devtools/openapi/spec"
 )
 
 // Construct response effects from Gin's actual renderer while leaving JSON type projection to the core.

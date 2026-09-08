@@ -13,11 +13,11 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	ginswagger "github.com/openapi-golang/gin-swagger"
-	"github.com/openapi-golang/gin-swagger/internal/verify/testdata/browser/internal/apidoc"
-	"github.com/openapi-golang/openapi"
-	"github.com/openapi-golang/openapi/spec"
-	"github.com/openapi-golang/openapi/swaggerui"
+	ginswagger "github.com/go-devtools/gin-swagger"
+	"github.com/go-devtools/gin-swagger/internal/verify/testdata/browser/internal/apidoc"
+	"github.com/go-devtools/openapi"
+	"github.com/go-devtools/openapi/spec"
+	"github.com/go-devtools/openapi/swaggerui"
 )
 
 // Supported roles.

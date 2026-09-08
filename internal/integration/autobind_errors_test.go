@@ -10,9 +10,9 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	ginswagger "github.com/openapi-golang/gin-swagger"
-	"github.com/openapi-golang/gin-swagger/internal/integration/testdata/autobind"
-	"github.com/openapi-golang/openapi/contracttest"
+	ginswagger "github.com/go-devtools/gin-swagger"
+	"github.com/go-devtools/gin-swagger/internal/integration/testdata/autobind"
+	"github.com/go-devtools/openapi/contracttest"
 )
 
 // Binding failures and body limits must follow automatic conditions without importing inapplicable error statuses.

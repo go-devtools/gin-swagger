@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/openapi-golang/openapi"
-	core "github.com/openapi-golang/openapi/compiler"
+	"github.com/go-devtools/openapi"
+	core "github.com/go-devtools/openapi/compiler"
 )
 
 // Compile actual tag-free Gin handlers through the public SDK.
@@ -22,7 +22,7 @@ func TestGinFrontendFromSource(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	module = []byte(strings.Replace(string(module), "module github.com/openapi-golang/gin-swagger", "module example.com/gin-fixture", 1))
+	module = []byte(strings.Replace(string(module), "module github.com/go-devtools/gin-swagger", "module example.com/gin-fixture", 1))
 	if err = os.WriteFile(filepath.Join(dir, "go.mod"), module, 0600); err != nil {
 		t.Fatal(err)
 	}

@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/openapi-golang/openapi/contracttest"
+	"github.com/go-devtools/openapi/contracttest"
 )
 
 // Compare real handler responses before and after mounting, then validate their wire bytes independently.

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/openapi-golang/openapi/contracttest"
+	"github.com/go-devtools/openapi/contracttest"
 )
 
 // Match generated contracts to actual requests without changing business responses through mounting.

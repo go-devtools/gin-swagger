@@ -3,7 +3,7 @@ package compiler
 import (
 	"go/types"
 
-	core "github.com/openapi-golang/openapi/compiler"
+	core "github.com/go-devtools/openapi/compiler"
 )
 
 // Model binding success and failure as finite alternatives correlating results with response commits.

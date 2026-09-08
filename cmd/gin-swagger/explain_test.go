@@ -10,7 +10,7 @@ import (
 
 // Exercise public explanations against the real example without modifying its business sources.
 func TestExplainBasicCLI(t *testing.T) {
-	prefix := "github.com/openapi-golang/gin-swagger/examples/basic."
+	prefix := "github.com/go-devtools/gin-swagger/examples/basic."
 	for _, tc := range []struct {
 		name string
 		args []string
@@ -77,7 +77,7 @@ func (failedExplainWriter) Write([]byte) (int, error) { return 0, errors.New("ou
 // Report JSON encoding failures instead of claiming successful explanation output.
 func TestExplainOutputFailure(t *testing.T) {
 	var errs bytes.Buffer
-	code := run(context.Background(), []string{"explain", "--dir", "../../examples/basic", "--symbol", "github.com/openapi-golang/gin-swagger/examples/basic.CreateUser"}, failedExplainWriter{}, &errs)
+	code := run(context.Background(), []string{"explain", "--dir", "../../examples/basic", "--symbol", "github.com/go-devtools/gin-swagger/examples/basic.CreateUser"}, failedExplainWriter{}, &errs)
 	if code != 1 || !bytes.Contains(errs.Bytes(), []byte("output unavailable")) {
 		t.Fatalf("write failure: %d %s", code, errs.String())
 	}

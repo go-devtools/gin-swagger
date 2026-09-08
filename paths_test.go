@@ -10,8 +10,8 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/openapi-golang/openapi"
-	"github.com/openapi-golang/openapi/spec"
+	"github.com/go-devtools/openapi"
+	"github.com/go-devtools/openapi/spec"
 )
 
 // Expose the value selected by the actual Gin router for independent wire assertions.

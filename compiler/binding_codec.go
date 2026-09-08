@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"strings"
 
-	core "github.com/openapi-golang/openapi/compiler"
-	"github.com/openapi-golang/openapi/spec"
+	core "github.com/go-devtools/openapi/compiler"
+	"github.com/go-devtools/openapi/spec"
 )
 
 // Select explicit Gin text-binding field rules for reuse by project generation entry points.

@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/openapi-golang/openapi"
-	"github.com/openapi-golang/openapi/spec"
+	"github.com/go-devtools/openapi"
+	"github.com/go-devtools/openapi/spec"
 )
 
 // Build independent grouped documents while preserving caching and HEAD behavior.

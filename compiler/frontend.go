@@ -6,8 +6,8 @@ import (
 	"go/constant"
 	"go/types"
 
-	core "github.com/openapi-golang/openapi/compiler"
-	"github.com/openapi-golang/openapi/spec"
+	core "github.com/go-devtools/openapi/compiler"
+	"github.com/go-devtools/openapi/spec"
 )
 
 // Match the complete Gin package identity rather than short method names.

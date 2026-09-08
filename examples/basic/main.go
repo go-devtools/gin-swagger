@@ -8,9 +8,9 @@ import (
 	"unicode/utf8"
 
 	"github.com/gin-gonic/gin"
-	ginswagger "github.com/openapi-golang/gin-swagger"
-	"github.com/openapi-golang/gin-swagger/examples/basic/internal/apidoc"
-	"github.com/openapi-golang/openapi"
+	ginswagger "github.com/go-devtools/gin-swagger"
+	"github.com/go-devtools/gin-swagger/examples/basic/internal/apidoc"
+	"github.com/go-devtools/openapi"
 )
 
 // Information submitted when creating a user.

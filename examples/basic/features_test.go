@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/openapi-golang/openapi/contracttest"
-	"github.com/openapi-golang/openapi/spec"
+	"github.com/go-devtools/openapi/contracttest"
+	"github.com/go-devtools/openapi/spec"
 )
 
 // Configure groups and security at startup while keeping the existing user endpoint unauthenticated.

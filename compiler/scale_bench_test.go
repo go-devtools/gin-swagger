@@ -10,11 +10,11 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	ginswagger "github.com/openapi-golang/gin-swagger"
-	gincompiler "github.com/openapi-golang/gin-swagger/compiler"
-	"github.com/openapi-golang/gin-swagger/internal/benchfixture"
-	"github.com/openapi-golang/openapi"
-	core "github.com/openapi-golang/openapi/compiler"
+	ginswagger "github.com/go-devtools/gin-swagger"
+	gincompiler "github.com/go-devtools/gin-swagger/compiler"
+	"github.com/go-devtools/gin-swagger/internal/benchfixture"
+	"github.com/go-devtools/openapi"
+	core "github.com/go-devtools/openapi/compiler"
 )
 
 // Retain read results so benchmarks measure the public defensive-copy allocation.
@@ -30,7 +30,7 @@ func scaleProject(b *testing.B, count int) core.Options {
 			b.Fatal(err)
 		}
 		if name == "go.mod" {
-			raw = bytes.Replace(raw, []byte("module github.com/openapi-golang/gin-swagger"), []byte("module example.test/gin-scale"), 1)
+			raw = bytes.Replace(raw, []byte("module github.com/go-devtools/gin-swagger"), []byte("module example.test/gin-scale"), 1)
 		}
 		if err := os.WriteFile(filepath.Join(dir, name), raw, 0600); err != nil {
 			b.Fatal(err)

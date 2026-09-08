@@ -1,5 +1,5 @@
 {
-  "name": "@openapi-golang/gin-swagger-development",
+  "name": "@go-devtools/gin-swagger-development",
   "private": true,
   "version": "0.0.0",
   "license": "MIT",
