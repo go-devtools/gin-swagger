@@ -57,7 +57,12 @@ func bindingResults(c core.CallContext, effects []core.Effect, mandatory bool) (
 			return []core.CallOutcome{{Results: []core.Value{{Unknown: true}}, Effects: effects}}, nil
 		}
 	}
-	outcomes := []core.CallOutcome{{Results: []core.Value{{Nil: true}}, Effects: effects}}
+	success := append([]core.Effect(nil), effects...)
+	for i := range success {
+		// JSON decoding and multipart framing cannot succeed on an empty stream. Form/query fields alone prove no body presence.
+		success[i].NonEmptyBody = success[i].Kind == core.RequestBody && (success[i].MediaType == "application/json" || success[i].MediaType == "multipart/form-data")
+	}
+	outcomes := []core.CallOutcome{{Results: []core.Value{{Nil: true}}, Effects: success}}
 	if !mandatory {
 		return append(outcomes, core.CallOutcome{Results: []core.Value{{NonNil: true}}, Effects: effects}), nil
 	}

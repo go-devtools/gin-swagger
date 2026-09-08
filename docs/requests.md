@@ -25,7 +25,11 @@ Multipart FileHeader values describe raw uploaded content with contentMediaType 
 
 Declared required/minLength/enum constraints define the client contract; they do not prove that Gin or business code enforces those declarations. Tests distinguish real binder rejection from independent contract validation. The example invalid numeric, array-length, header, URI, form, and malformed JSON requests keep their actual 400 response branches after mounting documentation.
 
-The compiler does not yet infer body-level required from all binder error and continuation paths. Field-level required remains separate. Raw form/file getters are covered below; the complete decoder/tag matrix still requires additional implementation. Automatic selection and binding.Form now use the finite conditions described below.
+JSON and multipart binding success now provide a neutral nonempty-body proof; a successful `FormFile` read does the same. The core follows the nil/non-nil result and final HTTP status through business branches. When every known accepted 2xx/3xx path requires the body, `requestBody.required` becomes true. Checked JSON errors followed by 400 and return therefore require input; ignoring an error, overriding a pending error with 200, or returning 204 on the error path leaves the body optional. Mandatory binding retains its committed 400/413 even when the handler renders afterward.
+
+URL-encoded binding can succeed on an empty stream, so property-level required comments do not make the body required. Automatic binding keeps these proofs within each method/media condition. Combining media with different presence requirements produces the existing condition-ambiguity diagnostic rather than weakening one branch. Custom middleware that supplies cached bytes or replaces the request stream, custom decoder acceptance, validator-specific error policy, and business success semantics outside modeled 2xx/3xx outcomes need a centralized rule or explicit client declaration. `Explain` includes outcome-specific `nonEmptyBody` evidence and the binding source.
+
+The body-presence integration fixture sends 32 real empty/nonempty requests across checked, ignored, cached, explicit, mandatory, helper, automatic, form, multipart, and upload cases. It validates response status/body contracts independently and checks that generation leaves the source unchanged.
 
 ## Centralized custom decoding
 
@@ -98,7 +102,7 @@ FormFile describes generic raw upload content rather than FileHeader metadata or
 
 Ten real form cases cover five HTTP methods and two media types, including empty strings, defaults, repeated values, and query isolation. Further tests cover repeated/missing query values, both dictionary encodings, binary uploads and missing files, and saving bytes before and after documentation mounting. Saving failures use an occupied regular-file parent, since Gin intentionally creates missing parent directories. Tests verify that compilation and mounting do not write uploaded files. Independent validators check decoded inputs and actual responses; wire behavior is checked through real HTTP requests.
 
-Core composition preserves multiple fields and whole-body constraints, while field required stays separate from body required. Full inference of empty-body rejection from arbitrary error paths, arbitrary MultipartForm map access, all file I/O helpers, all decoder/tag variants, and complete browser Try it out coverage remain work in progress. Read the [OpenAPI 3.2 encoding rules](https://spec.openapis.org/oas/v3.2.0.html#encoding-object) when adding custom serialization.
+Core composition preserves multiple fields and whole-body constraints, while field required stays separate from body required. Arbitrary error policies, MultipartForm map access, file I/O helpers, decoder/tag variants, and browser submission need their own verified rules; the listed body-presence cases do not imply unrestricted inference. Read the [OpenAPI 3.2 encoding rules](https://spec.openapis.org/oas/v3.2.0.html#encoding-object) when adding custom serialization.
 
 ## Explicit request and response types
 
@@ -131,3 +135,11 @@ The external consumer fixture in `internal/verify/testdata/external/testdata/con
 A malformed annotation on an unused dependency type does not poison valid routes. Selecting its handler exposes a structured source diagnostic with the logical import-path filename, owning type/field symbol, actual route, calling facts, and a repair hint. The same Bundle reports each selected route independently, and failed Mount calls leave the engine's routes unchanged.
 
 Declared constraints describe the client contract. They do not install runtime validation: the fixture explicitly verifies that its unchanged handler can still accept input outside those declarations. Successful wire samples are checked independently, alongside negative instances rejected by the generated contract. Generation checks preserve every fixture source file, including nested imported DTOs.
+
+## Raw strings, numeric parsing, and byte length
+
+A raw `Query` read remains a string parameter even when business code passes it to `strconv.Atoi` or `strconv.ParseInt`. Using the result does not prove that invalid syntax or overflow is rejected. Ordinary error checks and returns contribute the actual error-response branch; ignoring the error does not invent a 400 response. A verified centralized input rule can separately declare the accepted textual grammar. This frontend does not infer a numeric parameter schema merely from the later use of a parsed value.
+
+The actual HTTP fixture compares checked and ignored conversions with empty input, invalid characters, whitespace, signs, leading zeros, native-width overflow, and signed sixteen-bit saturation. Ignored syntax errors can produce zero; ignored range errors can produce a saturated value and still return 200. Independent validation checks raw string input and the emitted integer response. Mounting documentation preserves status, headers, and body bytes for all 35 input cases on equivalent engines.
+
+`len(string)` counts UTF-8 bytes, whereas JSON Schema `minLength` counts Unicode code points. A three-byte check accepts the single character `中`, rejects the two-byte character `é`, and accepts a four-byte emoji. These real requests verify that the frontend does not invent a character-count constraint from the byte-length condition.

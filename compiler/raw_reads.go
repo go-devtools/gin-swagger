@@ -92,7 +92,9 @@ func rawReadOutcomes(c core.CallContext) ([]core.CallOutcome, error) {
 		effect.WireSchema = &spec.Schema{SchemaObject: &spec.SchemaObject{ContentMediaType: "application/octet-stream"}}
 		effect.Encoding = &spec.Encoding{ContentType: "application/octet-stream"}
 		// File reads do not commit HTTP errors; nil and non-nil results only control subsequent business branches.
-		return []core.CallOutcome{{Results: []core.Value{{NonNil: true}, {Nil: true}}, Effects: []core.Effect{effect}}, {Results: []core.Value{{Nil: true}, {NonNil: true}}, Effects: []core.Effect{effect}}}, nil
+		success := effect
+		success.NonEmptyBody = true
+		return []core.CallOutcome{{Results: []core.Value{{NonNil: true}, {Nil: true}}, Effects: []core.Effect{success}}, {Results: []core.Value{{Nil: true}, {NonNil: true}}, Effects: []core.Effect{effect}}}, nil
 	}
 	encoded := effect
 	encoded.MediaType = "application/x-www-form-urlencoded"

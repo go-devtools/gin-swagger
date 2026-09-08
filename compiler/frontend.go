@@ -15,7 +15,7 @@ const ginPackage = "github.com/gin-gonic/gin"
 
 // Provide the same frontend to the CLI and custom generation entry points.
 func Frontend() core.Frontend {
-	return core.Frontend{Name: "gin-v1.12-front-v9", Match: func(f core.Function) bool {
+	return core.Frontend{Name: "gin-v1.12-front-v10", Match: func(f core.Function) bool {
 		return f.Signature.Params().Len() == 1 && isContext(f.Signature.Params().At(0).Type())
 	}, Entry: func(f core.Function) []core.Effect {
 		source := f.Source
@@ -122,8 +122,10 @@ func analyzeCall(c core.CallContext) ([]core.Effect, error) {
 		return explicitRenderer(c, normalizedGinStatus(integer(arg(0))), arg(1)), nil
 	case "SSEvent":
 		return sseResponse(c, "-1", arg(0), core.Value{Type: types.Typ[types.String], Constant: constant.MakeString("")}, core.Value{Type: types.Typ[types.Uint], Constant: constant.MakeInt64(0)}, arg(1)), nil
-	case "File", "FileAttachment", "FileFromFS", "Stream":
-		return unresolved(c, fmt.Sprintf("%s requires a media type or stream output projection", name)), nil
+	case "File", "FileAttachment", "FileFromFS":
+		return unresolved(c, fmt.Sprintf("%s requires a complete centralized file contract for media detection, conditional and range responses, and filesystem errors", name)), nil
+	case "Stream":
+		return unresolved(c, "Stream requires an explicit stream output projection"), nil
 	case "Next":
 		return unresolved(c, "route snapshot only exposes the final handler; middleware chains require a centralized declaration"), nil
 	case "Header":
