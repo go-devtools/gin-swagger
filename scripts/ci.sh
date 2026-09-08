@@ -46,7 +46,7 @@ race_tests() {
     [[ "$ci_package" == "$ci_module/internal/integration" ]] || ci_packages+=("$ci_package")
   done <<< "$ci_list"
   [[ "${#ci_packages[@]}" -gt 0 ]] || { echo 'ci.test.missing: no race packages discovered'; exit 2; }
-  go test -race -count=1 -json "${ci_packages[@]}" | tee "$ci_artifacts/race.json"
+  go test -race -p 1 -count=1 -json "${ci_packages[@]}" | tee "$ci_artifacts/race.json"
   ci_names="$(go test ./internal/integration -list '.')"
   : > "$ci_artifacts/race-integration-selection.txt"
   while IFS= read -r ci_name; do
@@ -83,7 +83,8 @@ case "${1:-test}" in
       go run ./cmd/gin-swagger generate --dir ./examples/basic --output ./internal/apidoc
       go run ./cmd/gin-swagger check --dir ./examples/basic --output ./internal/apidoc
     fi
-    go test -count=1 -json ./... | tee "$ci_artifacts/tests.json"
+    # Run source-analysis packages sequentially so nested consumer builds do not compete for runner memory.
+    go test -p 1 -count=1 -json ./... | tee "$ci_artifacts/tests.json"
     race_tests
     go vet ./... 2>&1 | tee "$ci_artifacts/vet.txt"
     go build ./...
